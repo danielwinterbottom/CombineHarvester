@@ -19,7 +19,7 @@
 #include "CombineHarvester/CombineTools/interface/Algorithm.h"
 #include "CombineHarvester/CombineTools/interface/AutoRebin.h"
 #include "CombineHarvester/CombinePdfs/interface/MorphFunctions.h"
-#include "CombineHarvester/HIG16037/interface/HttSystematics_MSSMRun2.h"
+#include "CombineHarvester/IsoCats/interface/HttSystematics_MSSMRun2.h"
 #include "RooWorkspace.h"
 #include "RooRealVar.h"
 #include "TH2.h"
@@ -105,13 +105,13 @@ int main(int argc, char** argv) {
   typedef vector<string> VString;
   typedef vector<pair<int, string>> Categories;
   std::map<string, string> input_dir;
-  input_dir["em"]  = string(getenv("CMSSW_BASE")) + "/src/CombineHarvester/HIG16037/shapes/"+input_folder_em+"/";
-  input_dir["mt"]  = string(getenv("CMSSW_BASE")) + "/src/CombineHarvester/HIG16037/shapes/"+input_folder_mt+"/";
-  input_dir["et"]  = string(getenv("CMSSW_BASE")) + "/src/CombineHarvester/HIG16037/shapes/"+input_folder_et+"/";
-  input_dir["tt"]  = string(getenv("CMSSW_BASE")) + "/src/CombineHarvester/HIG16037/shapes/"+input_folder_tt+"/";
-  input_dir["zmm"]  = string(getenv("CMSSW_BASE")) + "/src/CombineHarvester/HIG16037/shapes/"+input_folder_zmm+"/";
+  input_dir["em"]  = string(getenv("CMSSW_BASE")) + "/src/CombineHarvester/IsoCats/shapes/"+input_folder_em+"/";
+  input_dir["mt"]  = string(getenv("CMSSW_BASE")) + "/src/CombineHarvester/IsoCats/shapes/"+input_folder_mt+"/";
+  input_dir["et"]  = string(getenv("CMSSW_BASE")) + "/src/CombineHarvester/IsoCats/shapes/"+input_folder_et+"/";
+  input_dir["tt"]  = string(getenv("CMSSW_BASE")) + "/src/CombineHarvester/IsoCats/shapes/"+input_folder_tt+"/";
+  input_dir["zmm"]  = string(getenv("CMSSW_BASE")) + "/src/CombineHarvester/IsoCats/shapes/"+input_folder_zmm+"/";
 
-  VString chns = {"mt","et","tt","em"};
+  VString chns = {"mt","et"};
   if (zmm_fit) chns.push_back("zmm");
 
   RooRealVar mA(mass.c_str(), mass.c_str(), 90., 3200.);
@@ -137,8 +137,86 @@ int main(int argc, char** argv) {
   binning["mt_btag"] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
   binning["tt_nobtag"] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,900,3900};
   binning["tt_btag"] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,500,3900};
-  binning["em_nobtag"] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,900,1300,1700,3900};
-  binning["em_btag"] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,700,900,3900};
+  binning["et_nobtag_loose_1"]  = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtag_tight_1"]  = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtag_loose_2"]  = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtag_tight_2"]  = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtag_loose_3"]  = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtag_tight_3"]  = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtag_loose_4"]  = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtag_tight_4"]  = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtag_loose_5"]  = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtag_tight_5"]  = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtag_loose_6"]  = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtag_tight_6"]  = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_btag_loose_1"  ]  = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btag_tight_1"  ]  = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btag_loose_2"  ]  = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btag_tight_2"  ]  = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btag_loose_3"  ]  = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btag_tight_3"  ]  = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btag_loose_4"  ]  = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btag_tight_4"  ]  = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btag_loose_4"  ]  = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btag_tight_4"  ]  = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btag_loose_5"  ]  = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btag_tight_5"  ]  = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btag_loose_6"  ]  = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btag_tight_6"  ]  = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_nobtagloosemt30" ] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtagmediummt30"] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtagtightmt30" ] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtagloosemt40" ] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtagmediummt40"] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtagtightmt40" ] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtagloosemt50" ] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtagmediummt50"] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtagtightmt50" ] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtagloosemt70" ] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtagmediummt70"] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtagtightmt70" ] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtagloosemt30" ] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_nobtagmediummt30"] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["et_btagtightmt30"   ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btagloosemt30"   ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btagmediummt30"  ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btagtightmt40"   ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btagloosemt40"   ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btagmediummt40"  ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btagtightmt50"   ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btagloosemt50"   ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btagmediummt50"  ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btagtightmt70"   ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btagloosemt70"   ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btagmediummt70"  ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["mt_nobtagloosemt30" ] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["mt_nobtagmediummt30"] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["mt_nobtagtightmt30" ] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["mt_nobtagloosemt40" ] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["mt_nobtagmediummt40"] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["mt_nobtagtightmt40" ] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["mt_nobtagloosemt50" ] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["mt_nobtagmediummt50"] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["mt_nobtagtightmt50" ] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["mt_nobtagloosemt70" ] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["mt_nobtagmediummt70"] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["mt_nobtagtightmt70" ] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["mt_nobtagloosemt30" ] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["mt_nobtagmediummt30"] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900};
+  binning["mt_btagtightmt30"   ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["mt_btagloosemt30"   ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["mt_btagmediummt30"  ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["mt_btagtightmt40"   ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["mt_btagloosemt40"   ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["mt_btagmediummt40"  ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["mt_btagtightmt50"   ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["mt_btagloosemt50"   ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["mt_btagmediummt50"  ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["mt_btagtightmt70"   ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["mt_btagloosemt70"   ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["mt_btagmediummt70"  ] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+
+
 /*  binning["zmm_nobtag"] = {60,70,80,90,100,110,120};
   binning["zmm_btag"] = {60,70,80,90,100,110,120};*/
 
@@ -153,14 +231,26 @@ int main(int argc, char** argv) {
   //
   map<string,Categories> cats;
   cats["et_13TeV"] = {
-    {8, "et_nobtag"},
-    {9, "et_btag"}
+
+    {8, "et_nobtag_loose_5"},
+    {9, "et_nobtag_tight_5"},
+    {10,"et_btag_loose_5"},
+    {11,"et_btag_tight_5"},
+    {12,"et_nobtag_loose_6"},
+    {13,"et_nobtag_tight_6"},
+    {14,"et_btag_loose_6"},
+    {15,"et_btag_tight_6"},
+    {16,"et_nobtagtightmt50"},
+    {17,"et_btagtightmt50"},
+    {18,"et_nobtagmediummt50"},
+    {19,"et_btagmediummt50"}
+    
     };
 
-  cats["em_13TeV"] = {
-    {8, "em_nobtag"},
-    {9, "em_btag"}
-    };
+  //cats["em_13TeV"] = {
+  //  {8, "em_nobtag"},
+  //  {9, "em_btag"}
+  //  };
 
   cats["tt_13TeV"] = {
     {8, "tt_nobtag"},
@@ -168,8 +258,18 @@ int main(int argc, char** argv) {
     };
 
   cats["mt_13TeV"] = {
-    {8, "mt_nobtag"},
-    {9, "mt_btag"}
+    {8, "mt_nobtag_loose_5"},
+    {9, "mt_nobtag_tight_5"},
+    {10,"mt_btag_loose_5"},
+    {11,"mt_btag_tight_5"},
+    {12,"mt_nobtag_loose_6"},
+    {13,"mt_nobtag_tight_6"},
+    {14,"mt_btag_loose_6"},
+    {15,"mt_btag_tight_6"},
+    {16,"mt_nobtagtightmt50"},
+    {17,"mt_btagtightmt50"},
+    {18,"mt_nobtagmediummt50"},
+    {19,"mt_btagmediummt50"}
     };
 
   cats["zmm_13TeV"] = {
@@ -598,13 +698,34 @@ int main(int argc, char** argv) {
     // per-channel
     writer.WriteCards(chn, cb.cp().channel({chn, "zmm"}));
     // And per-channel-category
-    writer.WriteCards("htt_"+chn+"_8_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({8, 10, 11, 12}));
-    writer.WriteCards("htt_"+chn+"_9_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({9, 13, 14, 15}));
+    writer.WriteCards("htt_"+chn+"_8_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({8}));
+    writer.WriteCards("htt_"+chn+"_9_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({9}));
+    writer.WriteCards("htt_"+chn+"_10_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({10}));
+    writer.WriteCards("htt_"+chn+"_11_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({11}));
+    writer.WriteCards("htt_"+chn+"_12_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({12}));
+    writer.WriteCards("htt_"+chn+"_13_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({13}));
+    writer.WriteCards("htt_"+chn+"_14_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({14}));
+    writer.WriteCards("htt_"+chn+"_15_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({15}));
+    writer.WriteCards("htt_"+chn+"_16_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({16}));
+    writer.WriteCards("htt_"+chn+"_17_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({17}));
+    writer.WriteCards("htt_"+chn+"_18_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({18}));
+    writer.WriteCards("htt_"+chn+"_19_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({19}));
+    writer.WriteCards("htt_"+chn+"_isocats5_nobtag_ltcomb_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({8,9}));
+    writer.WriteCards("htt_"+chn+"_isocats5_btag_ltcomb_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({10,11}));
+    writer.WriteCards("htt_"+chn+"_isocats5_ltcomb_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({8,9,10,11}));
+    writer.WriteCards("htt_"+chn+"_isocats6_nobtag_ltcomb_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({12,13}));
+    writer.WriteCards("htt_"+chn+"_isocats6_btag_ltcomb_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({14,15}));
+    writer.WriteCards("htt_"+chn+"_isocats6_ltcomb_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({12,13,14,15}));
+    writer.WriteCards("htt_"+chn+"_tightmt50_comb_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({16,17}));
+    writer.WriteCards("htt_"+chn+"_mediummt50_comb_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({18,19}));
+    
   }
   // For btag/nobtag areas want to include control regions. This will
   // work even if the extra categories aren't there.
-  writer.WriteCards("htt_cmb_8_13TeV", cb.cp().bin_id({8, 10, 11, 12}));
-  writer.WriteCards("htt_cmb_9_13TeV", cb.cp().bin_id({9, 13, 14, 15}));
+  //writer.WriteCards("htt_cmb_8_13TeV", cb.cp().bin_id({8}));
+  //writer.WriteCards("htt_cmb_9_13TeV", cb.cp().bin_id({9}));
+  //writer.WriteCards("htt_cmb_10_13TeV", cb.cp().bin_id({10}));
+  //writer.WriteCards("htt_cmb_11_13TeV", cb.cp().bin_id({11}));
 
   cb.PrintAll();
   cout << " done\n";
