@@ -235,46 +235,51 @@ int main(int argc, char** argv) {
     //category numbers will start from 16 to mke absolutly sure that they are different to previous categories. nobtag categories will have even number 16,18, 20 ... and btag categories will have od numbers 17,19,21...
     
       
-    {16, "et_nobtagvloosemt30"},
-    {18, "et_nobtagvloosemt30"},
-    {20, "et_nobtagloosemt30"}, 
-    {22, "et_nobtagmediummt30"},
-    {24, "et_nobtagtightmt30"}, 
-    {26, "et_nobtagvloosemt40"},
-    {28, "et_nobtagloosemt40"}, 
-    {30, "et_nobtagmediummt40"},
-    {32, "et_nobtagtightmt40"}, 
-    {34, "et_nobtagvloosemt50"},
-    {36, "et_nobtagloosemt50"}, 
-    {38, "et_nobtagmediummt50"},
-    {40, "et_nobtagtightmt50"}, 
-    {42, "et_nobtagvloosemt70"},
-    {44, "et_nobtagloosemt70"}, 
-    {46, "et_nobtagmediummt70"},
-    {48, "et_nobtagtightmt70"},
-    
-    {17, "et_nobtagvloosemt30"},
-    {19, "et_nobtagvloosemt30"},
-    {21, "et_nobtagloosemt30"}, 
-    {23, "et_nobtagmediummt30"},
-    {25, "et_nobtagtightmt30"}, 
-    {27, "et_nobtagvloosemt40"},
-    {29, "et_nobtagloosemt40"}, 
-    {31, "et_nobtagmediummt40"},
-    {33, "et_nobtagtightmt40"}, 
-    {35, "et_nobtagvloosemt50"},
-    {37, "et_nobtagloosemt50"}, 
-    {39, "et_nobtagmediummt50"},
-    {41, "et_nobtagtightmt50"}, 
-    {43, "et_nobtagvloosemt70"},
-    {45, "et_nobtagloosemt70"}, 
-    {47, "et_nobtagmediummt70"},
-    {49, "et_nobtagtightmt70"},   
+    //{16, "et_nobtagvloosemt30"},
+    //{18, "et_nobtagvloosemt30"},
+    //{20, "et_nobtagloosemt30"}, 
+    //{22, "et_nobtagmediummt30"},
+    //{24, "et_nobtagtightmt30"}, 
+    //{26, "et_nobtagvloosemt40"},
+    //{28, "et_nobtagloosemt40"}, 
+    //{30, "et_nobtagmediummt40"},
+    //{32, "et_nobtagtightmt40"}, 
+    //{34, "et_nobtagvloosemt50"},
+    //{36, "et_nobtagloosemt50"}, 
+    //{38, "et_nobtagmediummt50"},
+    //{40, "et_nobtagtightmt50"}, 
+    //{42, "et_nobtagvloosemt70"},
+    //{44, "et_nobtagloosemt70"}, 
+    //{46, "et_nobtagmediummt70"},
+    //{48, "et_nobtagtightmt70"},
+    //
+    //{17, "et_btagvloosemt30"},
+    //{19, "et_btagvloosemt30"},
+    //{21, "et_btagloosemt30"}, 
+    //{23, "et_btagmediummt30"},
+    //{25, "et_btagtightmt30"}, 
+    //{27, "et_btagvloosemt40"},
+    //{29, "et_btagloosemt40"}, 
+    //{31, "et_btagmediummt40"},
+    //{33, "et_btagtightmt40"}, 
+    //{35, "et_btagvloosemt50"},
+    //{37, "et_btagloosemt50"}, 
+    //{39, "et_btagmediummt50"}
+    //{41, "et_btagtightmt50"},
+    //{43, "et_btagvloosemt70"},
+    //{45, "et_btagloosemt70"}, 
+    //{47, "et_btagmediummt70"},
+    //{49, "et_btagtightmt70"}   
 
     {50, "et_nobtag_loose_5"},
     {52, "et_nobtag_tight_5"},
     {51, "et_btag_loose_5"},
-    {53, "et_btag_tight_5"}
+    {53, "et_btag_tight_5"},
+    
+    {54, "et_nobtag_loose_6"},
+    {56, "et_nobtag_loose_7"},
+    {55, "et_btag_loose_6"},
+    {57, "et_btag_loose_7"}
     
     };
 
@@ -284,59 +289,64 @@ int main(int argc, char** argv) {
   //  };
 
   cats["tt_13TeV"] = {
-    {8, "tt_nobtag"},
-    {9, "tt_btag"}
+    //{8, "tt_nobtag"},
+    //{9, "tt_btag"}
     };
 
   cats["mt_13TeV"] = {
     
     //category numbers will start from 16 to mke absolutly sure that they are different to previous categories. nobtag categories will have even number 16,18, 20 ... and btag categories will have od numbers 17,19,21...  
       
-    {16, "mt_nobtagvloosemt30"},
-    {18, "mt_nobtagvloosemt30"},
-    {20, "mt_nobtagloosemt30"}, 
-    {22, "mt_nobtagmediummt30"},
-    {24, "mt_nobtagtightmt30"}, 
-    {26, "mt_nobtagvloosemt40"},
-    {28, "mt_nobtagloosemt40"}, 
-    {30, "mt_nobtagmediummt40"},
-    {32, "mt_nobtagtightmt40"}, 
-    {34, "mt_nobtagvloosemt50"},
-    {36, "mt_nobtagloosemt50"}, 
-    {38, "mt_nobtagmediummt50"},
-    {40, "mt_nobtagtightmt50"}, 
-    {42, "mt_nobtagvloosemt70"},
-    {44, "mt_nobtagloosemt70"}, 
-    {46, "mt_nobtagmediummt70"},
-    {48, "mt_nobtagtightmt70"},
-    
-    {17, "mt_nobtagvloosemt30"},
-    {19, "mt_nobtagvloosemt30"},
-    {21, "mt_nobtagloosemt30"}, 
-    {23, "mt_nobtagmediummt30"},
-    {25, "mt_nobtagtightmt30"}, 
-    {27, "mt_nobtagvloosemt40"},
-    {29, "mt_nobtagloosemt40"}, 
-    {31, "mt_nobtagmediummt40"},
-    {33, "mt_nobtagtightmt40"}, 
-    {35, "mt_nobtagvloosemt50"},
-    {37, "mt_nobtagloosemt50"}, 
-    {39, "mt_nobtagmediummt50"},
-    {41, "mt_nobtagtightmt50"}, 
-    {43, "mt_nobtagvloosemt70"},
-    {45, "mt_nobtagloosemt70"}, 
-    {47, "mt_nobtagmediummt70"},
-    {49, "mt_nobtagtightmt70"},   
-
+    //{16, "mt_nobtagvloosemt30"},
+    //{18, "mt_nobtagvloosemt30"},
+    //{20, "mt_nobtagloosemt30"}, 
+    //{22, "mt_nobtagmediummt30"},
+    //{24, "mt_nobtagtightmt30"}, 
+    //{26, "mt_nobtagvloosemt40"},
+    //{28, "mt_nobtagloosemt40"}, 
+    //{30, "mt_nobtagmediummt40"},
+    //{32, "mt_nobtagtightmt40"}, 
+    //{34, "mt_nobtagvloosemt50"},
+    //{36, "mt_nobtagloosemt50"}, 
+    //{38, "mt_nobtagmediummt50"},
+    //{40, "mt_nobtagtightmt50"}, 
+    //{42, "mt_nobtagvloosemt70"},
+    //{44, "mt_nobtagloosemt70"}, 
+    //{46, "mt_nobtagmediummt70"},
+    //{48, "mt_nobtagtightmt70"},
+    //
+    //{17, "mt_btagvloosemt30"},
+    //{19, "mt_btagvloosemt30"},
+    //{21, "mt_btagloosemt30"}, 
+    //{23, "mt_btagmediummt30"},
+    //{25, "mt_btagtightmt30"}, 
+    //{27, "mt_btagvloosemt40"},
+    //{29, "mt_btagloosemt40"}, 
+    //{31, "mt_btagmediummt40"}
+    //{33, "mt_btagtightmt40"}, 
+    //{35, "mt_btagvloosemt50"},
+    //{37, "mt_btagloosemt50"}, 
+    //{39, "mt_btagmediummt50"},
+    //{41, "mt_btagtightmt50"}, 
+    //{43, "mt_btagvloosemt70"},
+    //{45, "mt_btagloosemt70"}, 
+    //{47, "mt_btagmediummt70"},
+    //{49, "mt_btagtightmt70"}   
+    //
     {50, "mt_nobtag_loose_5"},
     {52, "mt_nobtag_tight_5"},
     {51, "mt_btag_loose_5"},
-    {53, "mt_btag_tight_5"}
+    {53, "mt_btag_tight_5"},
+    
+    {54, "mt_nobtag_loose_6"},
+    {56, "mt_nobtag_loose_7"},
+    {55, "mt_btag_loose_6"},
+    {57, "mt_btag_loose_7"}
     };
 
   cats["zmm_13TeV"] = {
-    {8, "zmm_nobtag"},
-    {9, "zmm_btag"}
+    //{8, "zmm_nobtag"},
+    //{9, "zmm_btag"}
     };
 
   if (control_region > 0){
@@ -751,65 +761,90 @@ int main(int argc, char** argv) {
   writer.SetWildcardMasses({});
   writer.SetVerbosity(1);
 
-  writer.WriteCards("cmb", cb);
+  //writer.WriteCards("cmb", cb);
   for (auto chn : chns) {
     if(chn == std::string("zmm"))
     {
         continue;
     }
     // per-channel
-    writer.WriteCards(chn, cb.cp().channel({chn, "zmm"}));
+    //writer.WriteCards(chn, cb.cp().channel({chn, "zmm"}));
     // And per-channel-category
-    writer.WriteCards("htt_"+chn+"_16_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({16}));
-    writer.WriteCards("htt_"+chn+"_17_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({17}));
-    writer.WriteCards("htt_"+chn+"_18_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({18}));
-    writer.WriteCards("htt_"+chn+"_19_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({19}));
-    writer.WriteCards("htt_"+chn+"_20_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({20}));
-    writer.WriteCards("htt_"+chn+"_21_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({21}));
-    writer.WriteCards("htt_"+chn+"_22_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({22}));
-    writer.WriteCards("htt_"+chn+"_23_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({23}));
-    writer.WriteCards("htt_"+chn+"_24_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({24}));
-    writer.WriteCards("htt_"+chn+"_25_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({25}));
-    writer.WriteCards("htt_"+chn+"_26_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({26}));
-    writer.WriteCards("htt_"+chn+"_27_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({27}));
-    writer.WriteCards("htt_"+chn+"_28_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({28}));
-    writer.WriteCards("htt_"+chn+"_29_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({29}));
-    writer.WriteCards("htt_"+chn+"_30_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({30}));
-    writer.WriteCards("htt_"+chn+"_31_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({31}));
-    writer.WriteCards("htt_"+chn+"_32_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({32}));
-    writer.WriteCards("htt_"+chn+"_33_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({33}));
-    writer.WriteCards("htt_"+chn+"_34_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({34}));
-    writer.WriteCards("htt_"+chn+"_35_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({35}));
-    writer.WriteCards("htt_"+chn+"_36_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({36}));
-    writer.WriteCards("htt_"+chn+"_37_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({37}));
-    writer.WriteCards("htt_"+chn+"_38_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({38}));
-    writer.WriteCards("htt_"+chn+"_39_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({39}));
-    writer.WriteCards("htt_"+chn+"_40_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({40}));
-    writer.WriteCards("htt_"+chn+"_41_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({41}));
-    writer.WriteCards("htt_"+chn+"_42_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({42}));
-    writer.WriteCards("htt_"+chn+"_43_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({43}));
-    writer.WriteCards("htt_"+chn+"_44_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({44}));
-    writer.WriteCards("htt_"+chn+"_45_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({45}));
-    writer.WriteCards("htt_"+chn+"_46_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({46}));
-    writer.WriteCards("htt_"+chn+"_47_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({47}));
-    writer.WriteCards("htt_"+chn+"_48_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({48}));
-    writer.WriteCards("htt_"+chn+"_49_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({49}));
+    //writer.WriteCards("htt_"+chn+"_16_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({16}));
+    //writer.WriteCards("htt_"+chn+"_17_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({17}));
+    ////writer.WriteCards("htt_"+chn+"_18_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({18}));
+    //writer.WriteCards("htt_"+chn+"_19_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({19}));
+    ////writer.WriteCards("htt_"+chn+"_20_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({20}));
+    //writer.WriteCards("htt_"+chn+"_21_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({21}));
+    ////writer.WriteCards("htt_"+chn+"_22_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({22}));
+    //writer.WriteCards("htt_"+chn+"_23_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({23}));
+    ////writer.WriteCards("htt_"+chn+"_24_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({24}));
+    //writer.WriteCards("htt_"+chn+"_25_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({25}));
+    ////writer.WriteCards("htt_"+chn+"_26_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({26}));
+    //writer.WriteCards("htt_"+chn+"_27_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({27}));
+    ////writer.WriteCards("htt_"+chn+"_28_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({28}));
+    //writer.WriteCards("htt_"+chn+"_29_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({29}));
+    ////writer.WriteCards("htt_"+chn+"_30_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({30}));
+    //writer.WriteCards("htt_"+chn+"_31_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({31}));
+    ////writer.WriteCards("htt_"+chn+"_32_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({32}));
+    //writer.WriteCards("htt_"+chn+"_33_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({33}));
+    ////writer.WriteCards("htt_"+chn+"_34_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({34}));
+    //writer.WriteCards("htt_"+chn+"_35_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({35}));
+    ////writer.WriteCards("htt_"+chn+"_36_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({36}));
+    //writer.WriteCards("htt_"+chn+"_37_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({37}));
+    ////writer.WriteCards("htt_"+chn+"_38_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({38}));
+    //writer.WriteCards("htt_"+chn+"_39_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({39}));
+    ////writer.WriteCards("htt_"+chn+"_40_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({40}));
+    //writer.WriteCards("htt_"+chn+"_41_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({41}));
+    ////writer.WriteCards("htt_"+chn+"_42_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({42}));
+    //writer.WriteCards("htt_"+chn+"_43_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({43}));
+    ////writer.WriteCards("htt_"+chn+"_44_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({44}));
+    //writer.WriteCards("htt_"+chn+"_45_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({45}));
+    ////writer.WriteCards("htt_"+chn+"_46_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({46}));
+    //writer.WriteCards("htt_"+chn+"_47_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({47}));
+    ////writer.WriteCards("htt_"+chn+"_48_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({48}));
+    //writer.WriteCards("htt_"+chn+"_49_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({49}));
+    
     writer.WriteCards("htt_"+chn+"_50_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({50}));
     writer.WriteCards("htt_"+chn+"_51_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({51}));
     writer.WriteCards("htt_"+chn+"_52_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({52}));
     writer.WriteCards("htt_"+chn+"_53_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({53}));
+    writer.WriteCards("htt_"+chn+"_54_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({54}));
+    writer.WriteCards("htt_"+chn+"_55_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({55}));
+    writer.WriteCards("htt_"+chn+"_56_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({56}));
+    writer.WriteCards("htt_"+chn+"_57_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({57}));
     
-    //50 - 53 are what we care about combining 
+    //
+    //these are the combinations for the 4 category splits 
     //combine nobtag categories
     writer.WriteCards(chn+"_comb_50_52", cb.cp().channel({chn,"zmm"}).bin_id({50,52}));
     // combine btag categories
     writer.WriteCards(chn+"_comb_51_53", cb.cp().channel({chn,"zmm"}).bin_id({51,53}));
     // combine all categories
     writer.WriteCards(chn+"_comb_50_51_52_53", cb.cp().channel({chn,"zmm"}).bin_id({50,51,52,53}));
-    //combine no-btag tight with b-tag tight categories
+    
+    //these combinations are for the comparrisons of the old categorisations
+    //combine no-btag tight with b-tag tight categories (for comparrisons)
     writer.WriteCards(chn+"_comb_52_53", cb.cp().channel({chn,"zmm"}).bin_id({52,53}));
     //combine equivalent tight50 categories for X-check
-    writer.WriteCards(chn+"_comb_40_41", cb.cp().channel({chn,"zmm"}).bin_id({40,41}));
+    //writer.WriteCards(chn+"_comb_40_41", cb.cp().channel({chn,"zmm"}).bin_id({40,41}));
+    
+    // these are the combinations for the 6 category splits
+    // combine all 3 nobtag-categories 
+    writer.WriteCards(chn+"_comb_52_54_56", cb.cp().channel({chn,"zmm"}).bin_id({52,54,56}));
+    // combine all 3 btag-categories 
+    writer.WriteCards(chn+"_comb_53_55_57", cb.cp().channel({chn,"zmm"}).bin_id({53,55,57}));
+    // combine all 6 categories
+    writer.WriteCards(chn+"_comb_52_53_54_55_56_57", cb.cp().channel({chn,"zmm"}).bin_id({52,53,54,55,56,57}));
+    
+    // need to add these also!
+    writer.WriteCards(chn+"_comb_52_53_56_57", cb.cp().channel({chn,"zmm"}).bin_id({52,53,56,57}));
+    writer.WriteCards(chn+"_comb_52_53_54_55", cb.cp().channel({chn,"zmm"}).bin_id({52,53,54,55}));
+    
+    //comparrisons to medium40 (mt) and medium50 (et)
+    //writer.WriteCards(chn+"_comb_30,31", cb.cp().channel({chn,"zmm"}).bin_id({30,31})); //(mt)
+    //writer.WriteCards(chn+"_comb_38_39", cb.cp().channel({chn,"zmm"}).bin_id({38,39})); //(et)
+    
     
     
   }
