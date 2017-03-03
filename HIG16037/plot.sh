@@ -28,7 +28,12 @@ for i in "${channels[@]}"; do for j in "${sigs[@]}"; do
  python scripts/MSSMlimitCompare.py --file=oldplotting_$sig"_cmb.json",newplotting_$sig"_cmb.json" --labels="old_plotting,new_plotting" --outname="old_vs_new_plotting_"$sig $process --log --relative --channel_label="e#tau,#mu#tau,#tau#tau combination"
  
  python scripts/MSSMlimitCompare.py --file=oldplotting_$sig"_"$channel$".json",newplotting_$sig"_"$channel$".json" --labels="old_plotting,new_plotting" --outname="old_vs_new_plotting_"$sig"_"$channel $process --log --relative $chan_label
+ 
+ python scripts/MSSMlimitCompare.py --file="newplotting_"$sig"_htt_"$channel"_8_13TeV.json","oldplotting_"$sig"_htt_"$channel"_8_13TeV.json" --labels="old_plotting,new_plotting" --outname="old_vs_new_plotting_8_"$sig"_"$channel $process --log --relative $chan_label
+ 
+ python scripts/MSSMlimitCompare.py --file="newplotting_"$sig"_htt_"$channel"_9_13TeV.json","oldplotting_"$sig"_htt_"$channel"_9_13TeV.json" --labels="old_plotting,new_plotting" --outname="old_vs_new_plotting_9_"$sig"_"$channel $process --log --relative $chan_label
 
+ #newplotting_bbH_htt_cmb_8_13TeV.json
    
   old_baseline_label="medium50"
   old_baseline_json="mssm_old_"$sig"_et_comb_38_39.json"
