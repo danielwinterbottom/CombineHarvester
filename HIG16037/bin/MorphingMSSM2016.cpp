@@ -66,9 +66,9 @@ int main(int argc, char** argv) {
   // TODO: option to pick up cards from different dirs depending on channel?
   // ^ Something like line 90?
   string input_folder_em="DESY/";
-  string input_folder_et="Imperial/OldPlotting/";
-  string input_folder_mt="Imperial/OldPlotting/";
-  string input_folder_tt="Imperial/OldPlotting/";
+  string input_folder_et="Imperial/NewPlotting/";
+  string input_folder_mt="Imperial/NewPlotting/";
+  string input_folder_tt="Imperial/NewPlotting/";
   string input_folder_zmm="KIT/";
   string postfix="";
   bool auto_rebin = false;
@@ -84,9 +84,9 @@ int main(int argc, char** argv) {
   config.add_options()
     ("mass,m", po::value<string>(&mass)->default_value(mass))
     ("input_folder_em", po::value<string>(&input_folder_em)->default_value("DESY"))
-    ("input_folder_et", po::value<string>(&input_folder_et)->default_value("Imperial/OldPlotting/"))
-    ("input_folder_mt", po::value<string>(&input_folder_mt)->default_value("Imperial/OldPlotting/"))
-    ("input_folder_tt", po::value<string>(&input_folder_tt)->default_value("Imperial/OldPlotting/"))
+    ("input_folder_et", po::value<string>(&input_folder_et)->default_value("Imperial/NewPlotting/"))
+    ("input_folder_mt", po::value<string>(&input_folder_mt)->default_value("Imperial/NewPlotting/"))
+    ("input_folder_tt", po::value<string>(&input_folder_tt)->default_value("Imperial/NewPlotting/"))
     ("input_folder_zmm", po::value<string>(&input_folder_zmm)->default_value("KIT"))
     ("postfix", po::value<string>(&postfix)->default_value(""))
     ("auto_rebin", po::value<bool>(&auto_rebin)->default_value(false))

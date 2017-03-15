@@ -1,4 +1,4 @@
-MorphingMSSM2016 --output_folder=$1 -m MH --postfix="-mttot" --control_region=0 --manual_rebin=true --real_data=true --zmm_fit=false
+MorphingMSSM2016 --output_folder=$1 -m MH --postfix="-mttot" --control_region=1 --manual_rebin=true --real_data=true --zmm_fit=false
 
 combineTool.py -M T2W -o "ws.root" -P HiggsAnalysis.CombinedLimit.PhysicsModel:multiSignalModel --PO '"map=^.*/ggH$:r_ggH[0,0,200]"' --PO '"map=^.*/bbH$:r_bbH[0,0,200]"' -i output/$1/*
 
@@ -11,3 +11,4 @@ if [ $3 == 1 ];then
     #--job-mode 'lxbatch' --task-name $1_bbH --sub-opts '-q 1nh' --merge=2
 fi
 
+#combineTool.py -m "250" -M Asymptotic --rAbsAcc 0 --rRelAcc 0.0005 --boundlist input/mssm_boundaries.json  --setPhysicsModelParameters r_ggH=0,r_bbH=0 --redefineSignalPOIs r_ggH -d output/mssm_test_old_code/htt_mt_8_13TeV/ws.root --there -n ".ggH"
