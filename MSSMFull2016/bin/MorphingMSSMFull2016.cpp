@@ -575,7 +575,7 @@ int main(int argc, char** argv) {
   writer.SetWildcardMasses({});
   writer.SetVerbosity(1);
 
-  writer.WriteCards("cmb", cb);
+  //writer.WriteCards("cmb", cb);
   for (auto chn : chns) {
     if(chn == std::string("zmm"))
     {
@@ -584,13 +584,13 @@ int main(int argc, char** argv) {
     // per-channel
     writer.WriteCards(chn, cb.cp().channel({chn, "zmm"}));
     // And per-channel-category
-    writer.WriteCards("htt_"+chn+"_8_13TeV", cb.cp().channel({chn,"zmm"}).attr({"tight","high"},"mtsel").attr({"nobtag"},"cat"));
-    writer.WriteCards("htt_"+chn+"_9_13TeV", cb.cp().channel({chn,"zmm"}).attr({"tight","high"},"mtsel").attr({"btag"},"cat"));
+    //writer.WriteCards("htt_"+chn+"_8_13TeV", cb.cp().channel({chn,"zmm"}).attr({"tight","high"},"mtsel").attr({"nobtag"},"cat"));
+    //writer.WriteCards("htt_"+chn+"_9_13TeV", cb.cp().channel({chn,"zmm"}).attr({"tight","high"},"mtsel").attr({"btag"},"cat"));
     //writer.WriteCards("htt_"+chn+"_8_9_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({8,9,14,15,16,17,18,19}));
-    if(chn != std::string("tt")){
-      writer.WriteCards("htt_"+chn+"_10_13TeV", cb.cp().channel({chn,"zmm"}).attr({"loose","high"},"mtsel").attr({"nobtag"},"cat"));
-      writer.WriteCards("htt_"+chn+"_11_13TeV", cb.cp().channel({chn,"zmm"}).attr({"loose","high"},"mtsel").attr({"btag"},"cat"));
-    }
+    //if(chn != std::string("tt")){
+    //  writer.WriteCards("htt_"+chn+"_10_13TeV", cb.cp().channel({chn,"zmm"}).attr({"loose","high"},"mtsel").attr({"nobtag"},"cat"));
+    //  writer.WriteCards("htt_"+chn+"_11_13TeV", cb.cp().channel({chn,"zmm"}).attr({"loose","high"},"mtsel").attr({"btag"},"cat"));
+    //}
     if(chn == std::string("em")){
         writer.WriteCards("htt_"+chn+"_12_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({12}));
         writer.WriteCards("htt_"+chn+"_13_13TeV", cb.cp().channel({chn,"zmm"}).bin_id({13}));
@@ -598,8 +598,8 @@ int main(int argc, char** argv) {
   }
   // For btag/nobtag areas want to include control regions. This will
   // work even if the extra categories aren't there.
-  writer.WriteCards("htt_cmb_btag_13TeV", cb.cp().attr({"btag"},"cat"));
-  writer.WriteCards("htt_cmb_nobtag_13TeV", cb.cp().attr({"nobtag"},"cat"));
+  //writer.WriteCards("htt_cmb_btag_13TeV", cb.cp().attr({"btag"},"cat"));
+  //writer.WriteCards("htt_cmb_nobtag_13TeV", cb.cp().attr({"nobtag"},"cat"));
 
   cb.PrintAll();
   cout << " done\n";
