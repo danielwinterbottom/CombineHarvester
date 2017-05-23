@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+    #!/usr/bin/env python
 
 import ROOT
 import json
@@ -176,8 +176,18 @@ class CollectLimits(CombineToolBase):
                     print "Expected bands will be taken from toys"
                     print mh
                     limits = sorted(js_out[mh]['toys']['obs'])
+                    #90,140,250,450,800,1600,2300,3200
                     #if mh == '160.0' or mh == '90.0' :
                     #    limits = [x for x in limits if x > 0.1]
+                    #if mh == '90.0' : limits = [x for x in limits if x > 5]
+                    #if mh == '140.0' : limits = [x for x in limits if x > 0.5]
+                    #if mh == '250.0' : limits = [x for x in limits if x > 0.1]
+                    #if mh == '450.0' : limits = [x for x in limits if x > 0.02]
+                    #if mh == '800.0' : limits = [x for x in limits if x > 0.005]
+                    #if mh == '1600.0' : limits = [x for x in limits if x > 0.001]
+                    #if mh == '2300.0' : limits = [x for x in limits if x > 0.001]
+                    #if mh == '3200.0' : limits = [x for x in limits if x > 0.001]
+                    #limits = [x for x in limits if x > 0.001]
                     quantiles = array('d', [0.025, 0.160, 0.5, 0.840, 0.975])
                     res = array('d', [0., 0., 0., 0., 0.])
                     empty = array('i', [0])
