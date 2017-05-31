@@ -151,7 +151,7 @@ int main(int argc, char** argv) {
   if (zmm_fit) chns.push_back("zmm");
   if (ttbar_fit) chns.push_back("ttbar");
 
-  RooRealVar mA(mass.c_str(), mass.c_str(), 90., 3200.);
+  RooRealVar mA(mass.c_str(), mass.c_str(), 130., 3200.);
   mA.setConstant(true);
   RooRealVar mH("mH", "mH", 90., 3200.);
   RooRealVar mh("mh", "mh", 90., 3200.);
@@ -594,7 +594,8 @@ int main(int argc, char** argv) {
   if(mass=="MH"){
     mass_var = {
       {"ggH", &mA},
-      {"bbH", &mA}
+      {"bbH", &mA},
+      {"bbH-NLO", &mA}
     };
   }
   if (do_morphing) {

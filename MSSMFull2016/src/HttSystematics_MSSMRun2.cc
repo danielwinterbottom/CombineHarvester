@@ -193,7 +193,7 @@ void AddMSSMRun2Systematics(CombineHarvester & cb, int control_region, bool zmm_
       ({"tt"}, {9}, {"1800"}, 0.98)
       ({"tt"}, {8}, {"3200"}, 1.03)
       ({"tt"}, {9}, {"3200"}, 1.02));
- 
+
   cb.cp().process({"bbH-NLO"}).AddSyst(cb, "Qsh_bbH","lnN", SystMap<channel,bin_id,mass>::init
       ({"et","mt","tt"}, {8,10}, {"130"}, 1.03)
       ({"et","mt","tt"}, {9,11}, {"130"}, 0.86)
