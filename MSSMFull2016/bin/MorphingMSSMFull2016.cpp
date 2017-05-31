@@ -97,6 +97,7 @@ int main(int argc, char** argv) {
   bool zmm_fit = true;
   bool ttbar_fit = true;
   bool do_jetfakes = false;
+  bool do_nlobbH = false;
   string chan;
   po::variables_map vm;
   po::options_description config("configuration");
@@ -117,6 +118,7 @@ int main(int argc, char** argv) {
     ("zmm_fit", po::value<bool>(&zmm_fit)->default_value(true))
     ("ttbar_fit", po::value<bool>(&ttbar_fit)->default_value(false))
     ("jetfakes", po::value<bool>(&do_jetfakes)->default_value(false))
+    ("nlobbH", po::value<bool>(&do_nlobbH)->default_value(false))
     ("channel", po::value<string>(&chan)->default_value("all"))
     ("check_neg_bins", po::value<bool>(&check_neg_bins)->default_value(false))
     ("poisson_bbb", po::value<bool>(&poisson_bbb)->default_value(false))
@@ -144,7 +146,7 @@ int main(int argc, char** argv) {
   if ( chan.find("et") != std::string::npos ) chns.push_back("et");
   if ( chan.find("em") != std::string::npos ) chns.push_back("em");
   if ( chan.find("tt") != std::string::npos ) chns.push_back("tt");
-  if ( chan=="all" ) chns = {"mt","et","tt","em"};
+  if ( chan=="all" ) chns = {"mt","et","tt"/*,"em"*/};
 
   if (zmm_fit) chns.push_back("zmm");
   if (ttbar_fit) chns.push_back("ttbar");
@@ -191,6 +193,18 @@ int main(int argc, char** argv) {
   binning["em_btag_highPzeta"] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,700,4000};
 /*  binning["zmm_nobtag"] = {60,70,80,90,100,110,120};
   binning["zmm_btag"] = {60,70,80,90,100,110,120};*/
+
+  // binning for NLO studies - take corsest binning of 3 options
+  binning["et_nobtag_tight"] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,900,3900};
+  binning["et_nobtag_loosemt"] = {0,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,350,400,700,900,3900};
+  binning["et_btag_loosemt"] = {0,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["et_btag_tight"] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["mt_nobtag_tight"] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,900,3900};
+  binning["mt_nobtag_loosemt"] = {0,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,1100,3900};
+  binning["mt_btag_tight"] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["mt_btag_loosemt"] = {0,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  binning["tt_nobtag"] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,900,1100,1500,3900};
+  binning["tt_btag"] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
 
   // Create an empty CombineHarvester instance that will hold all of the
   // datacard configuration and histograms etc.
@@ -266,17 +280,27 @@ int main(int argc, char** argv) {
       }
   }
 
-  vector<string> masses = {"90","100","110","120","130","140","160","180", "200", "250", "350", "400", "450", "500", "600", "700", "800", "900","1000","1200","1400","1600","1800","2000","2300","2600","2900","3200"};
+  vector<string> ggh_masses = {"90","100","110","120","130","140","160","180", "200", "250", "350", "400", "450", "500", "600", "700", "800", "900","1000","1200","1400","1600","1800","2000","2300","2600","2900","3200"};
+  vector<string> bbh_masses = {"90","100","110","120","130","140","160","180", "200", "250", "350", "400", "450", "500", "600", "700", "800", "900","1000","1200","1400","1600","1800","2000","2300","2600","2900","3200"};
+  if (do_nlobbH) bbh_masses = {/*"80",*/"130","200","350","700","1200","1800","3200"}; // leave bbH80 for now since stats are too low
 
   map<string, VString> signal_types = {
     {"ggH", {"ggh_htautau", "ggH_Htautau", "ggA_Atautau"}},
     {"bbH", {"bbh_htautau", "bbH_Htautau", "bbA_Atautau"}}
   };
   if(mass=="MH"){
-    signal_types = {
-      {"ggH", {"ggH"}},
-      {"bbH", {"bbH"}}
-    };
+    if (do_nlobbH){
+      signal_types = {
+        {"ggH", {"ggH"}},
+        {"bbH", {"bbH-NLO"}}
+      };    
+    }
+    else {  
+      signal_types = {
+        {"ggH", {"ggH"}},
+        {"bbH", {"bbH"}}
+      };
+    }
   }
     vector<string> sig_procs = {"ggH","bbH"};
   for(auto chn : chns){
@@ -284,8 +308,9 @@ int main(int argc, char** argv) {
 
     cb.AddProcesses({"*"}, {"htt"}, {"13TeV"}, {chn}, bkg_procs[chn], cats[chn+"_13TeV"], false);
 
-    cb.AddProcesses(masses, {"htt"}, {"13TeV"}, {chn}, signal_types["ggH"], cats[chn+"_13TeV"], true);
-    cb.AddProcesses(masses, {"htt"}, {"13TeV"}, {chn}, signal_types["bbH"], cats[chn+"_13TeV"], true);
+    cb.AddProcesses(ggh_masses, {"htt"}, {"13TeV"}, {chn}, signal_types["ggH"], cats[chn+"_13TeV"], true);
+    if (do_nlobbH) cb.AddProcesses(bbh_masses, {"htt"}, {"13TeV"}, {chn}, signal_types["bbH"], cats[chn+"_13TeV"], true);
+    else cb.AddProcesses(bbh_masses, {"htt"}, {"13TeV"}, {chn}, signal_types["bbH"], cats[chn+"_13TeV"], true);
     if(SM125==string("bkg_SM125") && chn!="zmm") cb.AddProcesses({"*"}, {"htt"}, {"13TeV"}, {chn}, SM_procs, cats[chn+"_13TeV"], false);
     if(SM125==string("signal_SM125") && chn!="zmm") cb.AddProcesses({"*"}, {"htt"}, {"13TeV"}, {chn}, SM_procs, cats[chn+"_13TeV"], true);
     }
@@ -317,10 +342,18 @@ int main(int argc, char** argv) {
         input_dir[chn] + "htt_"+chn_label+".inputs-mssm-13TeV"+postfix+".root",
         "$BIN/ggH$MASS",
         "$BIN/ggH$MASS_$SYSTEMATIC");
-    cb.cp().channel({chn}).process(signal_types["bbH"]).ExtractShapes(
-        input_dir[chn] + "htt_"+chn_label+".inputs-mssm-13TeV"+postfix+".root",
-        "$BIN/bbH$MASS",
-        "$BIN/bbH$MASS_$SYSTEMATIC");
+    if (do_nlobbH){
+      cb.cp().channel({chn}).process(signal_types["bbH"]).ExtractShapes(
+         input_dir[chn] + "htt_"+chn_label+".inputs-mssm-13TeV"+postfix+".root",
+         "$BIN/bbH-NLO$MASS",
+         "$BIN/bbH-NLO$MASS_$SYSTEMATIC");    
+    }
+    else{
+      cb.cp().channel({chn}).process(signal_types["bbH"]).ExtractShapes(
+          input_dir[chn] + "htt_"+chn_label+".inputs-mssm-13TeV"+postfix+".root",
+          "$BIN/bbH$MASS",
+          "$BIN/bbH$MASS_$SYSTEMATIC");
+    }
   }
 
 
