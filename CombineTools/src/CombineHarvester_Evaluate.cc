@@ -153,6 +153,25 @@ TH1F CombineHarvester::GetShapeWithUncertainty(RooFitResult const& fit,
     r_vec[n] = dynamic_cast<RooRealVar const*>(rands.at(n));
     p_vec[n] = GetParameter(r_vec[n]->GetName());
   }
+  
+  //bool delete_stat = false;
+  //for (int n = p_vec.size()-1; n >=0; --n) {
+  //  std::string name = r_vec[n]->GetName();
+  //  std::cout << name << std::endl;
+  //  if (name.find("_bin_") != std::string::npos && delete_stat){
+  //    std::cout << "Stat" << std::endl;
+  //    std::cout << "deleting..." << std::endl;
+  //    r_vec.erase(r_vec.begin()+n);
+  //    p_vec.erase(p_vec.begin()+n);
+  //  }
+  //  else if (name.find("_bin_") == std::string::npos && !delete_stat){ 
+  //    std::cout << "Systematic" << std::endl;
+  //    std::cout << "deleting..." << std::endl;
+  //    r_vec.erase(r_vec.begin()+n);
+  //    p_vec.erase(p_vec.begin()+n);
+  //  }
+  //  n_pars = r_vec.size();
+  //}
 
   // Main loop through n_samples
   for (unsigned i = 0; i < n_samples; ++i) {
