@@ -107,6 +107,19 @@ TH1F CombineHarvester::GetShapeWithUncertainty() {
     shape.SetBinError(i, 0.0);
   }
   for (auto param_it : params_) {
+    std::string name =  param_it.first; 
+    //bool delete_stat = true;
+    //std::cout << name << std::endl;
+    //if (name.find("_bin_") != std::string::npos && delete_stat){
+    //  std::cout << "(Pre-Fit) Stat" << std::endl;
+    //  std::cout << "deleting..." << std::endl;
+    //  continue;
+    //}
+    //if (name.find("_bin_") == std::string::npos && !delete_stat){ 
+    //  std::cout << "(Pre-Fit) Systematic" << std::endl;
+    //  std::cout << "deleting..." << std::endl;
+    //  continue;
+    //}
     double backup = param_it.second->val();
     param_it.second->set_val(backup+param_it.second->err_d());
     TH1F shape_d = this->GetShapeInternal(lookup, param_it.first);
@@ -154,18 +167,18 @@ TH1F CombineHarvester::GetShapeWithUncertainty(RooFitResult const& fit,
     p_vec[n] = GetParameter(r_vec[n]->GetName());
   }
   
-  //bool delete_stat = false;
+  //bool delete_stat = true;
   //for (int n = p_vec.size()-1; n >=0; --n) {
   //  std::string name = r_vec[n]->GetName();
   //  std::cout << name << std::endl;
   //  if (name.find("_bin_") != std::string::npos && delete_stat){
-  //    std::cout << "Stat" << std::endl;
+  //    std::cout << "(Post-Fit) Stat" << std::endl;
   //    std::cout << "deleting..." << std::endl;
   //    r_vec.erase(r_vec.begin()+n);
   //    p_vec.erase(p_vec.begin()+n);
   //  }
   //  else if (name.find("_bin_") == std::string::npos && !delete_stat){ 
-  //    std::cout << "Systematic" << std::endl;
+  //    std::cout << "(Post-Fit) Systematic" << std::endl;
   //    std::cout << "deleting..." << std::endl;
   //    r_vec.erase(r_vec.begin()+n);
   //    p_vec.erase(p_vec.begin()+n);
