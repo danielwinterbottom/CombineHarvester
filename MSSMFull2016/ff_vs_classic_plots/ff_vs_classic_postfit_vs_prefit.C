@@ -46,7 +46,7 @@ h8->SetStats(0);
 h5->GetXaxis()->SetTitle("M_{T}^{tot} (GeV)");
 h5->GetXaxis()->SetTitleSize(h5->GetXaxis()->GetTitleSize()*1.5);
 h5->GetXaxis()->SetLabelSize(h5->GetXaxis()->GetLabelSize()*1.3);
-h1->GetYaxis()->SetTitle("post-fit/pre-fit)");
+h1->GetYaxis()->SetTitle("post-fit/pre-fit");
 h1->GetYaxis()->SetTitleSize(h1->GetYaxis()->GetTitleSize()*1.8);
 h1->GetYaxis()->SetTitleOffset(0.8);
 h1->GetYaxis()->SetLabelSize(h1->GetYaxis()->GetLabelSize()*1.2);

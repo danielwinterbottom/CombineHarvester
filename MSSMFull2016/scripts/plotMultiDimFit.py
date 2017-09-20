@@ -1,4 +1,6 @@
 import CombineHarvester.CombineTools.plotting as plot 
+import sys
+sys.setrecursionlimit(10000)
 import ROOT
 import math
 import argparse

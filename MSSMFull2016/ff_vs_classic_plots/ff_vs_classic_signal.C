@@ -41,9 +41,9 @@ legend = new TLegend(0.15, 0.8, 0.7, 0.85);
 legend->SetNColumns(2);
 legend->SetBorderSize(0);
 legend->SetTextSize(0.02);
-legend->AddEntry(h1, "FF nominal", "l");
+legend->AddEntry(h1, "FF signal nominal", "l");
 legend->AddEntry(h1_leg, "FF total uncertainty", "f");
-legend->AddEntry(h2, "classic nominal", "l");
+legend->AddEntry(h2, "classic signal nominal", "l");
 legend->AddEntry(h2, "classic total uncertainty", "e");
 legend->Draw();
 

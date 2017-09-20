@@ -87,7 +87,7 @@ class CombineToolBase:
 
     def attach_job_args(self, group):
         group.add_argument('--job-mode', default=self.job_mode, choices=[
-                           'interactive', 'script', 'lxbatch', 'SGE', 'crab3'], help='Task execution mode')
+                           'interactive', 'script', 'lxbatch', 'SGE', 'crab3', 'ICP'], help='Task execution mode')
         group.add_argument('--prefix-file', default=self.prefix_file,
                            help='Path to file containing job prefix')
         group.add_argument('--task-name', default=self.task_name,
@@ -185,7 +185,7 @@ class CombineToolBase:
             result = pool.map(
                 partial(run_command, self.dry_run), self.job_queue)
         script_list = []
-        if self.job_mode in ['script', 'lxbatch', 'SGE']:
+        if self.job_mode in ['script', 'lxbatch', 'SGE', 'ICP']:
             if self.prefix_file != '':
                 if self.prefix_file.endswith('.txt'):
                   job_prefix_file = open(self.prefix_file,'r')
@@ -216,6 +216,21 @@ class CombineToolBase:
                 full_script = os.path.abspath(script)
                 logname = full_script.replace('.sh', '_%J.log')
                 run_command(self.dry_run, 'qsub -o %s %s %s' % (logname, self.bopts, full_script))
+        if self.job_mode == 'ICP':
+            para_script_name = 'para_job_%s.sh' % (self.task_name) 
+            para_script_string='#!/bin/sh\ncd %s\n./job_%s_$((SGE_TASK_ID-1)).sh &> job_%s_$((SGE_TASK_ID-1)).log' % (os.environ['PWD'],self.task_name,self.task_name) 
+            para_script = open(para_script_name, 'w')
+            para_script.write(para_script_string)
+            para_script.close()
+            os.system('chmod 755 %s' % (para_script_name))
+            import math
+            n_scripts= len(script_list)    
+            n_para_jobs=int(math.ceil(float(n_scripts)/2000.))
+            for i in range(1,n_para_jobs+1):
+              max_job_number = i*2000
+              if max_job_number > n_scripts: max_job_number = n_scripts
+              para_string = '-t %i-%i:1' % ((i-1)*2000+1,max_job_number)
+              run_command(self.dry_run, 'qsub -cwd %s %s %s' % (self.bopts, para_string, para_script_name))        
         if self.job_mode == 'crab3':
             #import the stuff we need
             from CRABAPI.RawCommand import crabCommand
