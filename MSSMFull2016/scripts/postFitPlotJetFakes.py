@@ -66,6 +66,7 @@ plot.ModTDRStyle(r=0.04, l=0.14)
 parser = argparse.ArgumentParser()
 #Ingredients when output of PostFitShapes is already provided
 parser.add_argument('--file', '-f',help='Input file if shape file has already been created')
+parser.add_argument('--fakes_file', help='If set then superimpose the FF prediction on top of the classic prediction')
 parser.add_argument('--mA',default='700',help='Signal m_A to plot for model dep')
 parser.add_argument('--tanb',default='30',help='Signal tanb to plot for model dep')
 parser.add_argument('--mPhi',default='700',help='Signal m_Phi to plot for model indep')
@@ -111,6 +112,7 @@ parser.add_argument('--sb_vs_b_ratio', action='store_true',help='Draw a Signal +
 parser.add_argument('--x_title', default='m_{T}^{tot} (GeV)',help='Title for the x-axis')
 parser.add_argument('--y_title', default='dN/dm_{T}^{tot} (1/GeV)',help='Title for the y-axis')
 parser.add_argument('--lumi', default='35.9 fb^{-1} (13 TeV)',help='Lumi label')
+parser.add_argument('--do_classic', default=False, action='store_true', help='Make plots using classic background schemes')
 
 
 args = parser.parse_args()
@@ -147,6 +149,7 @@ frac_ratios=args.bkg_frac_ratios
 split_y_scale=args.split_y_scale
 sb_vs_b_ratio = args.sb_vs_b_ratio
 uniform=args.uniform_binning
+do_classic = args.do_classic
 #If plotting bkg fractions don't want to use log scale on y axis
 if fractions:
   log_y = False
@@ -225,6 +228,8 @@ if not args.postfitshapes:
     shape_file_name=args.file
 
 histo_file = ROOT.TFile(shape_file)
+if args.fakes_file and do_classic: fakes_file = ROOT.TFile(args.fakes_file)
+else: fakes_file = None
 
 #Store plotting information for different backgrounds 
 background_schemes = {'mt':[backgroundComp("t#bar{t}",["TTT"],ROOT.TColor.GetColor(155,152,204)),backgroundComp("Electroweak",["VVT"],ROOT.TColor.GetColor(222,90,106)),backgroundComp("Z#rightarrow#mu#mu",["ZL"],ROOT.TColor.GetColor(100,192,232)),backgroundComp("jet#rightarrow#tau_{h} fakes",["jetFakes"],ROOT.TColor.GetColor(192,232,100)),backgroundComp("Z#rightarrow#tau#tau",["ZTT"],ROOT.TColor.GetColor(248,206,104))],
@@ -233,6 +238,10 @@ background_schemes = {'mt':[backgroundComp("t#bar{t}",["TTT"],ROOT.TColor.GetCol
 'em':[backgroundComp("t#bar{t}",["TT"],ROOT.TColor.GetColor(155,152,204)),backgroundComp("QCD", ["QCD"], ROOT.TColor.GetColor(250,202,255)),backgroundComp("Electroweak",["VV","W"],ROOT.TColor.GetColor(222,90,106)),backgroundComp("Z#rightarrowll",["ZLL"],ROOT.TColor.GetColor(100,192,232)),backgroundComp("Z#rightarrow#tau#tau",["ZTT"],ROOT.TColor.GetColor(248,206,104))],
 'ttbar':[backgroundComp("QCD", ["QCD"], ROOT.TColor.GetColor(250,202,255)),backgroundComp("Electroweak",["VV","W"],ROOT.TColor.GetColor(222,90,106)),backgroundComp("Z#rightarrowll",["ZLL"],ROOT.TColor.GetColor(100,192,232)),backgroundComp("Z#rightarrow#tau#tau",["ZTT"],ROOT.TColor.GetColor(248,206,104)),backgroundComp("t#bar{t}",["TT"],ROOT.TColor.GetColor(155,152,204))],
 'zmm':[backgroundComp("Misidentified #mu", ["QCD"], ROOT.TColor.GetColor(250,202,255)),backgroundComp("t#bar{t}",["TT"],ROOT.TColor.GetColor(155,152,204)),backgroundComp("Electroweak",["VV","W"],ROOT.TColor.GetColor(222,90,106)),backgroundComp("Z#rightarrow#tau#tau",["ZTT"],ROOT.TColor.GetColor(248,206,104)),backgroundComp("Z#rightarrow#mu#mu",["ZLL"],ROOT.TColor.GetColor(100,192,232))]}
+
+if do_classic:
+    background_schemes['mt'] = [backgroundComp("t#bar{t}",["TTT","TTJ"],ROOT.TColor.GetColor(155,152,204)),backgroundComp("QCD", ["QCD"], ROOT.TColor.GetColor(250,202,255)),backgroundComp("Electroweak",["VVT","VVJ","W"],ROOT.TColor.GetColor(222,90,106)),backgroundComp("Z#rightarrow#mu#mu",["ZL","ZJ"],ROOT.TColor.GetColor(100,192,232)),backgroundComp("Z#rightarrow#tau#tau",["ZTT"],ROOT.TColor.GetColor(248,206,104))]
+    background_schemes['et'] = [backgroundComp("t#bar{t}",["TTT","TTJ"],ROOT.TColor.GetColor(155,152,204)),backgroundComp("QCD", ["QCD"], ROOT.TColor.GetColor(250,202,255)),backgroundComp("Electroweak",["VVT","VVJ","W"],ROOT.TColor.GetColor(222,90,106)),backgroundComp("Z#rightarrowee",["ZL","ZJ"],ROOT.TColor.GetColor(100,192,232)),backgroundComp("Z#rightarrow#tau#tau",["ZTT"],ROOT.TColor.GetColor(248,206,104))]
 
 #Extract relevent histograms from shape file
 [sighist,binname] = getHistogram(histo_file,'TotalSig', file_dir, mode, args.no_signal, log_x)
@@ -534,6 +543,18 @@ if not custom_y_range:
   else: axish[0].SetMinimum(0)
 
 hist_indices = [0,2] if split_y_scale else [0]
+
+if fakes_file is not None: 
+  fakes_histo = getHistogram(fakes_file,"TotalBkg",file_dir, mode, logx=log_x)[0]
+  fakes_histo.SetMarkerStyle(22)
+  fakes_histo.SetLineStyle(1)
+  fakes_histo.SetLineWidth(1)
+  fakes_histo.SetFillStyle(0)
+  fakes_histo.SetMarkerColor(ROOT.kRed+1)
+  fakes_histo.SetLineColor(ROOT.kRed+1)
+  if not soverb_plot and not fractions and not uniform: fakes_histo.Scale(1.0,"width")
+else: fakes_histo = None
+
 for i in hist_indices:
     pads[i].cd()
     axish[i].Draw("AXIS")
@@ -571,6 +592,7 @@ for i in hist_indices:
           sighist_bbH.Draw("histsame")
     if not soverb_plot and not fractions: 
       blind_datahist.DrawCopy("e0x0same")
+      if do_classic and fakes_file: fakes_histo.DrawCopy("e2same")
     axish[i].Draw("axissame")
 
 pads[0].cd()
@@ -594,6 +616,8 @@ background_schemes[channel].reverse()
 for legi,hists in enumerate(bkg_histos):
   legend.AddEntry(hists,background_schemes[channel][legi]['leg_text'],"f")
 legend.AddEntry(bkghist,"Background uncertainty","f")
+fakes_leg_histo = fakes_histo.Clone()
+if fakes_file is not None: legend.AddEntry(fakes_leg_histo,"#splitline{Background model}{using fake factor method}","fp")
 if not fractions:
   if not args.no_signal:
     if model_dep is True: 
@@ -663,6 +687,10 @@ if args.ratio and not soverb_plot and not fractions:
       if sb_vs_b_ratio:
         rlegend.AddEntry(ratio_sbhist,"(Sig+Bkg)/Bkg","L")
       rlegend.Draw("same")
+    if fakes_file is not None: 
+      fakes_histo = plot.MakeRatioHist(fakes_histo,bkghist,True,False)
+      fakes_histo.DrawCopy("e2same")
+      rlegend.AddEntry(fakes_histo,"Fake factor/Bkg","fp")
   else:
     pads[1].cd()
     axish[1].Draw("axis")

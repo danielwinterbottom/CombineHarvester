@@ -182,7 +182,7 @@ int main(int argc, char** argv) {
     bkg_procs["et"] = {"W", "QCD", "ZL", "ZJ", "TTT","TTJ", "VVT","VVJ","ZTT"};
     bkg_procs["mt"] = {"W", "QCD", "ZL", "ZJ", "TTT","TTJ", "VVT","VVJ","ZTT"};
     bkg_procs["tt"] = {"W", "QCD", "ZL", "ZJ", "TTT","TTJ", "VVT","VVJ","ZTT"};
-  }
+  }scripts/makeMassPlots_split-y-scale_classic_vs_ff.py
   bkg_procs["em"] = {"W", "QCD", "ZLL", "TT", "VV", "ZTT"};
   bkg_procs["zmm"] = {"W", "QCD", "ZLL", "TT", "VV", "ZTT"};
   bkg_procs["ttbar"] = {"W", "QCD", "ZLL", "TT", "VV", "ZTT"};
@@ -209,6 +209,16 @@ int main(int argc, char** argv) {
   binning["em_btag_lowPzeta"] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,700,4000};
   binning["em_btag_mediumPzeta"] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,700,4000};
   binning["em_btag_highPzeta"] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,700,4000};
+  
+  // to force FF to have same binnings as classical use bins below
+  //binning["et_nobtag_tight"] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,900,3900};
+  //binning["et_nobtag_loosemt"] = {0,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,350,400,700,900,3900};
+  //binning["et_btag_loosemt"] = {0,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  //binning["et_btag_tight"] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
+  //binning["mt_nobtag_tight"] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,900,3900};
+  //binning["mt_nobtag_loosemt"] = {0,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,1100,3900};
+  //binning["mt_btag_tight"] = {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,700,3900};
+  //binning["mt_btag_loosemt"] = {0,60,80,100,120,140,160,180,200,250,300,350,400,500,3900};
 /*  binning["zmm_nobtag"] = {60,70,80,90,100,110,120};
   binning["zmm_btag"] = {60,70,80,90,100,110,120};*/
 

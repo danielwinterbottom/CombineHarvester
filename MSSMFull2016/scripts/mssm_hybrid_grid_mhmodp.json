@@ -1,6 +1,6 @@
 {
   "verbose" : false,
-  "opts" : "--testStat=TEV --frequentist --singlePoint 1.0 --saveHybridResult --clsAcc 0 --fork 0 --fullBToys--redefineSignalPOIs x --setPhysicsModelParameters r=1 --freezeNuisances r",
+  "opts" : "--testStat=TEV --frequentist --singlePoint 1.0 --saveHybridResult --clsAcc 0 --fork 0 --redefineSignalPOIs x --setPhysicsModelParameters r=1 --freezeNuisances r  --minimizerTolerance 0.1",
   "POIs" : ["mA", "tanb"],
   "grids" : [
     ["90:200|10", "1:20|1", ""],
@@ -10,14 +10,8 @@
     ["1400:2000|50", "1:60|5", ""],
     ["1400:2000|50", "60", ""]
   ],
-  "grids_to_remove" : [
-    ["150:200|10","24:28|2"],
-    ["300","34:36|2"],
-    ["350","36:38|2"],
-    ["1900:2000|50","11"]
-  ], 
-  "toys_per_cycle"  : 800,
-  "min_toys"        : 500,
+  "toys_per_cycle"  : 400,
+  "min_toys"        : 1000,
   "max_toys"        : 200000,
   "signif"          : 4.0,
   "CL"              : 0.95,
@@ -32,8 +26,8 @@
       "cms_subtitle"  : "Internal",
       "formats"       : [".pdf", ".png"]
   },
-  "zipfile"         : "/srv/localstage/amd12/mhmodp2016-plots/collected.zip",
-  "statusfile"      : "/srv/localstage/amd12/mhmodp2016-plots/status.json",
+  "zipfile"         : "/vols/build/cms/dw515/CMSSW_7_4_7/src/CombineHarvester/MSSMFull2016/crab_test/collected.zip",
+  "statusfile"      : "/vols/build/cms/dw515/CMSSW_7_4_7/src/CombineHarvester/MSSMFull2016/crab_test/status.json",
   "output"          : "HybridNewGridMSSM.root",
   "output_incomplete" : true
 }

@@ -51,6 +51,8 @@ parser.add_argument(
 parser.add_argument(
     '--use-hig-17-020-style', action='store_true', help="""Plot a dashed black line for the expected limit as in hig-17-020""")
 parser.add_argument('--table_vals', help='Amount of values to be written in a table for different masses', default=10)
+parser.add_argument(
+    '--channel-comparrison', action='store_true', help="""Style used for comparing channels expected limits""")
 args = parser.parse_args()
 
 style_dict_exponly = {
@@ -155,6 +157,10 @@ if args.higgs_bg or args.higgs_injected:
 else:
     legend = plot.PositionedLegend(0.3, 0.2, 3, 0.015)
 
+if args.channel_comparrison: 
+   legend = plot.PositionedLegend(0.15, 0.2, 3, 0.015)
+   legend.SetHeader('expected')
+   
 if args.do_new_ggH:
     legend.SetX1(legend.GetX1() - 0.05)
     legend.SetY1(legend.GetY1() - 0.08)
@@ -240,7 +246,7 @@ for src in args.input:
             DrawAxisHists(pads, axis, pads[0])
         graphs[-1].Draw('PLSAME')
         legend.AddEntry(graphs[-1], '', 'PL')
-
+        
 
 
 axis[0].GetYaxis().SetTitle('95% CL limit on #sigma#font[42]{(gg#phi)}#upoint#font[52]{B}#font[42]{(#phi#rightarrow#tau#tau)}(pb)')
@@ -250,6 +256,10 @@ if args.y_title is not None:
     axis[0].GetYaxis().SetTitle(args.y_title)
 axis[0].GetXaxis().SetTitle(args.x_title)
 axis[0].GetXaxis().SetLabelOffset(axis[0].GetXaxis().GetLabelOffset()*2)
+axis[0].GetXaxis().SetNoExponent()
+axis[0].GetXaxis().SetMoreLogLabels()
+axis[0].GetXaxis().SetLabelOffset(0.9*axis[0].GetXaxis().GetLabelOffset())
+
 
 
 if args.logy:

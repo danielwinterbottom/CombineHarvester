@@ -323,6 +323,7 @@ class HybridNewGrid(CombineToolBase):
         # Set all the parameter values locally using defaults if necessary
         grids           = cfg['grids']
         grids_to_remove = cfg.get('grids_to_remove', None)
+        grids_to_zero = cfg.get('grids_to_zero', None)
         POIs            = cfg['POIs']
         opts            = cfg['opts']
         toys_per_cycle  = cfg['toys_per_cycle']
@@ -414,6 +415,18 @@ class HybridNewGrid(CombineToolBase):
 
         for p in points_to_remove:
             points.remove(p)
+            
+        #points_to_zero = [];
+        #if grids_to_zero is not None :
+        #    for igrid in grids_to_zero:
+        #        assert(len(igrid) == 2)
+        #        grids_to_zero.extend(itertools.product(utils.split_vals(igrid[0]),utils.split_vals(igrid[1])))
+        #
+        #    for p in grids_to_zero:
+        #        print p
+        #        points.remove(p)
+        #     modify p
+        #       points.append(p)
 
         # This dictionary will keep track of the combine output files for each model point
         file_dict = { }
