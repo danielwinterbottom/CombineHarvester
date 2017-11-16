@@ -158,7 +158,7 @@ else:
     legend = plot.PositionedLegend(0.3, 0.2, 3, 0.015)
 
 if args.channel_comparrison: 
-   legend = plot.PositionedLegend(0.15, 0.2, 3, 0.015)
+   legend = plot.PositionedLegend(0.18, 0.2, 3, 0.015)
    legend.SetHeader('expected')
    
 if args.do_new_ggH:

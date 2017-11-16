@@ -617,7 +617,7 @@ for legi,hists in enumerate(bkg_histos):
   legend.AddEntry(hists,background_schemes[channel][legi]['leg_text'],"f")
 legend.AddEntry(bkghist,"Background uncertainty","f")
 fakes_leg_histo = fakes_histo.Clone()
-if fakes_file is not None: legend.AddEntry(fakes_leg_histo,"#splitline{Background model}{using fake factor method}","fp")
+if fakes_file is not None: legend.AddEntry(fakes_leg_histo,"FF background model","fp")
 if not fractions:
   if not args.no_signal:
     if model_dep is True: 
@@ -690,7 +690,7 @@ if args.ratio and not soverb_plot and not fractions:
     if fakes_file is not None: 
       fakes_histo = plot.MakeRatioHist(fakes_histo,bkghist,True,False)
       fakes_histo.DrawCopy("e2same")
-      rlegend.AddEntry(fakes_histo,"Fake factor/Bkg","fp")
+      rlegend.AddEntry(fakes_histo,"FF/Bkg","fp")
   else:
     pads[1].cd()
     axish[1].Draw("axis")
