@@ -281,7 +281,7 @@ h_top.Draw()
 
 # Draw the legend in the top TPad
 legend = plot.PositionedLegend(0.4, 0.11, 3, 0.015)
-plot.Set(legend, NColumns=2, Header='#bf{%.0f%% CL Excluded:}' % (args.CL*100.))
+plot.Set(legend, NColumns=2, Header='#bf{%.0f%% CL excluded:}' % (args.CL*100.))
 if 'obs' in contours:
     legend.AddEntry(contours['obs'][0], "Observed", "F")
 if 'exp-1' in contours and 'exp+1' in contours:

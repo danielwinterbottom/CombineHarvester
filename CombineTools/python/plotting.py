@@ -319,6 +319,7 @@ def TwoPadSplit(split_point, gap_low, gap_high):
     upper = R.TPad('upper', 'upper', 0., 0., 1., 1.)
     upper.SetBottomMargin(split_point + gap_high)
     upper.SetFillStyle(4000)
+    upper.SetTicks(1)
     upper.Draw()
     lower = R.TPad('lower', 'lower', 0., 0., 1., 1.)
     lower.SetTopMargin(1 - split_point + gap_low)
@@ -333,10 +334,12 @@ def ThreePadSplit(upper_split_point, split_point, gap_low, gap_high):
     upper2.SetTopMargin(1 - upper_split_point)
     upper2.SetBottomMargin(split_point + gap_high)
     upper2.SetFillStyle(4000)
+    upper2.SetTicks(0,1)
     upper2.Draw()
     upper1 = R.TPad('upper1', 'upper1', 0., 0., 1., 1.)
     upper1.SetBottomMargin(upper_split_point)
     upper1.SetFillStyle(4000)
+    upper1.SetTicks(0,1)
     upper1.Draw()
     lower = R.TPad('lower', 'lower', 0., 0., 1., 1.)
     lower.SetTopMargin(1 - split_point + gap_low)
@@ -1378,8 +1381,11 @@ def DrawCMSLogo(pad, cmsText, extraText, iPosX, relPosX, relPosY, relExtraDY, ex
         latex.DrawLatex(posX_, posY_, extraText)
 
 
-def PositionedLegend(width, height, pos, offset):
+def PositionedLegend(width, height, pos, offset, horizontaloffset=None):
     o = offset
+    ho = horizontaloffset
+    if not ho:
+      ho = o
     w = width
     h = height
     l = R.gPad.GetLeftMargin()
@@ -1387,19 +1393,19 @@ def PositionedLegend(width, height, pos, offset):
     b = R.gPad.GetBottomMargin()
     r = R.gPad.GetRightMargin()
     if pos == 1:
-        return R.TLegend(l + o, 1 - t - o - h, l + o + w, 1 - t - o, '', 'NBNDC')
+        return R.TLegend(l + ho, 1 - t - o - h, l + ho + w, 1 - t - o, '', 'NBNDC')
     if pos == 2:
         c = l + 0.5 * (1 - l - r)
         return R.TLegend(c - 0.5 * w, 1 - t - o - h, c + 0.5 * w, 1 - t - o, '', 'NBNDC')
     if pos == 3:
-        return R.TLegend(1 - r - o - w, 1 - t - o - h, 1 - r - o, 1 - t - o, '', 'NBNDC')
+        return R.TLegend(1 - r - ho - w, 1 - t - o - h, 1 - r - ho, 1 - t - o, '', 'NBNDC')
     if pos == 4:
-        return R.TLegend(l + o, b + o, l + o + w, b + o + h, '', 'NBNDC')
+        return R.TLegend(l + ho, b + o, l + ho + w, b + o + h, '', 'NBNDC')
     if pos == 5:
         c = l + 0.5 * (1 - l - r)
         return R.TLegend(c - 0.5 * w, b + o, c + 0.5 * w, b + o + h, '', 'NBNDC')
     if pos == 6:
-        return R.TLegend(1 - r - o - w, b + o, 1 - r - o, b + o + h, '', 'NBNDC')
+        return R.TLegend(1 - r - ho - w, b + o, 1 - r - ho, b + o + h, '', 'NBNDC')
 
 
 def DrawHorizontalLine(pad, line, yval):
