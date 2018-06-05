@@ -32,8 +32,8 @@
       "cms_subtitle"  : "Internal",
       "formats"       : [".pdf", ".png"]
   },
-  "zipfile"         : "/srv/localstage/amd12/mhmodp2016-plots/collected.zip",
-  "statusfile"      : "/srv/localstage/amd12/mhmodp2016-plots/status.json",
+  "zipfile"         : "./collected.zip",
+  "statusfile"      : "./status.json",
   "output"          : "HybridNewGridMSSM.root",
   "output_incomplete" : true
 }

@@ -413,6 +413,7 @@ class HybridNewGrid(CombineToolBase):
                 points_to_remove.extend(itertools.product(utils.split_vals(igrid[0]),utils.split_vals(igrid[1])))
 
         for p in points_to_remove:
+            if p not in points: continue
             points.remove(p)
 
         # This dictionary will keep track of the combine output files for each model point
