@@ -26,7 +26,7 @@ for g in groups:
   for i in nlo_matching: 
     if any('_'+c+'.' in i for c in chns): datacard_files.append(cmssw_base+'/src/CombineHarvester/MSSMFull2016/shapes/'+g+'/NLO/'+i) 
 
-infilename = cmssw_base+'/src/CombineHarvester/MSSMFull2016/input/ztt_scale_uncerts.root'
+infilename = cmssw_base+'/src/CombineHarvester/MSSMFull2016/input/ztt_scale_uncerts_zptweight.root'
 dy_systs_infile = ROOT.TFile(infilename)
 
 for f in datacard_files:

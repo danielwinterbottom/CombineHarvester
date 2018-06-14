@@ -272,6 +272,10 @@ axis[0].GetXaxis().SetTitle(args.x_title)
 axis[0].GetXaxis().SetNoExponent()
 axis[0].GetXaxis().SetMoreLogLabels()
 axis[0].GetXaxis().SetLabelOffset(axis[0].GetXaxis().GetLabelOffset()*2)
+<<<<<<< Updated upstream
+=======
+axis[0].GetYaxis().SetTitleSize(0.04)
+>>>>>>> Stashed changes
 
 if args.logy:
     axis[0].SetMinimum(0.1)  # we'll fix this later
@@ -310,6 +314,7 @@ if args.do_new_ggH:
 if args.ratio_to is not None:
     pads[1].cd()
     plot.SetupTwoPadSplitAsRatio(pads, axis[0], axis[1], 'Ratio_{}', True, 0.1, 2.4)
+    axis[1].GetYaxis().SetTitleSize(0.04)
     axis[1].SetNdivisions(506, 'Y')
     splitsrc = args.ratio_to.split(':')
     ref = plot.LimitTGraphFromJSONFile(splitsrc[0], splitsrc[1])
