@@ -272,10 +272,7 @@ axis[0].GetXaxis().SetTitle(args.x_title)
 axis[0].GetXaxis().SetNoExponent()
 axis[0].GetXaxis().SetMoreLogLabels()
 axis[0].GetXaxis().SetLabelOffset(axis[0].GetXaxis().GetLabelOffset()*2)
-<<<<<<< Updated upstream
-=======
 axis[0].GetYaxis().SetTitleSize(0.04)
->>>>>>> Stashed changes
 
 if args.logy:
     axis[0].SetMinimum(0.1)  # we'll fix this later
