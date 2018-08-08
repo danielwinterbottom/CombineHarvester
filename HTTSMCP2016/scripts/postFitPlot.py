@@ -108,6 +108,7 @@ parser.add_argument('--x_title', default='m_{T}^{tot} (GeV)',help='Title for the
 parser.add_argument('--y_title', default='dN/dM_{T}^{tot} (1/GeV)',help='Title for the y-axis')
 parser.add_argument('--lumi', default='35.9 fb^{-1} (13 TeV)',help='Lumi label')
 parser.add_argument('--tauidplot', action='store_true',help='Do not draw signal')
+parser.add_argument('--esplot', action='store_true',help='Do not draw signal and use l->tau ES style')
 parser.add_argument('--totalprocs', action='store_true',help='Inclusve signal in background ratio')
 
 args = parser.parse_args()
@@ -225,6 +226,11 @@ background_schemes = {'mt':[backgroundComp("t#bar{t}",["TTT","TTJ"],ROOT.TColor.
 
 if args.tauidplot:
   background_schemes['mt'] = [backgroundComp("t#bar{t}",["TTT","TTJ"],ROOT.TColor.GetColor(155,152,204)),backgroundComp("QCD", ["QCD"], ROOT.TColor.GetColor(250,202,255)),backgroundComp("Electroweak",["VVT","VVJ","W"],ROOT.TColor.GetColor(222,90,106)),backgroundComp("Z#rightarrow#mu#mu",["ZL","ZJ"],ROOT.TColor.GetColor(100,192,232)),backgroundComp("Z#rightarrow#tau#tau",["ZTTpass","ZTTfail","EmbedZTTpass","EmbedZTTfail"],ROOT.TColor.GetColor(248,206,104))]
+if args.esplot:
+  background_schemes['mt'] = [backgroundComp("t#bar{t}",["TTT","TTJ"],ROOT.TColor.GetColor(155,152,204)),backgroundComp("QCD", ["QCD"], ROOT.TColor.GetColor(250,202,255)),backgroundComp("Electroweak",["VVT","VVJ","W"],ROOT.TColor.GetColor(222,90,106)),backgroundComp("Z#rightarrow#mu#mu",["ZL","ZJ"],ROOT.TColor.GetColor(100,192,232)),backgroundComp("Z#rightarrow#tau#tau",["ZTT"],ROOT.TColor.GetColor(248,206,104))]
+  background_schemes['et'] = [backgroundComp("t#bar{t}",["TTT","TTJ"],ROOT.TColor.GetColor(155,152,204)),backgroundComp("QCD", ["QCD"], ROOT.TColor.GetColor(250,202,255)),backgroundComp("Electroweak",["VVT","VVJ","W"],ROOT.TColor.GetColor(222,90,106)),backgroundComp("Z#rightarrow ee",["ZL","ZJ"],ROOT.TColor.GetColor(100,192,232)),backgroundComp("Z#rightarrow#tau#tau",["ZTT"],ROOT.TColor.GetColor(248,206,104))]
+
+
   #background_schemes['mt'] = [backgroundComp("t#bar{t}",["TTTpass","TTJpass","TTTfail","TTJfail"],ROOT.TColor.GetColor(155,152,204)),backgroundComp("QCD", ["QCD"], ROOT.TColor.GetColor(250,202,255)),backgroundComp("Electroweak",["VVTpass","VVJpass","Wpass","VVTfail","VVJfail","Wfail"],ROOT.TColor.GetColor(222,90,106)),backgroundComp("Z#rightarrow#mu#mu",["ZLpass","ZJpass","ZLfail","ZJfail"],ROOT.TColor.GetColor(100,192,232)),backgroundComp("Z#rightarrow#tau#tau",["EmbedZTTpass","EmbedZTTfail"],ROOT.TColor.GetColor(248,206,104))]
 
 #Extract relevent histograms from shape file
@@ -235,7 +241,7 @@ for i in range(0,sighist.GetNbinsX()):
   if sighist.GetBinContent(i) < y_axis_min: sighist.SetBinContent(i,y_axis_min)
 bkghist = getHistogram(histo_file,'TotalBkg',file_dir, mode, logx=log_x)[0]
 if args.totalprocs: bkghist = getHistogram(histo_file,'TotalProcs',file_dir, mode, logx=log_x)[0]
-if args.tauidplot: bkghist = getHistogram(histo_file,'TotalProcs',file_dir, mode, logx=log_x)[0]
+if args.tauidplot or args.esplot: bkghist = getHistogram(histo_file,'TotalProcs',file_dir, mode, logx=log_x)[0]
 
 total_datahist = getHistogram(histo_file,"data_obs",file_dir, mode, logx=log_x)[0]
 binerror_datahist = total_datahist.Clone()

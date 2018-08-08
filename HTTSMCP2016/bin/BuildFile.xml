@@ -1,5 +1,6 @@
 <bin file="MorphingSMCP2016.cpp" name="MorphingSMCP2016"></bin>
 <bin file="MorphingFits.cpp" name="MorphingFits"></bin>
+<bin file="FakeTauESMeasurement.cpp" name="FakeTauESMeasurement"></bin>
 <use name="root"/>
 <use name="rootmath"/>
 <use name="roofit"/>
