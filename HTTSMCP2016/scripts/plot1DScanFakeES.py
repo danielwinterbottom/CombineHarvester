@@ -97,6 +97,9 @@ def BuildScan(scan, param, files, color, yvals, chop, remove_near_min = None, re
     bestfit = None
     for i in xrange(graph.GetN()):
         print graph.GetY()[i]
+        y=graph.GetY()[i]
+        x=graph.GetX()[i]
+        graph.SetPoint(i,x/1000,y)
         if graph.GetY()[i] == 0.:
             bestfit = graph.GetX()[i]
     if envelope: plot.RemoveGraphYAll(graph, 0.)
@@ -181,6 +184,7 @@ parser.add_argument('--meta', default='', help='Other metadata to save in format
 parser.add_argument('--logo', default='CMS')
 parser.add_argument('--logo-sub', default='Internal')
 parser.add_argument('--x_title', default=None)
+parser.add_argument('--title', default=None)
 args = parser.parse_args()
 if args.pub: args.no_input_label = True
 
@@ -484,6 +488,7 @@ plot.DrawCMSLogo(pads[0], args.logo, args.logo_sub, 11, 0.045, 0.035, 1.2,  cmsT
 # plot.DrawCMSLogo(pads[0], '#it{ATLAS}#bf{ and }CMS', '#it{LHC Run 1 Preliminary}', 11, 0.025, 0.035, 1.1, cmsTextSize = 1.)
 
 #if not args.no_input_label: plot.DrawTitle(pads[0], '#bf{Input:} %s' % collab, 3)
+plot.DrawTitle(pads[0], args.title, 1)
 plot.DrawTitle(pads[0], '41.9 fb^{-1} (13 TeV)', 3)
 #plot.DrawTitle(pads[0], 'm_{H} = 125 GeV', 1)
 
@@ -508,9 +513,9 @@ if len(other_scans) >= 3:
         legend = ROOT.TLegend(0.46, 0.83, 0.95, 0.93, '', 'NBNDC')
         legend.SetNColumns(2)
 
-legend.AddEntry(main_scan['func'], args.main_label + ': %.2f{}^{#plus %.2f}_{#minus %.2f}' % (val_nom[0], val_nom[1], abs(val_nom[2])), 'L')
+legend.AddEntry(main_scan['func'], args.main_label + ': %.3f{}^{#plus %.3f}_{#minus %.3f}' % (val_nom[0], val_nom[1], abs(val_nom[2])), 'L')
 for i, other in enumerate(other_scans):
-    legend.AddEntry(other['func'], other_scans_opts[i][1] + ': %.2f{}^{#plus %.2f}_{#minus %.2f}' % (other['val'][0], other['val'][1], abs(other['val'][2])), 'L')
+    legend.AddEntry(other['func'], other_scans_opts[i][1] + ': %.3f{}^{#plus %.3f}_{#minus %.3f}' % (other['val'][0], other['val'][1], abs(other['val'][2])), 'L')
 # if len(args) >= 4: legend.AddEntry(syst_scan['func'], 'Stat. Only', 'L')
 legend.Draw()
 
