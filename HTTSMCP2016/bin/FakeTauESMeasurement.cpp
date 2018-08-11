@@ -56,11 +56,11 @@ int main(int argc, char** argv) {
       "./"+input_folder;
 
 
-  RooRealVar faketaues("faketaues", "faketaues", 1000, 900, 1100);
+  RooRealVar faketaues("faketaues", "faketaues", 1000, 900, 1200);
 
   VString chns =
       //{"tt"};
-      {"mt"/*,"mt"*/};
+      {"et"/*,"mt"*/};
    //   {"mt","et"};
 
 
@@ -96,7 +96,11 @@ int main(int argc, char** argv) {
   //energy_scales["mt_mu_0pi0"] = {"950","960","970","980","985","990","995","1000","1050","1010","1020","1030","1040","1050"};
 
   //energy_scales["mt_mu_1pi0"] = {"900","910","920","930","940","950","960","970","980","990","1000","1004","1006","1008","1010","1012","1014","1016","1018","1020","1022","1024","1026","1028","1030","1032","1034","1036","1038","1040","1050","1060","1070","1080","1090","1100"};
-  energy_scales["mt_mu_1pi0"] = {"900","910","920","930","940","950","960","970","980","990","1000","1010","1015","1020","1025","1030","1035","1040","1045","1050","1060","1070","1080","1090","1100"};
+  //energy_scales["mt_mu_1pi0"] = {"900","910","920","930","940","950","960","970","980","990","1000","1010","1015","1020","1025","1030","1035","1040","1045","1050","1060","1070","1080","1090","1100","1110","1120","1130","1140","1150","1160","1170","1180","1190","1200"};
+
+  //energy_scales["et_e_0pi0"] = {"900","910","920","930","940","950","960","970","980","990","1000","1010","1020","1030","1040","1050","1060","1070","1080","1090","1100"};
+  energy_scales["et_e_0pi0"] = {"900","910","920","930","940","950","960","970","980","990","1000","1015","1020","1030","1040","1050","1060","1070","1080","1090","1100"}; 
+  energy_scales["et_e_1pi0"] = {"900","910","920","930","940","950","960","970","980","990","1000","1010","1015","1020","1030","1035","1040","1045","1050","1055","1060","1070","1080","1090","1100"};
 
   for(auto chn : chns){
     cb.AddObservations({"*"}, {"htt"}, {"13TeV"}, {chn}, cats[chn+"_13TeV"]);
@@ -150,6 +154,9 @@ int main(int argc, char** argv) {
     cb.cp().process(real_tau).AddSyst(cb,
                                            "CMS_eff_t_$CHANNEL_$ERA", "lnN", SystMap<>::init(1.02));
 
+    //cb.cp().process(real_tau).AddSyst(cb,
+    //                                         "CMS_eff_t_$BIN_$ERA", "lnN", SystMap<>::init(1.05));
+
     cb.cp().process({"W"}).AddSyst(cb,
                                              "CMS_htt_jetToTauFake_$ERA", "shape", SystMap<>::init(1.00));  
     cb.cp().process(jetfake_noW).AddSyst(cb,
@@ -157,8 +164,6 @@ int main(int argc, char** argv) {
 
     cb.cp().process(zl).channel({"mt"}).AddSyst(cb,
                                                       "CMS_htt_mFakeTau_13TeV", "lnN", SystMap<>::init(1.20));
-    //cb.cp().process(zl).channel({"mt"}).bin_id({2}).AddSyst(cb,
-    //                                                  "CMS_htt_mFakeTau_13TeV", "lnN", SystMap<>::init(1.30));
 
     cb.cp().process(zl).channel({"et"}).AddSyst(cb,
                                                         "CMS_htt_eFakeTau_13TeV", "lnN", SystMap<>::init(1.20));
@@ -167,11 +172,12 @@ int main(int argc, char** argv) {
                                             "CMS_scale_t_1prong_$ERA", "shape", SystMap<>::init(1.00));
     cb.cp().process(real_tau).bin_id({2}).AddSyst(cb,
                                             "CMS_scale_t_1prong1pizero_$ERA", "shape", SystMap<>::init(1.00));
-    //cb.cp().process(real_tau).AddSyst(cb,
-    //                                         "CMS_scale_t_3prong_$ERA", "shape", SystMap<>::init(1.00));
     
     
     cb.cp().process(JoinStr({real_tau,jetfake_noW})).AddSyst(cb,"CMS_scale_j_$ERA", "shape", SystMap<>::init(1.00));
+
+    cb.cp().process({"ZL"}).channel({"et"}).bin_id({1}).AddSyst(cb,"CMS_scale_j_$ERA", "lnN", SystMapAsymm<>::init(0.972,1.015));
+    cb.cp().process({"ZL"}).channel({"et"}).bin_id({2}).AddSyst(cb,"CMS_scale_j_$ERA", "lnN", SystMapAsymm<>::init(0.976,1.012));
 
     
     cb.cp().process({"VVT","VVJ"}).AddSyst(cb,
@@ -287,6 +293,8 @@ int main(int argc, char** argv) {
         s->set_shapes(std::move(newhist_u), std::move(newhist_d), nullptr);
       }
   });
+
+  cb.cp().syst_name({"CMS_scale_j_13TeV"}).ForEachSyst([](ch::Systematic *sys) { sys->set_type("lnN");});
 
   cout << " done\n";
 
