@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
 
   VString chns =
       //{"tt"};
-      {/*"et",*/"mt"};
+      {"et","mt"};
    //   {"mt","et"};
 
 
@@ -175,7 +175,6 @@ int main(int argc, char** argv) {
 
     cb.cp().process({"ZL"}).channel({"mt"}).bin_id({1}).AddSyst(cb,"CMS_scale_j_$ERA", "lnN", SystMapAsymm<>::init(0.976,1.018));
     cb.cp().process({"ZL"}).channel({"mt"}).bin_id({2}).AddSyst(cb,"CMS_scale_j_$ERA", "lnN", SystMapAsymm<>::init(0.967,1.016));
-    
     cb.cp().process({"VVT","VVJ"}).AddSyst(cb,
                                         "CMS_htt_vvXsec_13TeV", "lnN", SystMap<>::init(1.05));
     
@@ -265,7 +264,7 @@ int main(int argc, char** argv) {
   cout << "Generating bbb uncertainties...";
   auto bbb = ch::BinByBinFactory()
     .SetAddThreshold(0.)
-    .SetMergeThreshold(00)
+    .SetMergeThreshold(0.)
     .SetFixNorm(false);
   bbb.MergeAndAdd(cb.cp().process({"ZTT","W", "ZJ", "QCD", "TTT", "VVT", "VVJ","TTT", "TTJ"}), cb); 
   

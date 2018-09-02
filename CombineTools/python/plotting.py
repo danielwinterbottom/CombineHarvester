@@ -319,6 +319,7 @@ def TwoPadSplit(split_point, gap_low, gap_high):
     upper = R.TPad('upper', 'upper', 0., 0., 1., 1.)
     upper.SetBottomMargin(split_point + gap_high)
     upper.SetFillStyle(4000)
+    upper.SetTicks(1)
     upper.Draw()
     lower = R.TPad('lower', 'lower', 0., 0., 1., 1.)
     lower.SetTopMargin(1 - split_point + gap_low)
