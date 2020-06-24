@@ -113,7 +113,9 @@ class AsymptoticGrid(CombineToolBase):
     for key,val in file_dict.iteritems():
       for filename in val:
         fin = ROOT.TFile(filename)
-        if fin.IsZombie(): continue
+        if fin.IsZombie() or fin.TestBit(ROOT.TFile.kRecovered):
+            print "[WARNING] Found corrupt file:",filename
+            continue
         tree = fin.Get('limit')
         for evt in tree:
           if abs(evt.quantileExpected+1)<0.01:
