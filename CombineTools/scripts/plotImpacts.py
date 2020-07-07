@@ -27,6 +27,7 @@ parser.add_argument('--blind', action='store_true', help='Do not print best fit 
 parser.add_argument('--color-groups', default=None, help='Comma separated list of GROUP=COLOR')
 parser.add_argument("--pullDef",  default=None, help="Choose the definition of the pull, see HiggsAnalysis/CombinedLimit/python/calculate_pulls.py for options")
 parser.add_argument('--POI', default=None, help='Specify a POI to draw')
+parser.add_argument('--no-bbb', action='store_true', help='Remove bin-by-bin uncertainties from plotting')
 args = parser.parse_args()
 
 if args.transparent:
@@ -83,12 +84,22 @@ POI_fit = POI_info['fit']
 # Sort parameters by largest absolute impact on this POI
 data['params'].sort(key=lambda x: abs(x['impact_%s' % POI]), reverse=True)
 
+# Keep track of the position in the sorted list
+dataindices = {}
+for i,x in enumerate(data['params']):
+    dataindices[x['name']] = i
+
+# Create a parameter list without bin-by-bin uncertainties
+data['params_nobbb'] = [x for x in data['params'] if "_bin" not in x['name']]
+
+datalist = data['params_nobbb'] if args.no_bbb else data['params']
+
 if args.checkboxes:
     cboxes = data['checkboxes']
 
 # Set the number of parameters per page (show) and the number of pages (n)
 show = args.per_page
-n = int(math.ceil(float(len(data['params'])) / float(show)))
+n = int(math.ceil(float(len(datalist)) / float(show)))
 if args.max_pages is not None and args.max_pages > 0:
     n = args.max_pages
 
@@ -120,8 +131,8 @@ if args.color_groups is not None:
 
 for page in xrange(n):
     canv = ROOT.TCanvas(args.output, args.output)
-    n_params = len(data['params'][show * page:show * (page + 1)])
-    pdata = data['params'][show * page:show * (page + 1)]
+    n_params = len(datalist[show * page:show * (page + 1)])
+    pdata = datalist[show * page:show * (page + 1)]
     print '>> Doing page %i, have %i parameters' % (page, n_params)
 
     boxes = []
@@ -135,7 +146,7 @@ for page in xrange(n):
         plot.Set(box, TextSize=0.02, BorderSize=0, FillColor=0, TextAlign=12, Margin=0.005)
         if i % 2 == 0:
             box.SetFillColor(18)
-        box.AddText('%i' % (n_params - i + page * show))
+        box.AddText('%i' % (dataindices[pdata[n_params - i - 1]['name']]))
         box.Draw()
         boxes.append(box)
 
@@ -279,6 +290,7 @@ for page in xrange(n):
 
     # And back to the second pad to draw the impacts graphs
     pads[1].cd()
+    pads[1].SetRightMargin(0.06)
     alpha = 0.7
 
     lo_color = {
