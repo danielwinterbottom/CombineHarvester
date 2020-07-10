@@ -28,6 +28,7 @@ parser.add_argument('--color-groups', default=None, help='Comma separated list o
 parser.add_argument("--pullDef",  default=None, help="Choose the definition of the pull, see HiggsAnalysis/CombinedLimit/python/calculate_pulls.py for options")
 parser.add_argument('--POI', default=None, help='Specify a POI to draw')
 parser.add_argument('--no-bbb', action='store_true', help='Remove bin-by-bin uncertainties from plotting')
+parser.add_argument('--no-sort', action='store_true', help='Do not sort by impact')
 args = parser.parse_args()
 
 if args.transparent:
@@ -82,7 +83,8 @@ for ele in data['POIs']:
 POI_fit = POI_info['fit']
 
 # Sort parameters by largest absolute impact on this POI
-data['params'].sort(key=lambda x: abs(x['impact_%s' % POI]), reverse=True)
+if not args.no_sort:
+    data['params'].sort(key=lambda x: abs(x['impact_%s' % POI]), reverse=True)
 
 # Keep track of the position in the sorted list
 dataindices = {}
