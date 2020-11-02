@@ -872,8 +872,17 @@ int main(int argc, char** argv) {
     ConvertShapesToLnN(cb.cp().backgrounds().channel({"mt_2016","mt_2017","mt_2018","et_2016","et_2017","et_2018"}).process({"VVT"}).bin_id({4,5,6}),tes,0.);
   }
 
+  ConvertShapesToLnN(cb.cp().channel({"et_2016","et_2017","et_2018"}).bin_id({2}),"CMS_htt_ZLShape_et_1prong_13TeV",0.); 
+  ConvertShapesToLnN(cb.cp().channel({"et_2016","et_2017","et_2018"}).bin_id({4}),"CMS_htt_ZLShape_et_1prong_13TeV",0.); 
+  ConvertShapesToLnN(cb.cp().channel({"et_2016","et_2017","et_2018"}).bin_id({2}),"CMS_htt_ZLShape_et_1prong1pi_13TeV",0.); 
+  ConvertShapesToLnN(cb.cp().channel({"et_2016","et_2017","et_2018"}).process({"EmbedZTT"}).bin_id({1,2,4}),"CMS_scale_t_1prong_13TeV",0.); 
+  ConvertShapesToLnN(cb.cp().channel({"et_2016","et_2017","et_2018"}).process({"EmbedZTT"}).bin_id({1,2}),"CMS_scale_t_3prong_13TeV",0.); 
+  ConvertShapesToLnN(cb.cp().channel({"et_2016","et_2017","et_2018"}).process({"jetFakes"}).bin_id({3,4,5,6}),"ff_et_wjets_met_closure_syst_njets0",0.); 
+  ConvertShapesToLnN(cb.cp().channel({"et_2016","et_2017","et_2018"}).process({"jetFakes"}).bin_id({3,4,5,6}),"ff_et_wjets_met_closure_syst_njets1",0.); 
+  ConvertShapesToLnN(cb.cp().channel({"et_2016","et_2017","et_2018"}).process({"jetFakes"}).bin_id({3,4,5,6}),"ff_et_wjets_met_closure_syst_njets2",0.); 
+  
   // remove uncertainties which are dominated by statistical fluctuations so are unphysical
-  cb.cp().channel({"et_2016","et_2017","et_2018"}).syst_name(JoinStr({{"CMS_scale_e_13TeV"},jes_systs})).process({"ZL"}).bin_id({5}).ForEachSyst([](ch::Systematic *sys) {
+  cb.cp().channel({"et_2016","et_2017","et_2018"}).syst_name(jes_systs).process({"ZL"}).bin_id({5}).ForEachSyst([](ch::Systematic *sys) {
         sys->set_type("lnN");
         sys->set_value_d(1.);
         sys->set_value_u(1.);
@@ -898,6 +907,43 @@ int main(int argc, char** argv) {
         sys->set_value_d(1.);
         sys->set_value_u(1.);
   });
+
+  cb.cp().channel({"et_2016","et_2017","et_2018"}).syst_name({"CMS_scale_j_FlavorQCD_13TeV","CMS_scale_j_Absolute_13TeV","CMS_scale_j_HF_13TeV","CMS_res_j_13TeV"}).process({"VVT","ZL"}).bin_id({1,2,3,4,5,6}).ForEachSyst([](ch::Systematic *sys) {
+        sys->set_type("lnN");
+        sys->set_value_d(1.);
+        sys->set_value_u(1.);
+  });
+
+   cb.cp().channel({"et_2016","et_2017","et_2018"}).syst_name({"CMS_scale_e_13TeV"}).process({"ZL","VVT","TTT"}).bin_id({1,2,3,4,5,6}).ForEachSyst([](ch::Systematic *sys) {
+        sys->set_type("lnN");
+        sys->set_value_d(1.);
+        sys->set_value_u(1.);
+  });
+
+   cb.cp().channel({"et_2016","et_2017","et_2018"}).syst_name({"CMS_htt_boson_reso_met_13TeV","CMS_htt_boson_scale_met_13TeV"}).process({"ZL"}).bin_id({1,2,3,4,5,6}).ForEachSyst([](ch::Systematic *sys) {
+        sys->set_type("lnN");
+        sys->set_value_d(1.);
+        sys->set_value_u(1.);
+  });
+
+   cb.cp().channel({"et_2016","et_2017","et_2018"}).syst_name({"CMS_scale_t_1prong_13TeV","CMS_scale_t_1prong1pizero_13TeV","CMS_scale_t_3prong_13TeV"}).process({"VVT","TTT"}).bin_id({1,2,3,4,5,6}).ForEachSyst([](ch::Systematic *sys) {
+        sys->set_type("lnN");
+        sys->set_value_d(1.);
+       sys->set_value_u(1.);
+  });
+
+   cb.cp().channel({"et_2016","et_2017","et_2018"}).syst_name({"CMS_htt_ZLShape_et_1prong_13TeV"}).process({"ZL"}).bin_id({3,5,6}).ForEachSyst([](ch::Systematic *sys) {
+        sys->set_type("lnN");
+        sys->set_value_d(1.);
+        sys->set_value_u(1.);
+  });
+
+   cb.cp().channel({"et_2016","et_2017","et_2018"}).syst_name({"CMS_htt_ZLShape_et_1prong1pi_13TeV"}).process({"ZL"}).bin_id({4,5}).ForEachSyst([](ch::Systematic *sys) {
+        sys->set_type("lnN");
+        sys->set_value_d(1.);
+        sys->set_value_u(1.);
+  });
+
   // these uncertainty that effectivly don't do anything will be removed at a later stage
 
   // If any shapes are identical then change these uncertainties to lnN - they will then be removed altogether in a latter step if the yields also match
