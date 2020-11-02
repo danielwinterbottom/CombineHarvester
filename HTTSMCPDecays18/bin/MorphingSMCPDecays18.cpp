@@ -358,7 +358,7 @@ int main(int argc, char** argv) {
     bool mergeSymm = false; 
     bool control = false; 
     bool prop_plot = false;
-    bool PolVec = false;
+    bool PolVec = true;
     bool savenuisancegroups = false;
     unsigned backgroundOnly = 0; 
 
@@ -384,7 +384,7 @@ int main(int argc, char** argv) {
     ("mergeSymm", po::value<bool>(&mergeSymm)->default_value(false))
     ("control", po::value<bool>(&control)->default_value(false))
     ("prop_plot", po::value<bool>(&prop_plot)->default_value(false))
-    ("PolVec", po::value<bool>(&PolVec)->default_value(false))
+    ("PolVec", po::value<bool>(&PolVec)->default_value(true))
     ("savenuisancegroups", po::value<bool>(&savenuisancegroups)->default_value(false))
     ("backgroundOnly", po::value<unsigned>(&backgroundOnly)->default_value(0));
 
