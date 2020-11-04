@@ -225,7 +225,8 @@ def draw_1d(
             dftools.draw.cms_label(ax[0], "Preliminary", lumi=lumi)
         # for all three years together (assume uncorrelated)
         elif (combined or lumi==137) and unrolled : 
-            custom_cms_label(ax[0], "Preliminary", lumi=137, extra_label=nbins[2])
+            #custom_cms_label(ax[0], "Preliminary", lumi=137, extra_label=nbins[2])
+            custom_cms_label(ax[0], "", lumi=137, extra_label=nbins[2])
         else:
             custom_cms_label(ax[0], "Preliminary", lumi=137)
             
@@ -577,7 +578,8 @@ process_kw={
         "qqH": r'$qq\mathrm{H} \rightarrow\tau\tau$',
         "VH": r'$\mathrm{VH} \rightarrow\tau\tau$',
         "H_sm": r'$\mathrm{SM\ H} \rightarrow\tau\tau$',
-        "H_ps": r'$\mathrm{PS\ H} \rightarrow\tau\tau$',
+        #"H_ps": r'$\mathrm{PS\ H} \rightarrow\tau\tau$',
+        "H_ps": r'$\mathrm{SM\ H} \rightarrow\tau\tau$',
         "Bestfit": r'$\mathrm{Bestfit\ H} \rightarrow\tau\tau$',
     },
     "colours": {
