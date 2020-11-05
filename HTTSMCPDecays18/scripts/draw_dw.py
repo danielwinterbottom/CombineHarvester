@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import scipy.interpolate as interp
 import scipy.optimize as opt
 from .stats import poisson_interval
+import matplotlib.lines as mlines
 
 __all__ = [
     "cms_label", "legend_data_mc", "data_mc", "data", "mc", "heatmap",
@@ -63,6 +64,10 @@ def legend_data_mc(
     else:
         handles = handles[::-1]
         fraction_labels = labels[::-1]
+ 
+    for i, h in enumerate(handles):
+      if isinstance(h, mpl.patches.Polygon):
+        handles[i] = mlines.Line2D([], [], color=h.get_ec(),)
 
     kwargs = dict(legend_kw)
     kwargs_noloc = dict(kwargs)
@@ -87,6 +92,7 @@ def legend_data_mc(
         ax[0].legend(handles, fraction_labels, **kwargs)
 
     handles, labels = ax[1].get_legend_handles_labels()
+
     if offaxis:
         ax[1].legend(handles, labels, bbox_to_anchor=(1, 1), **ratio_kwargs_noloc)
     else:
@@ -160,10 +166,6 @@ def mc(
         tdf_procsum = tdf.sum(axis=0)
         tdf = tdf[tdf_procsum.sort_values().index]
 
-        #print('!!!!')
-        #print (tdf)
-        #print(tdf.head())
-        #print (order)
     # if BestFit is in stack we need to move it to the top
     order= list(tdf.head())
     if 'Bestfit_stack' in order:
@@ -375,8 +377,15 @@ def data_mc(
             df_data_ratio.loc[:,"sum_w"] = (_df_data["sum_w"]-df_mc_sum_forratio["sum_w"].values)/df_mc_sum_forratio["sum_ww_up"].values**.5
             df_data_ratio.loc[:,"sum_ww"] = (_df_data.loc[:,"sum_ww"])/(df_mc_sum_forratio["sum_ww_up"].values)
 
-            # get propper poisson errors
-            down, up = poisson_interval(_df_data["sum_w"], scale=1.)
+            # get propper poisson errors - need to make sure we account for the scaling by the bin widths when estimating poisson errors
+            neff = _df_data["sum_w"]**2 /_df_data["sum_ww"]
+            scales = _df_data["sum_w"]/neff
+            scaled_df_data = _df_data["sum_w"]/scales
+
+            down, up = poisson_interval(scaled_df_data, scale=1)
+            down = down*scales
+            up = up*scales
+
             df_data_ratio.loc[:,"sum_ww_up"] = (up-_df_data.loc[:,"sum_w"])/(df_mc_sum_forratio["sum_ww_up"].values**.5)
             df_data_ratio.loc[:,"sum_ww_up"] = df_data_ratio.loc[:,"sum_ww_up"]*df_data_ratio.loc[:,"sum_ww_up"].values
             df_data_ratio.loc[:,"sum_ww_down"] = (_df_data.loc[:,"sum_w"]-down)/(df_mc_sum_forratio["sum_ww_up"].values**.5)

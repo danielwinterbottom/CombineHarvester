@@ -242,11 +242,11 @@ def draw_1d(
             dftools.draw.cms_label(ax[0], "Preliminary", lumi=lumi)
         # for all three years together (assume uncorrelated)
         elif (combined or lumi==137) and unrolled : 
-            #custom_cms_label(ax[0], "Preliminary", lumi=137, extra_label=nbins[2])
+            #custom_cms_label(ax[0], "Supplementary", lumi=137, extra_label=nbins[2])
             custom_cms_label(ax[0], " ", lumi=137, extra_label=nbins[2])
-            #custom_nocms_label(ax[0], lumi=137, extra_label=nbins[2])
         else:
-            custom_cms_label(ax[0], "Preliminary", lumi=137)
+            #custom_cms_label(ax[0], "Supplementary", lumi=137)
+            custom_cms_label(ax[0], " ", lumi=137)
             
         
         # to fix when y axis is too large 
@@ -292,12 +292,12 @@ def draw_1d(
         elif len(sigs) > 0 and len(sigs) < 3:
             if channel == "tt":
                 ymax *= 1.6
-            elif channel == "mt":
+            elif channel in ["mt",'et']:
                 ymax *= 1.8
         elif len(sigs) >= 3:
             if channel == "tt":
                 ymax *= 1.7
-            elif channel == "mt":
+            elif channelin ["mt",'et']:
                 ymax *= 1.8
         leg_kw = {
             "offaxis": False, "fontsize": 8, "labelspacing":0.12,
@@ -370,7 +370,7 @@ def draw_1d(
                 ax[0].set_ylim(1e0, ymc_max*1e2)
             elif logy and channel == "tt": 
                 ax[0].set_ylim(1e0, ymc_max*1e4)
-            elif logy and channel == "mt": 
+            elif logy and channel in ["mt",'et']: 
                 ax[0].set_ylim(1e0, ymc_max*1e4)
             elif blind:
                 ax[0].set_ylim(0., ymc_max*2.)
@@ -402,7 +402,7 @@ def draw_1d(
             for idx, xpos in enumerate(widebin_cents):
                 if channel == "tt":
                     ftsize = 9
-                elif channel == "mt":
+                elif channel in ["mt",'et']:
                     ftsize = 6
                 ax[0].text(
                     xpos, ypos, f"({nbins[0][idx]}, {nbins[0][idx+1]})", 
@@ -502,6 +502,7 @@ def draw_1d(
                 lines.append(mlines.Line2D(
                         [], [], color=process_kw["colours"][sig],
                 ))
+
                 if not unrolled:
                     # legend_items.append(f'{process_kw["labels"][sig]}'+ r"$/\mathrm{Bkg.\ unc.}$")
                     legend_items.append(f'{process_kw["labels"][sig]}')
@@ -547,13 +548,18 @@ def draw_1d(
             ax[1].set_ylabel(r'$\frac{\mathrm{Data}-\mathrm{Bkg.}}{\mathrm{Bkg.\ unc.}}$')
             if not unrolled:
                 # for mt
-                if channel == "mt":
-                    ax[1].set_ylim(-2., 4.)
-                    ax[1].set_yticks([-1., 2., 4.])
+                if channel in ["mt",'et']:
+                    ax[1].set_ylim(-2., 6.)
+                    ax[1].set_yticks([-2., 0.,  2., 4., 6.])
                 # for tt
                 elif channel == "tt":
                     ax[1].set_ylim(-4., 8.)
                     ax[1].set_yticks([-4, 0., 4., 8.])
+            #for mu-rho channel we use a larger range for ratio part
+            elif channel == 'mt' and nbins[3] == 'mu-rho':
+                ax[1].set_ylim(-5.,30.)
+                ax[1].set_yticks([0., 10., 20., 30.])
+                ax[1].vlines(vert_lines, *ax[1].get_ylim(), linestyles='--', colors='black', zorder=1)
             else:
                 ax[1].set_ylim(-5., 20.)
                 ax[1].set_yticks([-5., 0., 5., 10., 15., 20.])
@@ -787,6 +793,16 @@ nbins_kw = {
         #6: [[0.0, 0.45, 0.6, 0.7, 0.8, 0.9, 1.0], 4, r'$\mu a_{1}^{1\mathrm{pr}}$', "mu-0a1"], # mu-0a1
         6: [[0.0, 0.45, 0.6, 0.8, 1.0], 4, r'$\mu a_{1}^{1\mathrm{pr}}$', "mu-0a1"], # mu-0a1
         100: [[None], 1, "signal", "signal"],
+    },
+    "et": {
+        1: [[None], 1, r'$\tau_e \tau_h\ \mathrm{genuine}$', "embed"], # embed
+        2: [[None], 1, r'$\tau_e \tau_h\ \mathrm{fake}$', "fakes"], # fakes
+        3: [[0.0, 0.45, 0.6, 0.7, 0.8, 0.9, 1.0], 10, r'$e\rho$', "e-rho"], # e-rho
+        4: [[0.0, 0.45, 0.6, 0.7, 0.8, 0.9, 1.0], 8, r'$e\pi$', "e-pi"], # e-pi
+        5: [[0.0, 0.45, 0.6, 0.7, 0.8, 0.9, 1.0], 4, r'$e a_{1}^{3\mathrm{pr}}$', "e-a1"], # e-a1
+        #6: [[0.0, 0.45, 0.6, 0.7, 0.8, 0.9, 1.0], 4, r'$e a_{1}^{1\mathrm{pr}}$', "e-0a1"], # e-0a1
+        6: [[0.0, 0.45, 0.6, 0.8, 1.0], 4, r'$e a_{1}^{1\mathrm{pr}}$', "e-0a1"], # e-0a1
+        100: [[None], 1, "signal", "signal"],
     },}
 
 nllscan_kw = {
@@ -812,6 +828,15 @@ nllscan_kw = {
         4: [r'$\mu\pi$', "mu-pi", "#E8AD46"], # mu-pi
         5: [r'$\mu a_{1}^{3\mathrm{pr}}$', "mu-a1", "#addd8e"], # mu-a1
         6: [r'$\mu a_{1}^{1\mathrm{pr}}$', "mu-0a1", "#c994c7"], # mu-0a1
+    },
+    "mt": {
+        0: [r"$\tau_{e}\tau_h$", "combined", "#DE5A6A"],
+        1: ["embed", "embed", ""], # embed
+        2: ["fakes", "fakes", ""], # fakes
+        3: [r'$e\rho$', "mu-rho", "#9B98CC"], # mu-rho
+        4: [r'$e\pi$', "mu-pi", "#E8AD46"], # mu-pi
+        5: [r'$e a_{1}^{3\mathrm{pr}}$', "mu-a1", "#addd8e"], # mu-a1
+        6: [r'$e a_{1}^{1\mathrm{pr}}$', "mu-0a1", "#c994c7"], # mu-0a1
     },
     "years": {
         0: [r"Combined", "combined", "#DE5A6A"],
