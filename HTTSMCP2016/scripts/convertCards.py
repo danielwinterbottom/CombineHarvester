@@ -216,16 +216,23 @@ def getHistogramAndWriteToFile(infile,outfile,dirname,write_dirname, reweight=Fa
     # in second loop we symmetrise all templates except for mm ones
     for key in directory.GetListOfKeys():
         histo = directory.Get(key.GetName())
+
         if isinstance(histo,ROOT.TH1D) or isinstance(histo,ROOT.TH1F):
+          if ('WH' in key.GetName() or 'ZH' in key.GetName() or 'qqH' in key.GetName()) and ('_sm_' in key.GetName() or '_ps_' in key.GetName() or '_mm_' in key.GetName()):
+            # get SFs that are different for each systematic
+            ph = directory.Get(key.GetName().replace('_sm_','_').replace('_ps_','_').replace('_mm_','_') ).Integral()
+            jhu = directory.Get(key.GetName().replace('_ps_','_sm_').replace('_mm_','_sm_')).Integral()
+            jhu_sf = 1.
+            if jhu>0: jhu_sf = ph/jhu 
           if 'qqH_sm_' in key.GetName() or 'qqH_mm_' in key.GetName() or 'qqH_ps_' in key.GetName():
-            print 'applying SF = ', vbf_sf, ' to ', key.GetName()
-            histo.Scale(vbf_sf)
+            print 'applying SF = ', jhu_sf, ' to ', key.GetName()
+            histo.Scale(jhu_sf)
           if 'WH_sm_' in key.GetName() or 'WH_mm_' in key.GetName() or 'WH_ps_' in key.GetName():
-            print 'applying SF = ', wh_sf, ' to ', key.GetName()
-            histo.Scale(wh_sf)
+            print 'applying SF = ', jhu_sf, ' to ', key.GetName()
+            histo.Scale(jhu_sf)
           if 'ZH_sm_' in key.GetName() or 'ZH_mm_' in key.GetName() or 'ZH_ps_' in key.GetName():
-            print 'applying SF = ', zh_sf, ' to ', key.GetName()
-            histo.Scale(zh_sf)
+            print 'applying SF = ', jhu_sf, ' to ', key.GetName()
+            histo.Scale(jhu_sf)
           nxbins=12
           skip = ('data_obs' in key.GetName()) or not ('dijet' in dirname or 'vbf' in dirname)
           asymm = (('ggH_mm' in key.GetName() or 'ggHmm' in key.GetName()  or 'qqHmm' in key.GetName()  or 'qqH_mm' in key.GetName() or 'WHmm' in key.GetName() or 'WH_mm' in key.GetName()  or 'ZHmm' in key.GetName() or 'ZH_mm' in key.GetName() or 'reweightedto_mm' in key.GetName())) and 'reweightedto_sm' not in key.GetName() and 'reweightedto_ps' not in key.GetName()

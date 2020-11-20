@@ -41,7 +41,8 @@ To run with no systematics: '--freezeParameters allConstrainedNuisances'
 
 To scan alpha:
 
-combineTool.py -m 125 -M MultiDimFit --setParameters alpha=0 --setParameterRanges alpha=-90,90  --redefineSignalPOIs alpha  -d output/cp210720/cmb/125/ws.root --algo grid  --there -n .alpha --floatOtherPOIs 1 --points=21 --alignEdges 1 -t -1 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10  --cminDefaultMinimizerTolerance=1
+
+combineTool.py -m 125 -M MultiDimFit --setParameters alpha=0 --setParameterRanges alpha=-90,90  --redefineSignalPOIs alpha  -d output/cp071020/cmb/125/ws.root --algo grid  --there -n .alpha --floatOtherPOIs 1 --points=21 --alignEdges 1 -t -1 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,Migrad,0:1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10
 
 (Note we may want to change the --cminDefaultMinimizerStrategy 0 at some point but the fit does not always converget for --cminDefaultMinimizerStrategy 1 - could adjust the number of function calls and/or tolerance to get this to work)
 
@@ -72,7 +73,11 @@ python scripts/plot1DScanfa3.py --main output/cp210720/cmb/125/higgsCombine.alph
 
 or by channel use:
 
-scripts/plot1DScan.py --main output/cp210720/cmb/125/higgsCombine.alpha.v3.MultiDimFit.mH125.root --POI alpha --output alpha_bychan --no-numbers --no-box --x_title "#alpha_{gg} (#circ)" --x-max=90 --x-min=-90 --others output/cp210720/em_cmb/125/higgsCombine.alpha.MultiDimFit.mH125.root:e#mu:1 output/cp210720/et_cmb/125/higgsCombine.alpha.MultiDimFit.mH125.root:"e#tau":2 output/cp210720/tt_cmb/125/higgsCombine.alpha.MultiDimFit.mH125.root:"#tau#tau":3 output/cp210720/mt_cmb/125/higgsCombine.alpha.MultiDimFit.mH125.root:"#mu#tau":6 --rezero --improve --y-max=2.6 --rezero --improve
+python scripts/plot1DScan.py --main output/cp1109/cmb/125/higgsCombine.alpha.MultiDimFit.mH125.root --POI alpha --output alpha_bychan --no-numbers --no-box --x_title "#alpha_{gg} (#circ)" --x-max=90 --x-min=-90 --others output/cp1109/em_cmb/125/higgsCombine.alpha.MultiDimFit.mH125.root:e#mu:1 output/cp1109/et_cmb/125/higgsCombine.alpha.MultiDimFit.mH125.root:"e#tau":2 output/cp1109/tt_cmb/125/higgsCombine.alpha.MultiDimFit.mH125.root:"#tau#tau":3 output/cp1109/mt_cmb/125/higgsCombine.alpha.MultiDimFit.mH125.root:"#mu#tau":6 --rezero --improve --y-max=2.6 --rezero --improve
+
+plot by year:
+
+python scripts/plot1DScan.py --main output/cp1109/cmb/125/higgsCombine.alpha.MultiDimFit.mH125.root --POI alpha --output alpha_byyear --no-numbers --no-box --x_title "#alpha_{gg} (#circ)" --x-max=90 --x-min=-90 --others output/cp1109/htt_2016/125/higgsCombine.alpha.MultiDimFit.mH125.root:"2016":1 output/cp1109/htt_2017/125/higgsCombine.alpha.MultiDimFit.mH125.root:"2017":2 output/cp1109/htt_2018/125/higgsCombine.alpha.MultiDimFit.mH125.root:"2018":3  --rezero --improve --y-max=2.6 --rezero --improve
 
 Plot 1D scan of mu:
 
@@ -90,24 +95,24 @@ First create workspace using top instructions.
 
 Then perform initial fit:
 
-    combineTool.py -M Impacts -d cmb/125/ws.root -m 125 --robustFit 1 -t -1  --doInitialFit --X-rtd FITTER_NEW_CROSSING_ALGO --X-rtd FITTER_NEVER_GIVE_UP  --setParameters alpha=0 --setParameterRanges alpha=-90,90  --cminDefaultMinimizerStrategy=0 --cminDefaultMinimizerStrategy=0 --cminDefaultMinimizerTolerance=0.1 --cminFallbackAlgo Minuit2,Migrad,0:1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10
+    combineTool.py -M Impacts -d cmb/125/ws.root -m 125 --robustFit 1 -t -1  --doInitialFit --X-rtd FITTER_NEW_CROSSING_ALGO --X-rtd FITTER_NEVER_GIVE_UP  --setParameters alpha=0 --setParameterRanges alpha=-90,90  --cminDefaultMinimizerStrategy=0 --cminDefaultMinimizerTolerance=0.1 --cminFallbackAlgo Minuit2,Migrad,0:1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10
 
 this one seems to work but is slow:
 
 #combine -M MultiDimFit -n blah_initialFit_Test --algo singles --redefineSignalPOIs alpha -t -1 --setParameterRanges alpha=-90,90:muV=-2,4:muggH=0.5,1.5 --cminDefaultMinimizerStrategy=0 --cminDefaultMinimizerTolerance=1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10 --X-rtd FITTER_NEW_CROSSING_ALGO --X-rtd FITTER_NEVER_GIVE_UP --X-rtd MINIMIZER_analytic --robustFit 1 -v 2 -m 125 -d output/cp210720/cmb/125/ws.root --setParameters alpha=0
     
-combineTool.py -M Impacts -d cmb/125/ws.root -m 125 --robustFit 1 -t -1  --doInitialFit --X-rtd FITTER_NEW_CROSSING_ALGO --X-rtd FITTER_NEVER_GIVE_UP --X-rtd MINIMIZER_analytic  --setParameters alpha=0 --setParameterRanges alpha=-90,90:muV=-2,4:muggH=0.5,1.5  --cminDefaultMinimizerStrategy=0 --cminDefaultMinimizerStrategy=0 --cminDefaultMinimizerTolerance=1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10
+combineTool.py -M Impacts -d cmb/125/ws.root -m 125 --robustFit 1 -t -1  --doInitialFit --X-rtd FITTER_NEW_CROSSING_ALGO --X-rtd FITTER_NEVER_GIVE_UP --X-rtd MINIMIZER_analytic  --setParameters alpha=0 --setParameterRanges alpha=-90,90:muV=-2,4:muggH=0.5,1.5  --cminDefaultMinimizerStrategy=0 --cminDefaultMinimizerTolerance=1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10
 
 To run impacts for each systematic on crab (RECOMMENDED):
 First open `custom_crab.py` and edit the workarea name.
 Make sure you have a valid grid proxy.
 Then run:
 
-    combineTool.py -M Impacts -d ws.root -m 125 --robustFit 1 -t  -1  --doFits --X-rtd FITTER_NEW_CROSSING_ALGO --X-rtd FITTER_NEVER_GIVE_UP  --setParameters alpha=0 --setParameterRanges alpha=-90,90  --cminDefaultMinimizerStrategy=0 --cminDefaultMinimizerStrategy=0 --cminDefaultMinimizerTolerance=0.1 --cminFallbackAlgo Minuit2,Migrad,0:1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10 --merge 1 --job-mode crab3 --task-name grid-test-impacts --custom-crab custom_crab.py
+    combineTool.py -M Impacts -d ws.root -m 125 --robustFit 1 -t  -1  --doFits --X-rtd FITTER_NEW_CROSSING_ALGO --X-rtd FITTER_NEVER_GIVE_UP  --setParameters alpha=0 --setParameterRanges alpha=-90,90  --cminDefaultMinimizerStrategy=0 --cminDefaultMinimizerTolerance=0.1 --cminFallbackAlgo Minuit2,Migrad,0:1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10 --merge 1 --job-mode crab3 --task-name grid-test-impacts --custom-crab custom_crab.py
 
 Otherwise for SGE batch use:
 
-    combineTool.py -M Impacts -d ws.root -m 125 --robustFit 1 -t  -1  --doFits --X-rtd FITTER_NEW_CROSSING_ALGO --X-rtd FITTER_NEVER_GIVE_UP  --setParameters alpha=0 --setParameterRanges alpha=-90,90  --cminDefaultMinimizerStrategy=0 --cminDefaultMinimizerStrategy=0 --cminDefaultMinimizerTolerance=0.1 --cminFallbackAlgo Minuit2,Migrad,0:1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10 --merge 1 --job-mode 'SGE'  --prefix-file ic --sub-opts "-q hep.q -l h_rt=3:0:0" 
+    combineTool.py -M Impacts -d ws.root -m 125 --robustFit 1 -t  -1  --doFits --X-rtd FITTER_NEW_CROSSING_ALGO --X-rtd FITTER_NEVER_GIVE_UP  --setParameters alpha=0 --setParameterRanges alpha=-90,90  --cminDefaultMinimizerStrategy=0 --cminDefaultMinimizerTolerance=0.1 --cminFallbackAlgo Minuit2,Migrad,0:1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10 --merge 1 --job-mode 'SGE'  --prefix-file ic --sub-opts "-q hep.q -l h_rt=3:0:0" 
 
 Less recommended:
 For lxplus batch use `--job-mode condor --sub-opts='+JobFlavour = "longlunch"` but this is not fully tested (eg. might run out of time).
@@ -119,6 +124,12 @@ Collect results:
 Make impact plot:
 
     plotImpacts.py -i impacts.json -o impacts
+
+### to help convergence when fitting on data:
+
+    combineTool.py -M Impacts  -d ../cmb/125/ws.root -m 125 --doInitialFit --X-rtd FITTER_NEW_CROSSING_ALGO --X-rtd FITTER_NEVER_GIVE_UP  --setParameters alpha=0 --setParameterRanges alpha=-90,90:muV=-5,5:muggH=-5,5  --cminDefaultMinimizerStrategy=0 --cminFallbackAlgo Minuit2,Migrad,0:1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10  --setRobustFitTolerance=1 --robustFit=1 --maxFailedSteps=20
+
+    combineTool.py -M Impacts  -d ../cmb/125/ws.root -m 125 --doFits --X-rtd FITTER_NEW_CROSSING_ALGO --X-rtd FITTER_NEVER_GIVE_UP  --setParameters alpha=0 --setParameterRanges alpha=-90,90:muV=-5,5:muggH=-5,5  --cminDefaultMinimizerStrategy=0 --cminFallbackAlgo Minuit2,Migrad,0:1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10  --setRobustFitTolerance=1 --robustFit=1 --maxFailedSteps=20  --job-mode crab3 --task-name grid-test-impacts-new --custom-crab ../../../custom_crab.py
 
 
 ## Make post-fit plots

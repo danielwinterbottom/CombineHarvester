@@ -568,7 +568,7 @@ int main(int argc, char** argv) {
     int do_control_plots = 0;
     bool powheg_check = false;
     int sync = 0;
-    bool mergeSymm = false;
+    bool mergeSymm = true;
 
     string era;
     po::variables_map vm;
@@ -593,7 +593,7 @@ int main(int argc, char** argv) {
     ("era", po::value<string>(&era)->default_value("2016,2017,2018"))
     ("ttbar_fit", po::value<bool>(&ttbar_fit)->default_value(false))
     ("powheg_check", po::value<bool>(&powheg_check)->default_value(false))
-    ("mergeSymm", po::value<bool>(&mergeSymm)->default_value(false))
+    ("mergeSymm", po::value<bool>(&mergeSymm)->default_value(true))
     ("sync", po::value<int>(&sync)->default_value(0));
 
     po::store(po::command_line_parser(argc, argv).options(config).run(), vm);
@@ -642,7 +642,7 @@ int main(int argc, char** argv) {
     input_dir["ttbar"]  = string(getenv("CMSSW_BASE")) + "/src/CombineHarvester/HTTSMCP2016/shapes/"+input_folder_em+"/";    
     
     
-    VString chns = {"mt","tt"};
+    VString chns = {"mt","tt","et","em"};
     if (ttbar_fit) chns.push_back("ttbar");
     if(sync>0) chns = {"mt"};   
 
@@ -651,14 +651,14 @@ int main(int argc, char** argv) {
     bkg_procs["et"] = {"ZTT", "QCD", "ZL", "ZJ","TTT","TTJ", "VVT", "VVJ", "EWKZ", "W"};
     bkg_procs["mt"] = {"ZTT", "QCD", "ZL", "ZJ","TTT","TTJ", "VVT", "VVJ", "EWKZ", "W"};
     bkg_procs["tt"] = {"ZTT", "W", "QCD", "ZL", "ZJ","TTT","TTJ",  "VVT","VVJ", "EWKZ"};
-    bkg_procs["em"] = {"ZTT","W", "QCD", "ZLL", "TT", "VV"};
+    bkg_procs["em"] = {"ZTT","W", "QCD", "ZLL", "TT", "VV","ggH_hww125","qqH_hww125"};
     bkg_procs["ttbar"] = {"ZTT", "W", "QCD", "ZLL", "TT", "VV", "EWKZ"};
     
     if(do_embedding){
       bkg_procs["et"] = {"EmbedZTT", "QCD", "ZL", "ZJ","TTT","TTJ", "VVT", "VVJ", "W", "EWKZ"};
       bkg_procs["mt"] = {"EmbedZTT", "QCD", "ZL", "ZJ","TTT","TTJ",  "VVT", "VVJ", "W", "EWKZ"};
       bkg_procs["tt"] = {"EmbedZTT", "W", "QCD", "ZL", "ZJ","TTT","TTJ",  "VVT","VVJ", "EWKZ"};
-      bkg_procs["em"] = {"EmbedZTT","W", "QCD", "ZLL", "TT", "VV"};
+      bkg_procs["em"] = {"EmbedZTT","W", "QCD", "ZLL", "TT", "VV","ggH_hww125","qqH_hww125"};
       bkg_procs["ttbar"] = {"EmbedZTT", "W", "QCD", "ZLL", "TT", "VV", "EWKZ"};
     }
 
@@ -1269,6 +1269,33 @@ int main(int argc, char** argv) {
       }
   });
 
+
+  //If number of effective events is < 50 then remove all it's shape uncertainties as these are unphysical and driven by bbb fluctuations. If MergeSymm option is used then bins 3-4 have underestimated ststistical uncertainty by factor of 1/sqrt(2) so we multiple by this value
+  cb.ForEachProc([&](ch::Process *p) {
+
+    std::unique_ptr<TH1> nominal = p->ClonedScaledShape();
+
+    double err=0.;
+    double integral = nominal.get()->IntegralAndError(-1,-1,err);
+    err/=integral;      
+    if(p->bin_id() > 2 && mergeSymm) err*=sqrt(2.);
+    double effective_events = pow(1./err, 2);
+
+    if(effective_events<50.) {
+
+      std::cout << "Found only " << effective_events << " effective events for: " << std::endl;
+      std::cout << ch::Process::PrintHeader << *p << "\n";
+      std::cout << (p->bin_id() > 2 && mergeSymm) << std::endl;
+      std::cout << "This is less than 50 so removing shape systs:" << std::endl;
+      cb.FilterSysts([&](ch::Systematic *s){
+          bool remove_syst = (MatchingProcess(*p,*s)) && s->type().find("shape") != std::string::npos;
+          if(remove_syst) std::cout << s->name() << std::endl; 
+          return remove_syst;
+      });
+      std::cout << "------------" << std::endl;
+    }
+  });
+
   // convert systematics to lnN here
   ConvertShapesToLnN(cb.cp().signals().bin_id({1}), "CMS_scale_gg_13TeV", 0.);
   //ConvertShapesToLnN(cb.cp().signals().bin_id({1}), "CMS_FiniteQuarkMass_13TeV", 0.);
@@ -1429,6 +1456,20 @@ int main(int argc, char** argv) {
       SmoothShapes(cb.cp().bin_id({3,4,5,6}), "ff_sub_syst_et", ndphibins, false, true, false);
       SmoothShapes(cb.cp().bin_id({3,4,5,6}), "ff_sub_syst_mt", ndphibins, false, true, false);
       SmoothShapes(cb.cp().bin_id({3,4,5,6}), "ff_sub_syst_tt", ndphibins, false, true, false);
+
+      // merge mass bins for theory uncertainties as effect on masses is very small:
+      std::vector<std::string> theory_systs={"QCDscale_ggH_ACCEPT","QCDscale_qqH_ACCEPT","CMS_FiniteQuarkMass_13TeV","CMS_PS_ISR_ggH_13TeV","CMS_PS_FSR_ggH_13TeV","CMS_UE_ggH_13TeV"};
+      for (auto i : theory_systs) {
+        SmoothShapes(cb.cp().bin_id({3,4,5,6}), i, ndphibins, false, false, true);
+        SmoothShapes(cb.cp().channel({"tt_2016","tt_2017","tt_2018"},false).bin_id({2}), i, nmassbins, false, true, false);
+        SmoothShapes(cb.cp().channel({"tt_2016","tt_2017","tt_2018"}).bin_id({2}), i, nmassbins_tt, false, true, false);
+      }
+      //convert theory systs to lnN if they have no impact on shapes at all - this includes basically all categories except for the boosted category where all systs except for PS_FSR affect the shape of the pT distributions
+      ConvertShapesToLnN(cb.cp().signals().bin_id({1,2,3,4,5,6}), "CMS_PS_FSR_ggH_13TeV", 0.);
+      ConvertShapesToLnN(cb.cp().signals().bin_id({1,3,4,5,6}), "CMS_PS_ISR_ggH_13TeV", 0.);
+      ConvertShapesToLnN(cb.cp().backgrounds().bin_id({1,2,3,4,5,6}), "QCDscale_qqH_ACCEPT", 0.);
+      ConvertShapesToLnN(cb.cp().signals().bin_id({1,3,4,5,6}), "QCDscale_ggH_ACCEPT", 0.);
+      ConvertShapesToLnN(cb.cp().signals().bin_id({1,3,4,5,6}), "CMS_FiniteQuarkMass_13TeV", 0.);
  
     }
 
@@ -1463,6 +1504,8 @@ int main(int argc, char** argv) {
     cb.cp().process({"EmbedZTT"}).RenameSystematic(cb,"CMS_scale_e","CMS_scale_embedded_e");
     cb.cp().RenameSystematic(cb,"CMS_scale_mu_13TeV","CMS_scale_m");
     DecorrelateMCAndEMB(cb,"CMS_scale_m","CMS_scale_embedded_m",0.5);
+    cb.cp().process({"EmbedZTT"}).RenameSystematic(cb,"CMS_scale_e","CMS_scale_embedded_e");
+
     DecorrelateMCAndEMB(cb,"CMS_scale_t_1prong_13TeV","CMS_scale_embedded_t_1prong_13TeV",0.5);
     DecorrelateMCAndEMB(cb,"CMS_scale_t_1prong1pizero_13TeV","CMS_scale_embedded_t_1prong1pizero_13TeV",0.5);
     DecorrelateMCAndEMB(cb,"CMS_scale_t_3prong_13TeV","CMS_scale_embedded_t_3prong_13TeV",0.5);

@@ -251,8 +251,10 @@ if args.pub: main_scan['graph'].SetMarkerSize(0)
 main_scan['graph'].SetMarkerColor(1)
 main_scan['graph'].SetLineColor(ROOT.kBlue)
 main_scan['graph'].SetLineStyle(2)
+#main_scan['graph'].SetMarkerSize(0)
 main_scan['graph'].SetLineWidth(3)
-main_scan['graph'].Draw('AP') #'APL'
+if args.POI == 'CMS_zz4l_fai1': main_scan['graph'].Draw('APL')
+else: main_scan['graph'].Draw('AP')
 # main_scan['graph'].Fit('pol4')
 # polfunc = main_scan['graph'].GetFunction('pol4')
 # print 'Function min at %f' % polfunc.GetMinimumX(0.05, 0.25)
@@ -299,7 +301,8 @@ for other in other_scans:
     if args.breakdown is not None:
         other['graph'].SetMarkerSize(0.4)
     if args.pub: other['graph'].SetMarkerSize(0.0)
-    other['graph'].Draw('PSAME')
+    #other['graph'].Draw('PSAME')
+    other['graph'].Draw('SAME')
 
 line = ROOT.TLine()
 line.SetLineColor(14)
@@ -339,7 +342,8 @@ for yval in yvals:
 
 
 main_scan['func'].SetLineColor(ROOT.TColor.GetColor("#000099"))
-main_scan['func'].Draw('same')
+#main_scan['func'].SetLineColor(1)
+if not args.POI=='CMS_zz4l_fai1': main_scan['func'].Draw('same')
 main_scan['graph'].Draw('PSAME')
 
 if args.POI == 'alpha':
@@ -592,7 +596,7 @@ for i, other in enumerate(other_scans):
     else:
       legend.AddEntry(other['func'], other_scans_opts[i][1] + ': %.2f{}^{#plus %.2f}_{#minus %.2f}' % (other['val'][0], other['val'][1], abs(other['val'][2])), 'L')
 # if len(args) >= 4: legend.AddEntry(syst_scan['func'], 'Stat. Only', 'L')
-legend.Draw()
+if not args.POI == 'CMS_zz4l_fai1': legend.Draw()
 
 save_graph = main_scan['graph'].Clone()
 #save_graph.GetXaxis().SetTitle('%s = %.3f %+.3f/%+.3f' % (fixed_name, val_nom[0], val_nom[2], val_nom[1]))

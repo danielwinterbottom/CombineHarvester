@@ -133,7 +133,7 @@ class CPMixture(PhysicsModel):
 
 
         if self.useRate:
-          self.modelBuilder.factory_('expr::muggH("pow(cos(@0/90*{pi}/2),2) + 2.25*pow(sin(@0/90*{pi}/2),2)", alpha)'.format(**params))
+          self.modelBuilder.factory_('expr::muggH("pow(cos(-@0/90*{pi}/2),2) + 2.25*pow(sin(-@0/90*{pi}/2),2)", alpha)'.format(**params))
 
         self.modelBuilder.factory_('expr::muV_mutautau("@0*@1", muV, mutautau)')
         self.modelBuilder.factory_('expr::muggH_mutautau("@0*@1", muggH, mutautau)')
@@ -143,8 +143,8 @@ class CPMixture(PhysicsModel):
 
               if not self.do_fa3:
                 if not self.do2D:
-                  self.modelBuilder.factory_('expr::a2("sqrt(@0)*cos(@1/90*{pi}/2)", muggH_mutautau, alpha)'.format(**params))
-                  self.modelBuilder.factory_('expr::a3("sqrt(@0)*sin(@1/90*{pi}/2)", muggH_mutautau, alpha)'.format(**params))
+                  self.modelBuilder.factory_('expr::a2("sqrt(@0)*cos(-@1/90*{pi}/2)", muggH_mutautau, alpha)'.format(**params))
+                  self.modelBuilder.factory_('expr::a3("sqrt(@0)*sin(-@1/90*{pi}/2)", muggH_mutautau, alpha)'.format(**params))
               else:
                 self.modelBuilder.factory_('expr::a3("sqrt( (@0*@1*{sigma1_hzz})/({sigma3_hzz + @1*({sigma1_hzz - sigma3_hzz})}) ) ", muggH_mutautau, fa3)'.format(**params))
                 self.modelBuilder.factory_('expr::a2("sqrt(@0-@1*@1)", muggH_mutautau, a3)'.format(**params)) 
@@ -156,8 +156,8 @@ class CPMixture(PhysicsModel):
  
             else: 
               for c in ['em', 'et', 'mt', 'tt']:
-                self.modelBuilder.factory_('expr::a2_%s("sqrt(@0)*cos(@1/90*{pi}/2)", muggH_mutautau, alpha_%s)'.format(**params) % (c, c))
-                self.modelBuilder.factory_('expr::a3_%s("sqrt(@0)*sin(@1/90*{pi}/2)", muggH_mutautau, alpha_%s)'.format(**params) % (c, c))
+                self.modelBuilder.factory_('expr::a2_%s("sqrt(@0)*cos(-@1/90*{pi}/2)", muggH_mutautau, alpha_%s)'.format(**params) % (c, c))
+                self.modelBuilder.factory_('expr::a3_%s("sqrt(@0)*sin(-@1/90*{pi}/2)", muggH_mutautau, alpha_%s)'.format(**params) % (c, c))
    
                 self.modelBuilder.factory_('expr::sm_scaling_%s("@0*@0 - @0*@1", a2_%s, a3_%s)' % (c, c, c))
                 self.modelBuilder.factory_('expr::ps_scaling_%s("@1*@1 - @0*@1", a2_%s, a3_%s)' % (c, c, c))
