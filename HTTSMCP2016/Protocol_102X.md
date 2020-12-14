@@ -125,6 +125,10 @@ Make impact plot:
 
     plotImpacts.py -i impacts.json -o impacts
 
+## for approx impacts use:
+
+combineTool.py -M Impacts  -d ../cmb/125/ws.root -m 125 --doFits --X-rtd FITTER_NEW_CROSSING_ALGO --X-rtd FITTER_NEVER_GIVE_UP  --setParameters alpha=0 --setParameterRanges alpha=-90,90:muV=-5,5:muggH=-5,5  --cminDefaultMinimizerStrategy=1 --cminFallbackAlgo Minuit2,Migrad,1:1 --cminFallbackAlgo Minuit2,Migrad,0:1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10  --setRobustFitTolerance=1 --robustFit=1 --maxFailedSteps=20 --approx robust
+
 ### to help convergence when fitting on data:
 
     combineTool.py -M Impacts  -d ../cmb/125/ws.root -m 125 --doInitialFit --X-rtd FITTER_NEW_CROSSING_ALGO --X-rtd FITTER_NEVER_GIVE_UP  --setParameters alpha=0 --setParameterRanges alpha=-90,90:muV=-5,5:muggH=-5,5  --cminDefaultMinimizerStrategy=0 --cminFallbackAlgo Minuit2,Migrad,0:1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10  --setRobustFitTolerance=1 --robustFit=1 --maxFailedSteps=20
@@ -139,6 +143,14 @@ Run fit:
 
 Run postfitshapes:
    PostFitShapesFromWorkspace -m 125 -d output/cp110219/htt_01jet/125/combined.txt.cmb -w output/cp110219/htt_01jet/125/ws.root -o shapes_unblinding_01jets.root --print --sampling --postfit -f output/cp110219/htt_01jet/125/multidimfit.muggH.plots.freeze.root:fit_mdf
+
+#for all channels/categories (combining years as well):
+
+#run fit:
+
+combineTool.py -m 125 -M MultiDimFit --setParameters alpha=0 --setParameterRanges alpha=-90,90  --redefineSignalPOIs alpha  -d output/paper_181120/cmb/125/ws.root --algo none  --there -n .bestfit3 --floatOtherPOIs 1  --cminDefaultMinimizerStrategy 1 --cminFallbackAlgo Minuit2,Migrad,1:1 --cminFallbackAlgo Minuit2,Migrad,0:0.1 --cminFallbackAlgo Minuit2,Migrad,0:1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10 --saveFitResult --robustHesse=1
+
+#for i in et mt tt em; do for j in 1 2 3 4 5 6; do PostFitShapesFromWorkspace -m 125 -d output/paper_181120/htt_"$i"_"$j"_13TeV/125/combined.txt.cmb -w output/paper_181120/htt_"$i"_"$j"_13TeV/125/ws.root -o shapes_unblinding_"$i"_"$j".root --print --sampling --postfit -f output/paper_181120/cmb/125/multidimfit.bestfit.root:fit_mdf --total-shapes=true ; done; done
 
 you can also freeze a parameter for plotting purposes e.g if you want to show CP-odd signal use --freeze alpha=90
 

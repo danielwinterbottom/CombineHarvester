@@ -251,6 +251,7 @@ def main(args):
         bin_label = "0-jet"
         plot.ModTDRStyle(r=0.04, l=0.18)
         args.ratio_range = "0.7,1.3"
+        args.ratio_range = "0.85,1.15"
     if bin_number == "2":
         args.ratio_range = "0.4,1.6"
         bin_label = "boosted"
@@ -322,6 +323,8 @@ def main(args):
     x_blind_max = args.x_blind_max
     empty_bin_error = args.empty_bin_error
     extra_pad = float(args.extra_pad)
+    if bin_number == "1" and '_tt_' in file_dir:
+      extra_pad = 0.6
     custom_x_range = args.custom_x_range
     custom_y_range = args.custom_y_range
     x_axis_min = float(args.x_axis_min)
@@ -566,34 +569,39 @@ def main(args):
     if int(bin_number) in [1,2]:
         [sighist,binname] = getHistogram(histo_file,'TotalSig', file_dir, mode, args.no_signal, log_x)
         if args.combined_yrs:
-            if era == "2016":
-                sighist.Add(getHistogram(histo_file,'TotalSig', file_dir.replace(era,"2017"), mode, args.no_signal, log_x)[0].Clone())
-                sighist.Add(getHistogram(histo_file,'TotalSig', file_dir.replace(era,"2018"), mode, args.no_signal, log_x)[0].Clone())
+          [sighist,binname] = getHistogram(histo_file,'TotalSig', mode, mode, args.no_signal, log_x)
+            #if era == "2016":
+            #    sighist.Add(getHistogram(histo_file,'TotalSig', file_dir.replace(era,"2017"), mode, args.no_signal, log_x)[0].Clone())
+            #    sighist.Add(getHistogram(histo_file,'TotalSig', file_dir.replace(era,"2018"), mode, args.no_signal, log_x)[0].Clone())
     else:
         [sighist,binname] = getHistogram(histo_file,'TotalSig', file_dir, mode, args.no_signal, log_x)
         if args.combined_yrs:
-            if era == "2016":
-                sighist.Add(getHistogram(histo_file,'TotalSig', file_dir.replace(era,"2017"), mode, args.no_signal, log_x)[0].Clone())
-                sighist.Add(getHistogram(histo_file,'TotalSig', file_dir.replace(era,"2018"), mode, args.no_signal, log_x)[0].Clone())
+          [sighist,binname] = getHistogram(histo_file,'TotalSig', mode, mode, args.no_signal, log_x)
+            #if era == "2016":
+                #sighist.Add(getHistogram(histo_file,'TotalSig', file_dir.replace(era,"2017"), mode, args.no_signal, log_x)[0].Clone())
+                #sighist.Add(getHistogram(histo_file,'TotalSig', file_dir.replace(era,"2018"), mode, args.no_signal, log_x)[0].Clone())
     if args.file_alt != "": 
       [sighistPS,binnamePS] = getHistogram(histo_file_alt,'TotalSig', file_dir, mode, args.no_signal, log_x)
       if args.combined_yrs:
-            if era == "2016":
-                sighistPS.Add(getHistogram(histo_file_alt,'TotalSig', file_dir.replace(era,"2017"), mode, args.no_signal, log_x)[0].Clone()) 
-                sighistPS.Add(getHistogram(histo_file_alt,'TotalSig', file_dir.replace(era,"2018"), mode, args.no_signal, log_x)[0].Clone()) 
+        [sighistPS,binnamePS] = getHistogram(histo_file_alt,'TotalSig', mode, mode, args.no_signal, log_x)
+            #if era == "2016":
+            #    sighistPS.Add(getHistogram(histo_file_alt,'TotalSig', file_dir.replace(era,"2017"), mode, args.no_signal, log_x)[0].Clone()) 
+            #    sighistPS.Add(getHistogram(histo_file_alt,'TotalSig', file_dir.replace(era,"2018"), mode, args.no_signal, log_x)[0].Clone()) 
     if int(bin_number) in [1,2]:
         [sighistPS,binnamePS] = getHistogram(histo_file,'TotalSig', file_dir, mode, args.no_signal, log_x)
         if args.combined_yrs:
-            if era == "2016":
-                sighistPS.Add(getHistogram(histo_file,'TotalSig', file_dir.replace(era,"2017"), mode, args.no_signal, log_x)[0].Clone()) 
-                sighistPS.Add(getHistogram(histo_file,'TotalSig', file_dir.replace(era,"2018"), mode, args.no_signal, log_x)[0].Clone()) 
+          [sighistPS,binnamePS] = getHistogram(histo_file,'TotalSig', mode, mode, args.no_signal, log_x)
+            #if era == "2016":
+            #    sighistPS.Add(getHistogram(histo_file,'TotalSig', file_dir.replace(era,"2017"), mode, args.no_signal, log_x)[0].Clone()) 
+            #    sighistPS.Add(getHistogram(histo_file,'TotalSig', file_dir.replace(era,"2018"), mode, args.no_signal, log_x)[0].Clone()) 
     elif args.file_alt != "":
         [sighistPS,binnamePS] = getHistogram(histo_file_alt,'TotalSig', file_dir, mode, args.no_signal, log_x)
         #[sighistPS,binnamePS] = getHistogram(histo_file_alt,'ggH_ps_htt', file_dir, mode, args.no_signal, log_x)
         if args.combined_yrs:
-            if era == "2016":
-                sighistPS.Add(getHistogram(histo_file_alt,'TotalSig', file_dir.replace(era,"2017"), mode, args.no_signal, log_x)[0].Clone())
-                sighistPS.Add(getHistogram(histo_file_alt,'TotalSig', file_dir.replace(era,"2018"), mode, args.no_signal, log_x)[0].Clone())
+          [sighistPS,binnamePS] = getHistogram(histo_file_alt,'TotalSig', mode, mode, args.no_signal, log_x)
+            #if era == "2016":
+            #    sighistPS.Add(getHistogram(histo_file_alt,'TotalSig', file_dir.replace(era,"2017"), mode, args.no_signal, log_x)[0].Clone())
+            #    sighistPS.Add(getHistogram(histo_file_alt,'TotalSig', file_dir.replace(era,"2018"), mode, args.no_signal, log_x)[0].Clone())
                 #sighistPS.Add(getHistogram(histo_file_alt,'ggH_ps_htt', file_dir.replace(era,"2017"), mode, args.no_signal, log_x)[0].Clone())
     if int(bin_number) in [1,2]:
         sighists.append(sighist)
@@ -610,8 +618,7 @@ def main(args):
                 shist.SetBinContent(i,y_axis_min)
     bkghist = getHistogram(histo_file,'TotalBkg',file_dir, mode, logx=log_x)[0]
     if args.combined_yrs:
-        if era == "2016":
-            bkghist = getHistogram(histo_file,'TotalBkg',mode, mode, logx=log_x)[0]
+      bkghist = getHistogram(histo_file,'TotalBkg',mode, mode, logx=log_x)[0]
             #bkghist.Add(getHistogram(histo_file,'TotalBkg', file_dir.replace(era,"2017"), mode, log_x)[0].Clone())
     sbhist = bkghist.Clone()
     sbhist.Add(sighist)
@@ -621,9 +628,10 @@ def main(args):
     if not args.use_asimov:
         total_datahist = getHistogram(histo_file,"data_obs",file_dir, mode, logx=log_x)[0]
         if args.combined_yrs:
-            if era == "2016":
-                total_datahist.Add(getHistogram(histo_file,'data_obs', file_dir.replace(era,"2017"), mode, log_x)[0].Clone())
-                total_datahist.Add(getHistogram(histo_file,'data_obs', file_dir.replace(era,"2018"), mode, log_x)[0].Clone())
+          total_datahist = getHistogram(histo_file,"data_obs", mode, mode, logx=log_x)[0]
+            #if era == "2016":
+            #    total_datahist.Add(getHistogram(histo_file,'data_obs', file_dir.replace(era,"2017"), mode, log_x)[0].Clone())
+            #    total_datahist.Add(getHistogram(histo_file,'data_obs', file_dir.replace(era,"2018"), mode, log_x)[0].Clone())
     else:
         total_datahist = getHistogram(histo_file,"TotalProcs",file_dir, mode, logx=log_x)[0].Clone()
         for bin_ in range(1,total_datahist.GetNbinsX()+1):
@@ -760,6 +768,8 @@ def main(args):
     #Create stacked plot for the backgrounds
     bkg_histos = []
     bkg_histos_fractions = []
+    other_years = ['2016','2017','2018']
+    other_years.remove(era)
     for i,t in enumerate(background_schemes[channel]):
         plots = t['plot_list']
         isHist = False
@@ -770,13 +780,13 @@ def main(args):
                 if not uniform:
                     h = getHistogram(histo_file,k, file_dir,mode, logx=log_x)[0]
                     if args.combined_yrs: 
-                      h.Add(getHistogram(histo_file,k, file_dir.replace(era,"2017"),mode, logx=log_x)[0])
-                      h.Add(getHistogram(histo_file,k, file_dir.replace(era,"2018"),mode, logx=log_x)[0])
+                      for x in other_years: h.Add(getHistogram(histo_file,k, file_dir.replace(era,x),mode, logx=log_x)[0])
                 else :
                     htemp = getHistogram(histo_file,k,file_dir, mode,logx=log_x)[0]
                     if args.combined_yrs: 
-                      htemp.Add(getHistogram(histo_file,k,file_dir.replace(era,"2017"), mode,logx=log_x)[0])
-                      htemp.Add(getHistogram(histo_file,k,file_dir.replace(era,"2018"), mode,logx=log_x)[0])
+                      for x in other_years: htemp.Add(getHistogram(histo_file,k,file_dir.replace(era,x), mode,logx=log_x)[0])
+                      #htemp.Add(getHistogram(histo_file,k,file_dir.replace(era,"2017"), mode,logx=log_x)[0])
+                      #htemp.Add(getHistogram(histo_file,k,file_dir.replace(era,"2018"), mode,logx=log_x)[0])
                     h = ROOT.TH1F(k,k,htemp.GetNbinsX(),0,htemp.GetNbinsX())
                     for bp in range(0,htemp.GetNbinsX()):
                         h.SetBinContent(bp+1,htemp.GetBinContent(bp+1))
@@ -787,14 +797,18 @@ def main(args):
                     isHist = True
                     if not uniform:
                         h.Add(getHistogram(histo_file,k, file_dir,mode,logx=log_x)[0])
-                        if args.combined_yrs: 
-                          h.Add(getHistogram(histo_file,k, file_dir.replace(era,"2017"),mode,logx=log_x)[0])
-                          h.Add(getHistogram(histo_file,k, file_dir.replace(era,"2018"),mode,logx=log_x)[0])
+                        if args.combined_yrs:
+                          for x in other_years: h.Add(getHistogram(histo_file,k, file_dir.replace(era,x),mode,logx=log_x)[0]) 
+                          #h.Add(getHistogram(histo_file,k, mode,mode,logx=log_x)[0])
+                          #h.Add(getHistogram(histo_file,k, file_dir.replace(era,"2017"),mode,logx=log_x)[0])
+                          #h.Add(getHistogram(histo_file,k, file_dir.replace(era,"2018"),mode,logx=log_x)[0])
                     else :
                         htemp = getHistogram(histo_file,k,file_dir, mode,logx=log_x)[0]
                         if args.combined_yrs: 
-                          htemp.Add(getHistogram(histo_file,k,file_dir.replace(era,"2017"), mode,logx=log_x)[0])
-                          htemp.Add(getHistogram(histo_file,k,file_dir.replace(era,"2018"), mode,logx=log_x)[0])
+                          htemp = getHistogram(histo_file,k, mode, mode,logx=log_x)[0]
+                          for x in other_years: htemp.Add(getHistogram(histo_file,k,file_dir.replace(era,x), mode,logx=log_x)[0])
+                          #htemp.Add(getHistogram(histo_file,k,file_dir.replace(era,"2017"), mode,logx=log_x)[0])
+                          #htemp.Add(getHistogram(histo_file,k,file_dir.replace(era,"2018"), mode,logx=log_x)[0])
                         htemp2 = ROOT.TH1F(k,k,htemp.GetNbinsX(),0,htemp.GetNbinsX())
                         for bp in range(0,htemp.GetNbinsX()):
                             htemp2.SetBinContent(bp+1,htemp.GetBinContent(bp+1))
@@ -1044,10 +1058,12 @@ def main(args):
     legend.AddEntry(bkghist,"Background uncertainty","f")
     if int(bin_number) > 2:
         if not mode == 'prefit':
-          legend.AddEntry(sighist,"ggH#rightarrow#tau#tau (#alpha_{gg}=-59#circ)"%vars(),"l")
-          if args.file_alt != "": legend.AddEntry(sighistPS,"ggH#rightarrow#tau#tau (#alpha_{gg}=0#circ)"%vars(),"l")
+          #legend.AddEntry(sighist,"ggH#rightarrow#tau#tau (#alpha_{gg}=-59#circ)"%vars(),"l")
+          legend.AddEntry(sighist,"ggH#rightarrow#tau#tau (Bestfit)"%vars(),"l")
+          if args.file_alt != "": legend.AddEntry(sighistPS,"ggH#rightarrow#tau#tau (#alpha_{gg}=90#circ)"%vars(),"l")
         else:
           legend.AddEntry(sighist,"ggH#rightarrow#tau#tau (#alpha_{gg}=0#circ)"%vars(),"l")
+          #legend.AddEntry(sighist,"ggH#rightarrow#tau#tau (Bestfit)"%vars(),"l")
           if args.file_alt != "": legend.AddEntry(sighistPS,"ggH#rightarrow#tau#tau (#alpha_{gg}=90#circ)"%vars(),"l")
 
     elif int(bin_number) == 1:
@@ -1072,10 +1088,10 @@ def main(args):
     #CMS and lumi labels
     plot.FixTopRange(pads[0], plot.GetPadYMax(pads[0]), extra_pad if extra_pad>0 else 0.15)
     if bin_number == "1":
-        plot.DrawCMSLogo(pads[0], 'CMS', 'Preliminary', 11, 0.045, 0.05, 1.0, '', 1.0)
+        plot.DrawCMSLogo(pads[0], 'CMS', '', 11, 0.045, 0.05, 1.0, '', 1.0)
         plot.DrawTitle(pads[0], lumi, 3)
     else:
-        plot.DrawCMSLogo(pads[0], 'CMS', 'Preliminary', 0, 0.07, -0.1, 2.0, '', 0.6)
+        plot.DrawCMSLogo(pads[0], 'CMS', '', 0, 0.07, -0.1, 2.0, '', 0.6)
         DrawTitleUnrolled(pads[0], lumi, 3, scale=0.7)
     
     #Add ratio plot if required
@@ -1138,8 +1154,9 @@ def main(args):
             rlegend.AddEntry(ratio_datahist,"Data/Bkg","PE")
             rlegend.AddEntry(""," ","")
             #rlegend.AddEntry(ratio_sighist,"(Sig(#alpha_{gg}=0#circ)+Bkg)/Bkg","L")
-            if not mode == 'prefit': rlegend.AddEntry(ratio_sighist,"(Sig(#alpha_{gg}=-59#circ)+Bkg)/Bkg","L")
-            else: rlegend.AddEntry(ratio_sighist,"(Sig(#alpha_{gg}=0#circ)+Bkg)/Bkg","L")
+            #if not mode == 'prefit': rlegend.AddEntry(ratio_sighist,"(Sig(#alpha_{gg}=-59#circ)+Bkg)/Bkg","L")
+            if not mode == 'prefit': rlegend.AddEntry(ratio_sighist,"(Sig(Bestfit)+Bkg)/Bkg","L")
+            else: rlegend.AddEntry(ratio_sighist,"(Sig(#alpha_{gg}=90#circ)+Bkg)/Bkg","L")
             rlegend.AddEntry(""," ","")
             if not mode == 'prefit': rlegend.AddEntry(ratio_sighist_PS,"(Sig(#alpha_{gg}=0#circ)+Bkg)/Bkg","L")
             else: rlegend.AddEntry(ratio_sighist_PS,"(Sig(#alpha_{gg}=90#circ)+Bkg)/Bkg","L")
