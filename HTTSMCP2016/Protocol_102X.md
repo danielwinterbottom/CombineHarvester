@@ -131,10 +131,13 @@ combineTool.py -M Impacts  -d ../cmb/125/ws.root -m 125 --doFits --X-rtd FITTER_
 
 ### to help convergence when fitting on data:
 
-    combineTool.py -M Impacts  -d ../cmb/125/ws.root -m 125 --doInitialFit --X-rtd FITTER_NEW_CROSSING_ALGO --X-rtd FITTER_NEVER_GIVE_UP  --setParameters alpha=0 --setParameterRanges alpha=-90,90:muV=-5,5:muggH=-5,5  --cminDefaultMinimizerStrategy=0 --cminFallbackAlgo Minuit2,Migrad,0:1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10  --setRobustFitTolerance=1 --robustFit=1 --maxFailedSteps=20
+# initial fit
 
-    combineTool.py -M Impacts  -d ../cmb/125/ws.root -m 125 --doFits --X-rtd FITTER_NEW_CROSSING_ALGO --X-rtd FITTER_NEVER_GIVE_UP  --setParameters alpha=0 --setParameterRanges alpha=-90,90:muV=-5,5:muggH=-5,5  --cminDefaultMinimizerStrategy=0 --cminFallbackAlgo Minuit2,Migrad,0:1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10  --setRobustFitTolerance=1 --robustFit=1 --maxFailedSteps=20  --job-mode crab3 --task-name grid-test-impacts-new --custom-crab ../../../custom_crab.py
+combineTool.py -M Impacts  -d ../cmb/125/ws.root -m 125 --doInitialFit --X-rtd FITTER_NEW_CROSSING_ALGO --X-rtd FITTER_NEVER_GIVE_UP  --setParameters alpha=0 --setParameterRanges alpha=-90,90:muV=-5,5:muggH=-5,5  --cminDefaultMinimizerStrategy=1 --cminFallbackAlgo Minuit2,Migrad,1:1 --cminFallbackAlgo Minuit2,Migrad,0:1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10  --setRobustFitTolerance=1 --robustFit=1 --maxFailedSteps=20
 
+# to run parameter fits but with some failing:
+
+combineTool.py -M Impacts  -d ../cmb/125/ws.root -m 125 --doFits --X-rtd FITTER_NEW_CROSSING_ALGO --X-rtd FITTER_NEVER_GIVE_UP  --setParameters alpha=0 --setParameterRanges alpha=-90,90:muV=-5,5:muggH=-5,5  --cminDefaultMinimizerStrategy=1 --cminFallbackAlgo Minuit2,Migrad,1:1 --cminFallbackAlgo Minuit2,Migrad,0:1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10  --setRobustFitTolerance=1 --robustFit=1 --maxFailedSteps=20  --job-mode crab3 --task-name grid-test-impacts-newtheoryv2 --custom-crab ../../../custom_crab.py
 
 ## Make post-fit plots
 
