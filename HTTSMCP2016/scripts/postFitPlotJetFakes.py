@@ -14,7 +14,23 @@ ROOT.gROOT.SetBatch(ROOT.kTRUE)
 ROOT.TH1.AddDirectory(False)
 
 def getHistogram(fname, histname, dirname='', postfitmode='prefit', allowEmpty=False, logx=False):
+  
     outname = fname.GetName()
+
+    if isinstance(dirname,list) or isinstance(histname,list):
+      if not isinstance(dirname,list): dirname = [dirname]
+      if not isinstance(histname,list): histname = [histname]
+
+      firstHist=True
+      for d in dirname: 
+        for h in histname: 
+          htemp = getHistogram(fname, h, d, postfitmode, allowEmpty, logx)[0]
+          if firstHist: 
+            histo=htemp.Clone()
+            firstHist=False
+          else: histo.Add(htemp)
+      return [histo,outname]
+    
     for key in fname.GetListOfKeys():
         histo = fname.Get(key.GetName())
         dircheck = False
@@ -43,6 +59,7 @@ def getHistogram(fname, histname, dirname='', postfitmode='prefit', allowEmpty=F
         return [ROOT.TH1F('empty', '', 1, 0, 1), outname]
     else:
         return None
+
 
 def signalComp(leg,plots,colour,stacked):
     return dict([('leg_text',leg),('plot_list',plots),('colour',colour),('in_stack',stacked)])
@@ -430,35 +447,35 @@ def main(args):
     background_schemes = {
         'mt':[
                 backgroundComp("qqH#rightarrow#tau#tau + VH#rightarrow#tau#tau",["qqH_htt125","ZH_htt125","WH_htt125"],ROOT.TColor.GetColor(51,51,230)),
-                backgroundComp("t#bar{t}",["TTT"],ROOT.TColor.GetColor(155,152,204)),
-                backgroundComp("Electroweak",["VVT"],ROOT.TColor.GetColor(222,90,106)),
-                backgroundComp("Z#rightarrow#mu#mu",["ZL","EWKZ"],ROOT.TColor.GetColor(100,192,232)),
-                backgroundComp("jet#rightarrow#tau_{h} fakes",["jetFakes"],ROOT.TColor.GetColor(192,232,100)),
-                backgroundComp("#mu#rightarrow#tau embedding",["EmbedZTT"],ROOT.TColor.GetColor(248,206,104)),
+                backgroundComp("t#bar{t}+jets",["TTT"],ROOT.TColor.GetColor("#9999cc")),
+                backgroundComp("Others",["VVT"],ROOT.TColor.GetColor("#12cadd")),
+                backgroundComp("Z#rightarrowee/#mu#mu",["ZL","EWKZ"],ROOT.TColor.GetColor("#4496c8")),
+                backgroundComp("jet#rightarrow#tau_{h} mis-ID",["jetFakes"],ROOT.TColor.GetColor("#ffccff")),
+                backgroundComp("#tau#tau bkg.",["EmbedZTT"],ROOT.TColor.GetColor("#ffcc66")),
                 ],
 
         'et':[
                 backgroundComp("qqH#rightarrow#tau#tau + VH#rightarrow#tau#tau",["qqH_htt125","ZH_htt125","WH_htt125"],ROOT.TColor.GetColor(51,51,230)),
-                backgroundComp("t#bar{t}",["TTT"],ROOT.TColor.GetColor(155,152,204)),
-                backgroundComp("Electroweak",["VVT"],ROOT.TColor.GetColor(222,90,106)),
-                backgroundComp("Z#rightarrowee",["ZL","EWKZ"],ROOT.TColor.GetColor(100,192,232)),
-                backgroundComp("jet#rightarrow#tau_{h} fakes",["jetFakes"],ROOT.TColor.GetColor(192,232,100)),
-                backgroundComp("#mu#rightarrow#tau embedding",["EmbedZTT"],ROOT.TColor.GetColor(248,206,104)),
+                backgroundComp("t#bar{t}+jets",["TTT"],ROOT.TColor.GetColor("#9999cc")),
+                backgroundComp("Others",["VVT"],ROOT.TColor.GetColor("#12cadd")),
+                backgroundComp("Z#rightarrowee/#mu#mu",["ZL","EWKZ"],ROOT.TColor.GetColor("#4496c8")),
+                backgroundComp("jet#rightarrow#tau_{h} mis-ID",["jetFakes"],ROOT.TColor.GetColor("#ffccff")),
+                backgroundComp("#tau#tau bkg.",["EmbedZTT"],ROOT.TColor.GetColor("#ffcc66")),
                 ],
 
         'tt':[
                 backgroundComp("qqH#rightarrow#tau#tau + VH#rightarrow#tau#tau",["qqH_htt125","ZH_htt125","WH_htt125"],ROOT.TColor.GetColor(51,51,230)),
-                backgroundComp("l#rightarrow#tau_{h} fakes",["VVT","ZL","EWKZ","TTT"],ROOT.TColor.GetColor(100,192,232)),
-                backgroundComp("jet#rightarrow#tau_{h} fakes",["jetFakes"],ROOT.TColor.GetColor(192,232,100)),
-                backgroundComp("#mu#rightarrow#tau embedding",["EmbedZTT"],ROOT.TColor.GetColor(248,206,104)),
+                backgroundComp("l#rightarrow#tau_{h} fakes",["VVT","ZL","EWKZ","TTT"],ROOT.TColor.GetColor("#4496c8")),
+                backgroundComp("jet#rightarrow#tau_{h} mis-ID",["jetFakes"],ROOT.TColor.GetColor("#ffccff")),
+                backgroundComp("#tau#tau bkg.",["EmbedZTT"],ROOT.TColor.GetColor("#ffcc66")),
                 ],
 
         'em':[
                 backgroundComp("qqH#rightarrow#tau#tau + VH#rightarrow#tau#tau",["qqH_htt125","ZH_htt125","WH_htt125"],ROOT.TColor.GetColor(51,51,230)),
-                backgroundComp("t#bar{t}",["TT"],ROOT.TColor.GetColor(155,152,204)),
-                backgroundComp("Electroweak",["VV","W","ZLL","EWKZ"],ROOT.TColor.GetColor(222,90,106)),
-                backgroundComp("QCD", ["QCD"], ROOT.TColor.GetColor(250,202,255)),
-                backgroundComp("#mu#rightarrow#tau embedding",["EmbedZTT"],ROOT.TColor.GetColor(248,206,104)),
+                backgroundComp("t#bar{t}+jets",["TT"],ROOT.TColor.GetColor("#9999cc")),
+                backgroundComp("Others",["VV","W","ZLL","EWKZ"],ROOT.TColor.GetColor("#12cadd")),
+                backgroundComp("QCD", ["QCD"], ROOT.TColor.GetColor("#ffccff")),
+                backgroundComp("#tau#tau bkg.",["EmbedZTT"],ROOT.TColor.GetColor("#ffcc66")),
                 ]
         }
 
@@ -471,134 +488,170 @@ def main(args):
       background_schemes = dict(background_schemes.items()+background_schemes_new.items())
       background_schemes['tt'] = [
                 backgroundComp("qqH#rightarrow#tau#tau + VH#rightarrow#tau#tau",["qqH_htt125","ZH_htt125","WH_htt125"],ROOT.TColor.GetColor(51,51,230)),
-                backgroundComp("jet#rightarrow#tau_{h} fakes",["jetFakes"],ROOT.TColor.GetColor(192,232,100)),
-                backgroundComp("#mu#rightarrow#tau embedding",["EmbedZTT"],ROOT.TColor.GetColor(248,206,104)),
-                backgroundComp("l#rightarrow#tau_{h} fakes",["VVT","ZL","EWKZ","TTT"],ROOT.TColor.GetColor(100,192,232)),
+                backgroundComp("jet#rightarrow#tau_{h} mis-ID",["jetFakes"],ROOT.TColor.GetColor("#ffccff")),
+                backgroundComp("#tau#tau bkg.",["EmbedZTT"],ROOT.TColor.GetColor("#ffcc66")),
+                backgroundComp("l#rightarrow#tau_{h} fakes",["VVT","ZL","EWKZ","TTT"],ROOT.TColor.GetColor("#4496c8")),
                 ]
       background_schemes['et'] = [
                 backgroundComp("qqH#rightarrow#tau#tau + VH#rightarrow#tau#tau",["qqH_htt125","ZH_htt125","WH_htt125"],ROOT.TColor.GetColor(51,51,230)),
-                backgroundComp("jet#rightarrow#tau_{h} fakes",["jetFakes"],ROOT.TColor.GetColor(192,232,100)),
-                backgroundComp("#mu#rightarrow#tau embedding",["EmbedZTT"],ROOT.TColor.GetColor(248,206,104)),
-                backgroundComp("t#bar{t}",["TTT"],ROOT.TColor.GetColor(155,152,204)),
-                backgroundComp("Electroweak",["VVT"],ROOT.TColor.GetColor(222,90,106)),
-                backgroundComp("Z#rightarrowee",["ZL","EWKZ"],ROOT.TColor.GetColor(100,192,232)),
+                backgroundComp("jet#rightarrow#tau_{h} mis-ID",["jetFakes"],ROOT.TColor.GetColor("#ffccff")),
+                backgroundComp("#tau#tau bkg.",["EmbedZTT"],ROOT.TColor.GetColor("#ffcc66")),
+                backgroundComp("t#bar{t}+jets",["TTT"],ROOT.TColor.GetColor("#9999cc")),
+                backgroundComp("Others",["VVT"],ROOT.TColor.GetColor("#12cadd")),
+                backgroundComp("Z#rightarrowee/#mu#mu",["ZL","EWKZ"],ROOT.TColor.GetColor("#4496c8")),
                 ]
       background_schemes['mt'] = [
                 backgroundComp("qqH#rightarrow#tau#tau + VH#rightarrow#tau#tau",["qqH_htt125","ZH_htt125","WH_htt125"],ROOT.TColor.GetColor(51,51,230)),
-                backgroundComp("jet#rightarrow#tau_{h} fakes",["jetFakes"],ROOT.TColor.GetColor(192,232,100)),
-                backgroundComp("#mu#rightarrow#tau embedding",["EmbedZTT"],ROOT.TColor.GetColor(248,206,104)),
-                backgroundComp("t#bar{t}",["TTT"],ROOT.TColor.GetColor(155,152,204)),
-                backgroundComp("Electroweak",["VVT"],ROOT.TColor.GetColor(222,90,106)),
-                backgroundComp("Z#rightarrow#mu#mu",["ZL","EWKZ"],ROOT.TColor.GetColor(100,192,232)),
+                backgroundComp("jet#rightarrow#tau_{h} mis-ID",["jetFakes"],ROOT.TColor.GetColor("#ffccff")),
+                backgroundComp("#tau#tau bkg.",["EmbedZTT"],ROOT.TColor.GetColor("#ffcc66")),
+                backgroundComp("t#bar{t}+jets",["TTT"],ROOT.TColor.GetColor("#9999cc")),
+                backgroundComp("Others",["VVT"],ROOT.TColor.GetColor("#12cadd")),
+                backgroundComp("Z#rightarrowee/#mu#mu",["ZL","EWKZ"],ROOT.TColor.GetColor("#4496c8")),
                 ]
       background_schemes['em'] = [
                 backgroundComp("qqH#rightarrow#tau#tau + VH#rightarrow#tau#tau",["qqH_htt125","ZH_htt125","WH_htt125"],ROOT.TColor.GetColor(51,51,230)),
-                backgroundComp("t#bar{t}",["TT"],ROOT.TColor.GetColor(155,152,204)),
-                backgroundComp("#mu#rightarrow#tau embedding",["EmbedZTT"],ROOT.TColor.GetColor(248,206,104)),
-                backgroundComp("Electroweak",["VV","W","ZLL","EWKZ"],ROOT.TColor.GetColor(222,90,106)),
-                backgroundComp("QCD", ["QCD"], ROOT.TColor.GetColor(250,202,255)),
+                backgroundComp("t#bar{t}+jets",["TT"],ROOT.TColor.GetColor("#9999cc")),
+                backgroundComp("#tau#tau bkg.",["EmbedZTT"],ROOT.TColor.GetColor("#ffcc66")),
+                backgroundComp("Others",["VV","W","ZLL","EWKZ"],ROOT.TColor.GetColor("#12cadd")),
+                backgroundComp("QCD", ["QCD"], ROOT.TColor.GetColor("#ffccff")),
                 ]
 
 ######## small background near top of stack
 #
 #    background_schemes['tt'] = [
 #              backgroundComp("qqH#rightarrow#tau#tau + VH#rightarrow#tau#tau",["qqH_htt125","ZH_htt125","WH_htt125"],ROOT.TColor.GetColor(51,51,230)),
-#              backgroundComp("jet#rightarrow#tau_{h} fakes",["jetFakes"],ROOT.TColor.GetColor(192,232,100)),
+#              backgroundComp("jet#rightarrow#tau_{h} mis-ID",["jetFakes"],ROOT.TColor.GetColor(192,232,100)),
 #              backgroundComp("#mu#rightarrow#tau embedding",["EmbedZTT"],ROOT.TColor.GetColor(248,206,104)),
-#              backgroundComp("l#rightarrow#tau_{h} fakes",["VVT","ZL","EWKZ","TTT"],ROOT.TColor.GetColor(100,192,232)),
+#              backgroundComp("l#rightarrow#tau_{h} fakes",["VVT","ZL","EWKZ","TTT"],ROOT.TColor.GetColor("#4496c8")),
 #              ]
 #    background_schemes['et'] = [
 #              backgroundComp("qqH#rightarrow#tau#tau + VH#rightarrow#tau#tau",["qqH_htt125","ZH_htt125","WH_htt125"],ROOT.TColor.GetColor(51,51,230)),
-#              backgroundComp("jet#rightarrow#tau_{h} fakes",["jetFakes"],ROOT.TColor.GetColor(192,232,100)),
+#              backgroundComp("jet#rightarrow#tau_{h} mis-ID",["jetFakes"],ROOT.TColor.GetColor(192,232,100)),
 #              backgroundComp("#mu#rightarrow#tau embedding",["EmbedZTT"],ROOT.TColor.GetColor(248,206,104)),
-#              backgroundComp("t#bar{t}",["TTT"],ROOT.TColor.GetColor(155,152,204)),
-#              backgroundComp("Electroweak",["VVT"],ROOT.TColor.GetColor(222,90,106)),
-#              backgroundComp("Z#rightarrowee",["ZL","EWKZ"],ROOT.TColor.GetColor(100,192,232)),
+#              backgroundComp("t#bar{t}+jets",["TTT"],ROOT.TColor.GetColor("#9999cc")),
+#              backgroundComp("Others",["VVT"],ROOT.TColor.GetColor("#12cadd")),
+#              backgroundComp("Z#rightarrowee/#mu#mu",["ZL","EWKZ"],ROOT.TColor.GetColor("#4496c8")),
 #              ]
 #    background_schemes['mt'] = [
 #              backgroundComp("qqH#rightarrow#tau#tau + VH#rightarrow#tau#tau",["qqH_htt125","ZH_htt125","WH_htt125"],ROOT.TColor.GetColor(51,51,230)),
-#              backgroundComp("jet#rightarrow#tau_{h} fakes",["jetFakes"],ROOT.TColor.GetColor(192,232,100)),
+#              backgroundComp("jet#rightarrow#tau_{h} mis-ID",["jetFakes"],ROOT.TColor.GetColor(192,232,100)),
 #              backgroundComp("#mu#rightarrow#tau embedding",["EmbedZTT"],ROOT.TColor.GetColor(248,206,104)),
-#              backgroundComp("t#bar{t}",["TTT"],ROOT.TColor.GetColor(155,152,204)),
-#              backgroundComp("Electroweak",["VVT"],ROOT.TColor.GetColor(222,90,106)),
-#              backgroundComp("Z#rightarrow#mu#mu",["ZL","EWKZ"],ROOT.TColor.GetColor(100,192,232)),
+#              backgroundComp("t#bar{t}+jets",["TTT"],ROOT.TColor.GetColor("#9999cc")),
+#              backgroundComp("Others",["VVT"],ROOT.TColor.GetColor("#12cadd")),
+#              backgroundComp("Z#rightarrowee/#mu#mu",["ZL","EWKZ"],ROOT.TColor.GetColor("#4496c8")),
 #              ]
 #    background_schemes['em'] = [
 #              backgroundComp("qqH#rightarrow#tau#tau + VH#rightarrow#tau#tau",["qqH_htt125","ZH_htt125","WH_htt125"],ROOT.TColor.GetColor(51,51,230)),
-#              backgroundComp("t#bar{t}",["TT"],ROOT.TColor.GetColor(155,152,204)),
+#              backgroundComp("t#bar{t}+jets",["TT"],ROOT.TColor.GetColor("#9999cc")),
 #              backgroundComp("#mu#rightarrow#tau embedding",["EmbedZTT"],ROOT.TColor.GetColor(248,206,104)),
-#              backgroundComp("Electroweak",["VV","W","ZLL","EWKZ"],ROOT.TColor.GetColor(222,90,106)),
+#              backgroundComp("Others",["VV","W","ZLL","EWKZ"],ROOT.TColor.GetColor("#12cadd")),
 #              backgroundComp("QCD", ["QCD"], ROOT.TColor.GetColor(250,202,255)),
 #              ]
 
 ####### small background near bottom of stack
 
-    background_schemes['tt'] = [
-              backgroundComp("qqH#rightarrow#tau#tau + VH#rightarrow#tau#tau",["qqH_htt125","ZH_htt125","WH_htt125"],ROOT.TColor.GetColor(51,51,230)),
-              backgroundComp("l#rightarrow#tau_{h} fakes",["VVT","ZL","EWKZ","TTT"],ROOT.TColor.GetColor(100,192,232)),
-              backgroundComp("jet#rightarrow#tau_{h} fakes",["jetFakes"],ROOT.TColor.GetColor(192,232,100)),
-              backgroundComp("#mu#rightarrow#tau embedding",["EmbedZTT"],ROOT.TColor.GetColor(248,206,104)),
-              ]
+    #background_schemes['tt'] = [
+    #          backgroundComp("qqH#rightarrow#tau#tau + VH#rightarrow#tau#tau",["qqH_htt125","ZH_htt125","WH_htt125"],ROOT.TColor.GetColor(51,51,230)),
+    #          backgroundComp("l#rightarrow#tau_{h} fakes",["VVT","ZL","EWKZ","TTT"],ROOT.TColor.GetColor("#4496c8")),
+    #          backgroundComp("jet#rightarrow#tau_{h} mis-ID",["jetFakes"],ROOT.TColor.GetColor("#ffccff")),
+    #          backgroundComp("#tau#tau bkg.",["EmbedZTT"],ROOT.TColor.GetColor("#ffcc66")),
+    #          ]
     background_schemes['et'] = [
               backgroundComp("qqH#rightarrow#tau#tau + VH#rightarrow#tau#tau",["qqH_htt125","ZH_htt125","WH_htt125"],ROOT.TColor.GetColor(51,51,230)),
-              backgroundComp("t#bar{t}",["TTT"],ROOT.TColor.GetColor(155,152,204)),
-              backgroundComp("Electroweak",["VVT"],ROOT.TColor.GetColor(222,90,106)),
-              backgroundComp("jet#rightarrow#tau_{h} fakes",["jetFakes"],ROOT.TColor.GetColor(192,232,100)),
-              backgroundComp("#mu#rightarrow#tau embedding",["EmbedZTT"],ROOT.TColor.GetColor(248,206,104)),
-              backgroundComp("Z#rightarrowee",["ZL","EWKZ"],ROOT.TColor.GetColor(100,192,232)),
+              backgroundComp("t#bar{t}+jets",["TTT"],ROOT.TColor.GetColor("#9999cc")),
+              backgroundComp("Others",["VVT"],ROOT.TColor.GetColor("#12cadd")),
+              backgroundComp("jet#rightarrow#tau_{h} mis-ID",["jetFakes"],ROOT.TColor.GetColor("#ffccff")),
+              backgroundComp("#tau#tau bkg.",["EmbedZTT"],ROOT.TColor.GetColor("#ffcc66")),
+              backgroundComp("Z#rightarrowee/#mu#mu",["ZL","EWKZ"],ROOT.TColor.GetColor("#4496c8")),
               ]
     background_schemes['mt'] = [
               backgroundComp("qqH#rightarrow#tau#tau + VH#rightarrow#tau#tau",["qqH_htt125","ZH_htt125","WH_htt125"],ROOT.TColor.GetColor(51,51,230)),
-              backgroundComp("t#bar{t}",["TTT"],ROOT.TColor.GetColor(155,152,204)),
-              backgroundComp("Electroweak",["VVT"],ROOT.TColor.GetColor(222,90,106)),
-              backgroundComp("jet#rightarrow#tau_{h} fakes",["jetFakes"],ROOT.TColor.GetColor(192,232,100)),
-              backgroundComp("#mu#rightarrow#tau embedding",["EmbedZTT"],ROOT.TColor.GetColor(248,206,104)),
-              backgroundComp("Z#rightarrow#mu#mu",["ZL","EWKZ"],ROOT.TColor.GetColor(100,192,232)),
+              backgroundComp("t#bar{t}+jets",["TTT"],ROOT.TColor.GetColor("#9999cc")),
+              backgroundComp("Others",["VVT"],ROOT.TColor.GetColor("#12cadd")),
+              backgroundComp("jet#rightarrow#tau_{h} mis-ID",["jetFakes"],ROOT.TColor.GetColor("#ffccff")),
+              backgroundComp("#tau#tau bkg.",["EmbedZTT"],ROOT.TColor.GetColor("#ffcc66")),
+              backgroundComp("Z#rightarrowee/#mu#mu",["ZL","EWKZ"],ROOT.TColor.GetColor("#4496c8")),
               ]
     background_schemes['em'] = [
               backgroundComp("qqH#rightarrow#tau#tau + VH#rightarrow#tau#tau",["qqH_htt125","ZH_htt125","WH_htt125"],ROOT.TColor.GetColor(51,51,230)),
-              backgroundComp("t#bar{t}",["TT"],ROOT.TColor.GetColor(155,152,204)),
-              backgroundComp("Electroweak",["VV","W","ZLL","EWKZ"],ROOT.TColor.GetColor(222,90,106)),
-              backgroundComp("QCD", ["QCD"], ROOT.TColor.GetColor(250,202,255)),
-              backgroundComp("#mu#rightarrow#tau embedding",["EmbedZTT"],ROOT.TColor.GetColor(248,206,104)),
+              backgroundComp("t#bar{t}+jets",["TT"],ROOT.TColor.GetColor("#9999cc")),
+              backgroundComp("Others",["VV","W"],ROOT.TColor.GetColor("#12cadd")),
+              backgroundComp("QCD", ["QCD"], ROOT.TColor.GetColor("#ffccff")),
+              backgroundComp("Z#rightarrowee/#mu#mu",["ZLL","EWKZ"],ROOT.TColor.GetColor("#4496c8")),
+              backgroundComp("#tau#tau bkg.",["EmbedZTT"],ROOT.TColor.GetColor("#ffcc66")),
               ]
- 
-    
+
+##### new defs to match agreed color schemes #####
+
+    background_schemes['em'] = [
+              backgroundComp("Others",["VV","W"],ROOT.TColor.GetColor("#12cadd")),
+              backgroundComp("t#bar{t}+jets",["TT"],ROOT.TColor.GetColor("#9999cc")),
+              backgroundComp("Z#rightarrowee/#mu#mu",["ZLL","EWKZ"],ROOT.TColor.GetColor("#4496c8")),
+              backgroundComp("QCD",["QCD"],ROOT.TColor.GetColor("#ffccff")),
+              backgroundComp("#tau#tau bkg.",["EmbedZTT"],ROOT.TColor.GetColor("#ffcc66")),
+              backgroundComp("H#rightarrow#tau#tau (Best fit)", ["TotalSig"],ROOT.kRed),
+              ]
+
+    background_schemes['tt'] = [
+              backgroundComp("Others",["VVT"],ROOT.TColor.GetColor("#12cadd")),
+              backgroundComp("t#bar{t}+jets",["TTT"],ROOT.TColor.GetColor("#9999cc")),
+              backgroundComp("Z#rightarrowee/#mu#mu",["ZL","EWKZ"],ROOT.TColor.GetColor("#4496c8")),
+              backgroundComp("jet#rightarrow#tau_{h} mis-ID",["jetFakes","Wfakes"],ROOT.TColor.GetColor("#ffccff")),
+              backgroundComp("#tau#tau bkg.",["EmbedZTT"],ROOT.TColor.GetColor("#ffcc66")),
+              backgroundComp("H#rightarrow#tau#tau (Best fit)", ["TotalSig"],ROOT.kRed),
+              ]
+
+    background_schemes['et'] = background_schemes['tt']
+    background_schemes['mt'] = background_schemes['tt']
+
+    background_schemes_new = {}
+    for i in background_schemes:
+        background_schemes_new[i+'_unmod'] = background_schemes[i] 
+        background_schemes_new[i] = background_schemes[i] 
+    background_schemes = background_schemes_new    
+
     #Extract relevent histograms from shape file
     sighists = []
+
+    #signal_names = 'TotalSig'
+    signal_names = ['ggH_sm_htt','ggH_ps_htt','ggH_mm_htt']
+
+    file_dir_list = []
+    if args.combined_yrs:
+      for year in ['2016','2017','2018']:
+        file_dir_list.append(file_dir.replace(year,'2016'))
+        file_dir_list.append(file_dir.replace(year,'2017'))
+        file_dir_list.append(file_dir.replace(year,'2018'))
+      file_dir_list = list(set(file_dir_list))
+    else: file_dir_list = [file_dir]
+
     if int(bin_number) in [1,2]:
-        [sighist,binname] = getHistogram(histo_file,'TotalSig', file_dir, mode, args.no_signal, log_x)
-        if args.combined_yrs:
-          [sighist,binname] = getHistogram(histo_file,'TotalSig', mode, mode, args.no_signal, log_x)
-            #if era == "2016":
-            #    sighist.Add(getHistogram(histo_file,'TotalSig', file_dir.replace(era,"2017"), mode, args.no_signal, log_x)[0].Clone())
-            #    sighist.Add(getHistogram(histo_file,'TotalSig', file_dir.replace(era,"2018"), mode, args.no_signal, log_x)[0].Clone())
+        [sighist,binname] = getHistogram(histo_file,signal_names, file_dir_list, mode, args.no_signal, log_x)
+        #if args.combined_yrs:
+        #  [sighist,binname] = getHistogram(histo_file,signal_names, file_dir_list, mode, args.no_signal, log_x)
     else:
-        [sighist,binname] = getHistogram(histo_file,'TotalSig', file_dir, mode, args.no_signal, log_x)
-        if args.combined_yrs:
-          [sighist,binname] = getHistogram(histo_file,'TotalSig', mode, mode, args.no_signal, log_x)
-            #if era == "2016":
-                #sighist.Add(getHistogram(histo_file,'TotalSig', file_dir.replace(era,"2017"), mode, args.no_signal, log_x)[0].Clone())
-                #sighist.Add(getHistogram(histo_file,'TotalSig', file_dir.replace(era,"2018"), mode, args.no_signal, log_x)[0].Clone())
+        [sighist,binname] = getHistogram(histo_file,signal_names, file_dir_list, mode, args.no_signal, log_x)
+        #if args.combined_yrs:
+        #  [sighist,binname] = getHistogram(histo_file,signal_names, file_dir_list, mode, args.no_signal, log_x)
     if args.file_alt != "": 
-      [sighistPS,binnamePS] = getHistogram(histo_file_alt,'TotalSig', file_dir, mode, args.no_signal, log_x)
-      if args.combined_yrs:
-        [sighistPS,binnamePS] = getHistogram(histo_file_alt,'TotalSig', mode, mode, args.no_signal, log_x)
+      [sighistPS,binnamePS] = getHistogram(histo_file_alt,'ggH_ps_htt', file_dir_list, mode, args.no_signal, log_x)
+      #if args.combined_yrs:
+      #  [sighistPS,binnamePS] = getHistogram(histo_file_alt,'ggH_ps_htt', mode, mode, args.no_signal, log_x)
             #if era == "2016":
             #    sighistPS.Add(getHistogram(histo_file_alt,'TotalSig', file_dir.replace(era,"2017"), mode, args.no_signal, log_x)[0].Clone()) 
             #    sighistPS.Add(getHistogram(histo_file_alt,'TotalSig', file_dir.replace(era,"2018"), mode, args.no_signal, log_x)[0].Clone()) 
     if int(bin_number) in [1,2]:
-        [sighistPS,binnamePS] = getHistogram(histo_file,'TotalSig', file_dir, mode, args.no_signal, log_x)
-        if args.combined_yrs:
-          [sighistPS,binnamePS] = getHistogram(histo_file,'TotalSig', mode, mode, args.no_signal, log_x)
+        [sighistPS,binnamePS] = getHistogram(histo_file,'ggH_ps_htt', file_dir_list, mode, args.no_signal, log_x)
+        #if args.combined_yrs:
+        #  [sighistPS,binnamePS] = getHistogram(histo_file,'ggH_ps_htt', mode, mode, args.no_signal, log_x)
             #if era == "2016":
             #    sighistPS.Add(getHistogram(histo_file,'TotalSig', file_dir.replace(era,"2017"), mode, args.no_signal, log_x)[0].Clone()) 
             #    sighistPS.Add(getHistogram(histo_file,'TotalSig', file_dir.replace(era,"2018"), mode, args.no_signal, log_x)[0].Clone()) 
     elif args.file_alt != "":
-        [sighistPS,binnamePS] = getHistogram(histo_file_alt,'TotalSig', file_dir, mode, args.no_signal, log_x)
+        [sighistPS,binnamePS] = getHistogram(histo_file_alt,'ggH_ps_htt', file_dir_list, mode, args.no_signal, log_x)
         #[sighistPS,binnamePS] = getHistogram(histo_file_alt,'ggH_ps_htt', file_dir, mode, args.no_signal, log_x)
-        if args.combined_yrs:
-          [sighistPS,binnamePS] = getHistogram(histo_file_alt,'TotalSig', mode, mode, args.no_signal, log_x)
+        #if args.combined_yrs:
+        #  [sighistPS,binnamePS] = getHistogram(histo_file_alt,'ggH_ps_htt', mode, mode, args.no_signal, log_x)
             #if era == "2016":
             #    sighistPS.Add(getHistogram(histo_file_alt,'TotalSig', file_dir.replace(era,"2017"), mode, args.no_signal, log_x)[0].Clone())
             #    sighistPS.Add(getHistogram(histo_file_alt,'TotalSig', file_dir.replace(era,"2018"), mode, args.no_signal, log_x)[0].Clone())
@@ -616,9 +669,11 @@ def main(args):
         for i in range(0,shist.GetNbinsX()):
             if shist.GetBinContent(i) < y_axis_min: 
                 shist.SetBinContent(i,y_axis_min)
-    bkghist = getHistogram(histo_file,'TotalBkg',file_dir, mode, logx=log_x)[0]
+    bkghist = getHistogram(histo_file,'TotalProcs',file_dir, mode, logx=log_x)[0]
+    bkgonlyhist = getHistogram(histo_file,'TotalBkg',file_dir, mode, logx=log_x)[0]
     if args.combined_yrs:
-      bkghist = getHistogram(histo_file,'TotalBkg',mode, mode, logx=log_x)[0]
+      bkghist = getHistogram(histo_file,'TotalProcs',mode, mode, logx=log_x)[0]
+      bkgonlyhist = getHistogram(histo_file,'TotalBkg',mode, mode, logx=log_x)[0]
             #bkghist.Add(getHistogram(histo_file,'TotalBkg', file_dir.replace(era,"2017"), mode, log_x)[0].Clone())
     sbhist = bkghist.Clone()
     sbhist.Add(sighist)
@@ -1005,7 +1060,7 @@ def main(args):
             #Add signal, either model dependent or independent
             if not args.no_signal and ((split_y_scale and i == 2) or (not split_y_scale)):
                 sighist.SetLineColor(ROOT.kRed)
-                if args.file_alt != "": sighistPS.SetLineColor(ROOT.kGreen+2)
+                if args.file_alt != "": sighistPS.SetLineColor(ROOT.kBlack)
                 sighist.SetLineWidth(2)
                 if args.file_alt != "": sighistPS.SetLineWidth(2)
                 if int(bin_number) == 1:
@@ -1043,7 +1098,7 @@ def main(args):
     legend.SetTextFont(42)
     legend.SetFillStyle(0)
     
-    if not soverb_plot and not fractions: legend.AddEntry(total_datahist,"Data","PE")
+    if not soverb_plot and not fractions: legend.AddEntry(total_datahist,"Observation","PE")
     #Drawn on legend in reverse order looks better
     bkg_histos.reverse()
     if args.log_y: background_schemes[channel+'_unmod'].reverse()
@@ -1059,11 +1114,11 @@ def main(args):
     if int(bin_number) > 2:
         if not mode == 'prefit':
           #legend.AddEntry(sighist,"ggH#rightarrow#tau#tau (#alpha_{gg}=-59#circ)"%vars(),"l")
-          legend.AddEntry(sighist,"ggH#rightarrow#tau#tau (Bestfit)"%vars(),"l")
+          legend.AddEntry(sighist,"ggH#rightarrow#tau#tau (Best fit)"%vars(),"l")
           if args.file_alt != "": legend.AddEntry(sighistPS,"ggH#rightarrow#tau#tau (#alpha_{gg}=90#circ)"%vars(),"l")
         else:
           legend.AddEntry(sighist,"ggH#rightarrow#tau#tau (#alpha_{gg}=0#circ)"%vars(),"l")
-          #legend.AddEntry(sighist,"ggH#rightarrow#tau#tau (Bestfit)"%vars(),"l")
+          #legend.AddEntry(sighist,"ggH#rightarrow#tau#tau (Best fit)"%vars(),"l")
           if args.file_alt != "": legend.AddEntry(sighistPS,"ggH#rightarrow#tau#tau (#alpha_{gg}=90#circ)"%vars(),"l")
 
     elif int(bin_number) == 1:
@@ -1083,7 +1138,7 @@ def main(args):
     else:
         latex2.SetTextAlign(23)
         latex2.SetTextSize(0.05)
-        latex2.DrawLatex(0.46,0.94,"{} {}".format(channel_label, bin_label))
+        latex2.DrawLatex(0.46,0.955,"{} {}".format(channel_label, bin_label))
 
     #CMS and lumi labels
     plot.FixTopRange(pads[0], plot.GetPadYMax(pads[0]), extra_pad if extra_pad>0 else 0.15)
@@ -1098,7 +1153,7 @@ def main(args):
     if args.ratio and not soverb_plot and not fractions:
         ratio_bkghist = plot.MakeRatioHist(bkghist,bkghist,True,False)
         sbhist.SetLineColor(ROOT.kRed)
-        sbhist_PS.SetLineColor(ROOT.kGreen+2)
+        sbhist_PS.SetLineColor(ROOT.kBlack)
         sbhist.SetLineWidth(2)
         sbhist_PS.SetLineWidth(2)
         if int(bin_number) == 1:
@@ -1151,22 +1206,22 @@ def main(args):
             rlegend.SetTextFont(42)
             rlegend.SetTextSize(0.035)
             rlegend.SetFillStyle(0)
-            rlegend.AddEntry(ratio_datahist,"Data/Bkg","PE")
+            rlegend.AddEntry(ratio_datahist,"Obs./Bkg.","PE")
             rlegend.AddEntry(""," ","")
             #rlegend.AddEntry(ratio_sighist,"(Sig(#alpha_{gg}=0#circ)+Bkg)/Bkg","L")
             #if not mode == 'prefit': rlegend.AddEntry(ratio_sighist,"(Sig(#alpha_{gg}=-59#circ)+Bkg)/Bkg","L")
-            if not mode == 'prefit': rlegend.AddEntry(ratio_sighist,"(Sig(Bestfit)+Bkg)/Bkg","L")
-            else: rlegend.AddEntry(ratio_sighist,"(Sig(#alpha_{gg}=90#circ)+Bkg)/Bkg","L")
+            if not mode == 'prefit': rlegend.AddEntry(ratio_sighist,"(Sig.(Best fit)+bkg.)/Bkg.","L")
+            else: rlegend.AddEntry(ratio_sighist,"(Sig.(#alpha_{gg}=90#circ)+bkg.)/Bkg.","L")
             rlegend.AddEntry(""," ","")
-            if not mode == 'prefit': rlegend.AddEntry(ratio_sighist_PS,"(Sig(#alpha_{gg}=0#circ)+Bkg)/Bkg","L")
-            else: rlegend.AddEntry(ratio_sighist_PS,"(Sig(#alpha_{gg}=90#circ)+Bkg)/Bkg","L")
+            if not mode == 'prefit': rlegend.AddEntry(ratio_sighist_PS,"(Sig.(#alpha_{gg}=90#circ)+bkg.)/Bkg.","L")
+            else: rlegend.AddEntry(ratio_sighist_PS,"(Sig.(#alpha_{gg}=90#circ)+bkg.)/Bkg.","L")
         elif int(bin_number) > 1:
             rlegend = ROOT.TLegend(0.85, 0.27, 0.98, 0.16, '', 'NBNDC')
             rlegend.SetTextFont(42)
             rlegend.SetTextSize(0.035)
             rlegend.SetFillStyle(0)
-            rlegend.AddEntry(ratio_datahist,"Data/Bkg","PE")
-            rlegend.AddEntry(ratio_sighist,"(Sig+Bkg)/Bkg","L")
+            rlegend.AddEntry(ratio_datahist,"Obs./Bkg.","PE")
+            rlegend.AddEntry(ratio_sighist,"(Sig.+Bkg.)/Bkg.","L")
         else:
             rlegend = ROOT.TLegend(0.02, 0.27, 0.1, 0.16, '', 'NBNDC')
             rlegend.SetTextFont(42)
