@@ -45,9 +45,10 @@ void CMSHistFuncFactory::Run(ch::CombineHarvester &cb, RooWorkspace &ws, std::ma
     if (rebin_) data_hist = RebinHist(data_hist);
     // data_hist.Print("range");
 
-    RooRealVar *xvar = ws.var(TString::Format("CMS_x_%s", bin.c_str()));
+    TString xvar_name = TString::Format("CMS_x_%s", bin.c_str());
+    RooRealVar xvar = VarFromHist(xvar_name, xvar_name, data_hist);
     RooDataHist rdh_dat(TString::Format("%s_data_obs", bin.c_str()), "",
-                        RooArgList(*xvar), &data_hist);
+                        RooArgList(xvar), &data_hist);
 
     ws.import(rdh_dat);
 
