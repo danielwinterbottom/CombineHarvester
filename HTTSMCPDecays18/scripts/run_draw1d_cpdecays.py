@@ -81,8 +81,8 @@ def draw1d_cpdecays(
     # Plotting SM and PS template
     signals = []
     if draw_signals:
-        # signals = ["H_sm", "H_ps"]
         signals = ["Bestfit", "H_ps"]
+        #signals = ["Bestfit"] # to draw only best fit uncomment this line and comment lines related to df_plot_alt
 
     leg_kw = {"offaxis": True, "fontsize": 9, "labelspacing":0.12,}
 
@@ -133,7 +133,6 @@ def draw1d_cpdecays(
     # correspond to CH bins defined in Morphing scripts
     if channel == "tt":
         bins_to_plot = list(range(1,12))
-        bins_to_plot = [1,2,3,7]
     elif channel == "mt" or channel == "et":
         bins_to_plot = list(range(1,7))
         #bins_to_plot = [1,2,3,4]
@@ -163,13 +162,13 @@ def draw1d_cpdecays(
             elif channel == "mt" or channel == "et":
                 plot_var = "NN_score"
             partial_blind = False
-            blind = True # blind all of data for signal category
+            blind = False # blind all of data for signal category
             unrolled = False
             norm_bins = True
         else:
             # 'unrolled' category plots
             plot_var = "Bin_number"
-            partial_blind = True # unblind only first window of 'unrolled'
+            partial_blind = False # unblind only first window of 'unrolled'
             blind = False
             unrolled = True
             norm_bins = False
@@ -180,29 +179,54 @@ def draw1d_cpdecays(
         # Create dataframe to plot
         df_plot = create_df(datacard, directory, channel, processes, ch_kw)
 
+
+
         # In order to have alternative (PS) hypothesis create dataframe for this
         # and then replace PS hypothesis in df_plot by PS entries here.
         # This is because, with PostFitShapesFromWorkspace, we don't have any
-        # entries for PS signals when SM (alpha=0) 
+        # entries for PS signals when SM (alpha=0)
+
         if draw_signals:
-            if cmb_years: df_plot_alt = create_df(alt_datacard, directory, channel, ['TotalSigPS'], ch_kw)
-            else: df_plot_alt = create_df(alt_datacard, directory, channel, processes, ch_kw)
-            if df_plot_alt is not None:
-                df_plot_alt.reset_index(inplace=True)
-                df_plot_alt.loc[df_plot_alt["parent"] == "Bestfit", "parent"] = "H_ps"
-                df_plot_alt.set_index(["parent","binvar0","binvar1"], inplace=True)
-                df_plot = pd.concat([
-                    df_plot,
-                    df_plot_alt.loc[
-                        df_plot_alt.index.get_level_values("parent") == "H_ps"
-                    ]
-                ], axis='index', sort=False)
+            signals = ["Bestfit", "H_ps"]
+            if category in ['fakes', 'ztt', 'embed']:
+              signals.pop(-1)
+            else:
+              df_plot_alt=None
+              if cmb_years: df_plot_alt = create_df(alt_datacard, directory, channel, ['TotalSigPS'], ch_kw)
+              else: df_plot_alt = create_df(alt_datacard, directory, channel, processes, ch_kw)
+              if df_plot_alt is not None:
+                  df_plot_alt.reset_index(inplace=True)
+                  df_plot_alt.loc[df_plot_alt["parent"] == "Bestfit", "parent"] = "H_ps"
+                  df_plot_alt.set_index(["parent","binvar0","binvar1"], inplace=True)
+                  df_plot = pd.concat([
+                      df_plot,
+                      df_plot_alt.loc[
+                          df_plot_alt.index.get_level_values("parent") == "H_ps"
+                      ]
+                  ], axis='index', sort=False)
         if partial_blind:
             # Unblind first window of unrolled bins only (for now)
             data_mask = df_plot.index.get_level_values("parent") == "data_obs"
             blind_mask = df_plot.index.get_level_values("binvar0") >= \
                 nbins_kw[channel][bin_number][1]
             df_plot.loc[data_mask & blind_mask, "sum_w"] = np.nan
+
+        # to add bestfit to stack copy entries and name under different 'parent' process
+        # make sure to set the variances to zero though, so it doesn't add to the 
+        # uncertainty band for background
+        df_plot_stackbestfit = df_plot.copy()
+        df_plot_stackbestfit.reset_index(inplace=True)
+        df_plot_stackbestfit.loc[df_plot_stackbestfit["parent"] == "Bestfit", "parent"] = "Bestfit_stack"
+        df_plot_stackbestfit.loc[df_plot_stackbestfit["parent"] == "Bestfit_stack", "sum_ww"] = 0.
+        df_plot_stackbestfit.loc[df_plot_stackbestfit["parent"] == "Bestfit_stack", "sum_ww_up"] = 0.
+        df_plot_stackbestfit.loc[df_plot_stackbestfit["parent"] == "Bestfit_stack", "sum_ww_down"] = 0.
+        df_plot_stackbestfit.set_index(["parent","binvar0","binvar1"], inplace=True)
+        df_plot = pd.concat([
+            df_plot,
+            df_plot_stackbestfit.loc[
+                df_plot_stackbestfit.index.get_level_values("parent") == "Bestfit_stack"
+            ]
+        ], axis='index', sort=False)
 
         # Always use mcstat=True and mcsyst=True when plotting systematic unc.
         category_=category
@@ -214,7 +238,7 @@ def draw1d_cpdecays(
             signal_scale=signal_scale, ch_kw=ch_kw, process_kw=process_kw, 
             var_kw=var_kw, leg_kw=leg_kw, unrolled=unrolled, norm_bins=norm_bins,
             nbins=nbins_kw[channel][bin_number], mcstat=True, mcsyst=True,
-            logy=True, sm_bkg_ratio=True, postfix=mode,
+            logy=True, sm_bkg_ratio=False, postfix=mode, difference=True
         )
 
 if __name__ == "__main__":

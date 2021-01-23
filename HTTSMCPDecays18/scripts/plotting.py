@@ -5,6 +5,7 @@ import copy
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
 import matplotlib as mpl
 import dftools
 import scipy
@@ -19,8 +20,9 @@ def create_df(
     df = pd.DataFrame()
     _file = uproot.open(datacard)
     bkg_processes = [
-        proc for proc in processes if "sm_htt" not in proc and "ps_htt" not in proc and "data_obs" not in proc
+        proc for proc in processes if "sm_htt" not in proc and "ps_htt" not in proc and "TotalSig" not in proc and "data_obs" not in proc
     ]
+    print(bkg_processes)
     for process in processes:
         print(f"Loading {process}")
         if process not in _file[directory]:
@@ -101,8 +103,8 @@ def create_df(
 
 def add_axis(ax):
     def add_floating_axis1(ax1):
-        ax1.axis["lat"] = axis = ax1.new_floating_axis(0, 30)
-        axis.label.set_text(r"$\theta = 30^{\circ}$")
+        ax1.axis["lat"] = axis = ax1.new_floating_axis(0, 360)
+        axis.label.set_text(r"$\phi_{\mathrm{CP}} (\mathrm{degrees})$")
         axis.label.set_visible(True)
     
         return axis
@@ -120,6 +122,17 @@ def custom_cms_label(ax, label, lumi=35.9, energy=13, extra_label=''):
         0, 1, r'$\mathbf{CMS}\ \mathit{'+label+'}$',
         ha='left', va='bottom', transform=ax.transAxes,
     )
+    ax.text(
+        1, 1, r'${:.0f}\ \mathrm{{fb}}^{{-1}}$ ({:.0f} TeV)'.format(lumi, energy),
+        ha='right', va='bottom', transform=ax.transAxes,
+    )
+    # label on centre top of axes
+    ax.text(
+        0.5, 1, extra_label,
+        ha='center', va='bottom', transform=ax.transAxes,
+    )
+
+def custom_nocms_label(ax, lumi=35.9, energy=13, extra_label=''):
     ax.text(
         1, 1, r'${:.0f}\ \mathrm{{fb}}^{{-1}}$ ({:.0f} TeV)'.format(lumi, energy),
         ha='right', va='bottom', transform=ax.transAxes,
@@ -167,7 +180,7 @@ def draw_1d(
     unrolled=False, nbins=[[4], 14, "inclusive", "inclusive"], mcstat=True,
     sig_ratio=False, norm_bins=False, mcsyst=False,
     mcstat_kw={}, logy=False, postfix="", sm_bkg_ratio=False,
-    combined=False,
+    combined=False, difference=False,
 ):
     year_ = year
     if year == 'cmb': year_ = 2018
@@ -185,6 +198,8 @@ def draw_1d(
         df["sum_ww_down"] = df.eval("sum_ww_down/(binwidth**2)")
         df["sum_ww_up"] = df.eval("sum_ww_up/(binwidth**2)")
     
+    if difference:
+        postfix += "_diff"
     with mpl.backends.backend_pdf.PdfPages(
         "plots/{}_{}_{}_{}_{}_{}.pdf".format(
             plot_var, nbins[3], channel, year_, category, postfix
@@ -193,13 +208,15 @@ def draw_1d(
     ) as pdf:
         if not sig_ratio:
             fig, ax = plt.subplots(
-                figsize=(2.8, 3.1), dpi=200,
+                # figsize=(2.8, 3.1), dpi=200,
+                figsize=(2.4, 2.6), dpi=200,
                 nrows=2, ncols=1,
                 sharex=True, sharey=False,
-                gridspec_kw={"height_ratios": (2.5, 1), "hspace": 0.1, "wspace": 0.1},
+                gridspec_kw={"height_ratios": (2, 1), "hspace": 0.1, "wspace": 0.1},
             )
             if unrolled:
-                fig.set_size_inches(5.3, 3.2)
+                # fig.set_size_inches(5.3, 3.2)
+                fig.set_size_inches(4.2, 2.6)
         else:
             fig, ax = plt.subplots(
                 figsize=(2.8, 4.1), dpi=200,
@@ -209,15 +226,15 @@ def draw_1d(
             )
             if unrolled:
                 fig.set_size_inches(5.3, 4.2)
-    
+
         if year == "2016":
             lumi = 35.9
-        elif year == "2017": 
+        elif year == "2017":
             lumi = 41.5
-        elif year == "2018": 
+        elif year == "2018":
             lumi = 59.7
-        else: 
-          lumi = 137
+        else:
+            lumi = 137
         
         if unrolled and not combined and lumi != 137:
             dftools.draw.cms_label(ax[0], "Preliminary", lumi=lumi, extra_label=nbins[2])
@@ -225,9 +242,11 @@ def draw_1d(
             dftools.draw.cms_label(ax[0], "Preliminary", lumi=lumi)
         # for all three years together (assume uncorrelated)
         elif (combined or lumi==137) and unrolled : 
-            custom_cms_label(ax[0], "Preliminary", lumi=137, extra_label=nbins[2])
+            #custom_cms_label(ax[0], "Supplementary", lumi=137, extra_label=nbins[2])
+            custom_cms_label(ax[0], " ", lumi=137, extra_label=nbins[2])
         else:
-            custom_cms_label(ax[0], "Preliminary", lumi=137)
+            #custom_cms_label(ax[0], "Supplementary", lumi=137)
+            custom_cms_label(ax[0], " ", lumi=137)
             
         
         # to fix when y axis is too large 
@@ -241,9 +260,12 @@ def draw_1d(
             
         
         data_mask = df.index.get_level_values("parent") != "data_obs"
-        
+        sig_mask = df.index.get_level_values("parent") != "Bestfit_stack"
+        sig_mask*=data_mask
+ 
         df_data = df.loc[~data_mask,:]
         df_mc = df.loc[data_mask,:]
+        df_mc_ratio = df.loc[sig_mask,:]
         if norm_mc:
             df_mc = df_data.sum() * df_mc / df_mc.sum() 
             
@@ -270,30 +292,33 @@ def draw_1d(
         elif len(sigs) > 0 and len(sigs) < 3:
             if channel == "tt":
                 ymax *= 1.6
-            elif channel == "mt" or channel =="et":
+            elif channel in ["mt",'et']:
                 ymax *= 1.8
         elif len(sigs) >= 3:
             if channel == "tt":
                 ymax *= 1.7
-            elif channel == "mt" or channel =="et":
+            elif channelin ["mt",'et']:
                 ymax *= 1.8
         leg_kw = {
-            "offaxis": False, "fontsize": 7, "labelspacing":0.12,
+            "offaxis": False, "fontsize": 8, "labelspacing":0.12,
             "ncol": 2, "loc": 9, "framealpha": 0.,
         }
         ratio_leg_kw = {
-            "fontsize": 7, "labelspacing":0.12,
-            "ncol": 2, "loc": 0, "framealpha": 0.7,
+            "fontsize": 8, "labelspacing":0.12,
+            "ncol": 1, "loc": 0, "framealpha": 0.7,
         }
         if unrolled:
             leg_kw = {
-                "offaxis": True, "fontsize": 9, "labelspacing":0.14,
+                "offaxis": True, 
+                # "fontsize": 9, 
+                "labelspacing":0.14,
             }
             ratio_leg_kw = {
-                "fontsize": 9, "labelspacing":0.12,
+                # "fontsize": 8, 
+                "labelspacing":0.12,
                 "ncol": 2, "loc": 0, "framealpha": 0.7,
             }
-            logy = True
+            # logy = True
             
         if signal_scale != 1. and not unrolled:
             process_kw["labels"]["H_sm"] = f'${signal_scale}\\times \\mathrm{{SM\ H}} \\rightarrow\\tau\\tau$'
@@ -310,8 +335,13 @@ def draw_1d(
         if mcsyst:
             interval_func = lambda x, variance: (x-np.sqrt(variance), x+np.sqrt(variance))
             mcsyst_kw["interval_func"] = interval_func
-            mcstat_ratio_kw["label"] = "Bkg. syst. unc."
+            # mcstat_ratio_kw["label"] = "Bkg. syst. unc."
+            mcstat_ratio_kw["label"] = "Bkg. unc."
 
+        #import inspect
+        #dftools.draw.data_mc
+        #print('!!!!!!')
+        #print(inspect.getmodule(dftools.draw.data_mc))
 
         dftools.draw.data_mc(
             ax, df_data, df_mc, "binvar0", binning, 
@@ -328,6 +358,9 @@ def draw_1d(
             sig_kw=sig_kw, 
             mcstat_ratio_kw=mcstat_ratio_kw,
             variable_bin=True, # just to use full binning in case it's variable
+            difference=difference, # for data MC difference as opposed to ratio
+            ratio=not difference,
+            #mc_for_ratio=df_mc_ratio
         )
         
         if not unrolled:
@@ -337,8 +370,8 @@ def draw_1d(
                 ax[0].set_ylim(1e0, ymc_max*1e2)
             elif logy and channel == "tt": 
                 ax[0].set_ylim(1e0, ymc_max*1e4)
-            elif logy and (channel == "mt" or channel =="et"): 
-                ax[0].set_ylim(1e0, ymc_max*1e6)
+            elif logy and channel in ["mt",'et']: 
+                ax[0].set_ylim(1e0, ymc_max*1e4)
             elif blind:
                 ax[0].set_ylim(0., ymc_max*2.)
         ax[0].set_ylabel(r'Events')
@@ -351,14 +384,14 @@ def draw_1d(
         
         first_xpos = 0.
         if unrolled:
-            ax[0].set_ylim(1e-1, ymc_max*10)
-            ax[1].set_ylim(0, 2)
-            ax[1].set_yticks([0.5, 1., 1.5])
+            ax[0].set_ylim(1e0, ymc_max*5)
+            ax[1].set_ylim(0., 2.)
+            # ax[1].set_yticks([0.5, 1., 1.5])
             
             binvar0_bins = len(low_edges)
             vert_lines = list(range(nbins[1], binvar0_bins, int(nbins[1])))
             ax[0].vlines(vert_lines, *ax[0].get_ylim(), linestyles='--', colors='black', zorder=1)
-            ax[1].vlines(vert_lines, *ax[0].get_ylim(), linestyles='--', colors='black', zorder=1)
+            ax[1].vlines(vert_lines, *ax[1].get_ylim(), linestyles='--', colors='black', zorder=1)
             
             ax[1].set_xticks(list(range(0, binvar0_bins+int(nbins[1]), int(nbins[1]))))
             
@@ -369,7 +402,7 @@ def draw_1d(
             for idx, xpos in enumerate(widebin_cents):
                 if channel == "tt":
                     ftsize = 9
-                elif channel == "mt" or channel =="et":
+                elif channel in ["mt",'et']:
                     ftsize = 6
                 ax[0].text(
                     xpos, ypos, f"({nbins[0][idx]}, {nbins[0][idx+1]})", 
@@ -414,7 +447,7 @@ def draw_1d(
             ax[2].set_ylabel(r'Sig./SM')
             
             if unrolled:
-                ax[2].vlines(vert_lines, *ax[0].get_ylim(), linestyles='--', colors='black', zorder=1)
+                ax[2].vlines(vert_lines, *ax[2].get_ylim(), linestyles='--', colors='black', zorder=1)
             
         # for (sig+bkgs)/bkgs ratio
         if sm_bkg_ratio and len(sigs) > 0:
@@ -440,20 +473,124 @@ def draw_1d(
                 )
                 ax[1].set_ylabel(r'Ratio')
 
+
+        # for bestfit/bkg.unc.
+        if difference:
+            df_bkgs = df_mc.loc[sig_mask, :]
+            df_bkgs_sum = df_bkgs.groupby("binvar0").sum()
+            sum_ww_bkgs = df_bkgs_sum.loc[:,"sum_ww"]
+            legend_colours = []
+            legend_items = []
+            lines = []
+            # loop over signals in reverse order to have SM on top
+            for sig in sigs[::-1]:
+                mask = df_mc.index.get_level_values("parent") != sig
+                df_sig = df_mc.loc[~(mask),:]
+                sum_w_sig = df_sig.loc[:,"sum_w"]/signal_scale
+                
+                # this will be the (sig+bkgs)/bkgs ratio for each sig
+                sm_bkgs_ratio = (sum_w_sig.values)/np.sqrt(sum_ww_bkgs.values)
+                
+                ax[1].hist(
+                    low_edges, bins=binning, 
+                    weights=sm_bkgs_ratio, histtype='step', lw=1,
+                    color=process_kw["colours"][sig],
+                    zorder=1,
+                )
+                legend_colours.append(process_kw["colours"][sig])
+
+                lines.append(mlines.Line2D(
+                        [], [], color=process_kw["colours"][sig],
+                ))
+
+                if not unrolled:
+                    # legend_items.append(f'{process_kw["labels"][sig]}'+ r"$/\mathrm{Bkg.\ unc.}$")
+                    legend_items.append(f'{process_kw["labels"][sig]}')
+                if unrolled:
+                    if sig == "H_ps":
+                        # legend_items.append(r'$\frac{\mathrm{PS\ H}\rightarrow\tau\tau}{\mathrm{Bkg.\ unc.}}$')
+                        legend_items.append(r'$\mathrm{PS\ H}\rightarrow\tau\tau$')
+                    else:
+                        # legend_items.append(r'$\frac{\mathrm{Bestfit\ H}\rightarrow\tau\tau}{\mathrm{Bkg.\ unc.}}$')
+                        legend_items.append(r'$\mathrm{Bestfit\ H}\rightarrow\tau\tau$')
+            lines.append(ax[1].axhspan(-1, 1, zorder=-10, fc='gray', alpha=0.3))
+            legend_items.append("Bkg. unc.")
+            if unrolled:
+                ax[1].legend(
+                    lines,
+                    legend_items,
+                    bbox_to_anchor=(1, 1),
+                    labelspacing=0.14,
+                )
+            else:
+                diff_leg_kw = {
+                    "fontsize": 8, "labelspacing":0.12,
+                    "loc": 9, "framealpha": 0.,
+                    "ncol": 2,
+                }
+                ax[1].legend(
+                    lines[::-1],
+                    legend_items[::-1],
+                    **diff_leg_kw,
+                )
+
+
         ax[1].set_ylim(0.9, 1.1)
         ax[1].set_yticks([0.9, 1., 1.1])
         if unrolled:
             ax[1].set_ylim(0., 2.)
             ax[1].set_yticks([0., 0.5, 1., 1.5, 2.])
+            # ax[1].set_ylim(-50., 50.)
             #ax[1].set_ylim(0.7, 1.3)
             #ax[1].set_yticks([0.7, 1., 1.3])
-        if plot_var == 'pt_tt' and channel == "zmm":
-            ax[1].set_xlabel(r"$p_{\mathrm{T}}^{\mu\mu} (\mathrm{GeV})$")
-        if plot_var == 'm_vis' and channel == "zmm":
-            ax[1].set_xlabel(r"$m_{\mu\mu} (\mathrm{GeV})$")
-        #ax[1].set_xscale('function', functions=(lambda x: np.maximum(x, 0)**0.5, lambda x: x**2))
+
+        if difference:
+            ax[1].set_ylabel(r'$\frac{\mathrm{Data}-\mathrm{Bkg.}}{\mathrm{Bkg.\ unc.}}$')
+            if not unrolled:
+                # for mt
+                if channel in ["mt",'et']:
+                    ax[1].set_ylim(-2., 6.)
+                    ax[1].set_yticks([-2., 0.,  2., 4., 6.])
+                # for tt
+                elif channel == "tt":
+                    ax[1].set_ylim(-4., 8.)
+                    ax[1].set_yticks([-4, 0., 4., 8.])
+            #for mu-rho channel we use a larger range for ratio part
+            elif channel == 'mt' and nbins[3] == 'mu-rho':
+                ax[1].set_ylim(-5.,30.)
+                ax[1].set_yticks([0., 10., 20., 30.])
+                ax[1].vlines(vert_lines, *ax[1].get_ylim(), linestyles='--', colors='black', zorder=1)
+            else:
+                ax[1].set_ylim(-5., 20.)
+                ax[1].set_yticks([-5., 0., 5., 10., 15., 20.])
+                ax[1].vlines(vert_lines, *ax[1].get_ylim(), linestyles='--', colors='black', zorder=1)
+
+        # TEMP
+        # for Yuta plots
+        # last_bdt_bin = binning[-1]-nbins[1]
+        # ymax = max([
+        #     df_data.query("binvar0 >= @last_bdt_bin")["sum_w"].max(), 
+        #     df_bkgs_sum.query("binvar0 >= @last_bdt_bin")["sum_w"].max() 
+        # ])
+        # ax[0].set_ylim(0., ymax*1.2)
+        # ax[1].set_xlim(binning[-1]-nbins[1], binning[-1])
+
+        # additional label for background categories
+        if not unrolled:
+            ax[0].text(
+                0.2, 0.6, nbins[2],
+                ha='center', va='bottom', transform=ax[0].transAxes,
+                fontsize=8.,
+            )
+
+        left, right, top, bottom = (
+            fig.subplotpars.left, fig.subplotpars.right,
+            fig.subplotpars.top, fig.subplotpars.bottom,
+        )
+        width, height = fig.get_size_inches()
+        fig.set_size_inches(w=width/(right-left), h=height/(top-bottom))
         fig.align_labels(ax)
-        pdf.savefig(fig, bbox_inches='tight')
+        pdf.savefig(fig)
 
     #if not fractions:
     #    fig.savefig("plots/{}_{}_{}_{}_{}.png".format(plot_var, nbins[3], channel, year, category), bbox_inches='tight')
@@ -498,6 +635,7 @@ var_kw = {
     "IC_15Mar2020_max_score": r'BDT score',
     "IC_11May2020_max_score": r'BDT score',
     "IC_01Jun2020_max_score": r'BDT score',
+    "BDT_score": r'BDT score',
     "NN_score": r'NN score',
     "Bin_number": r'Bin number',
     "jmva_1": r'PU jet ID',
@@ -560,7 +698,7 @@ var_kw_bychannel = {
 
 process_kw={
     "labels": {
-        "SMTotal": "Bkg. Total", 
+        "SMTotal": "_Bkg. Total", # legend label won't be drawn with '_' in front
         #"Backgrounds": "Bkgs", 
         "Backgrounds": "Minors", 
         "Minors": "Minors", 
@@ -579,11 +717,13 @@ process_kw={
         "H_sm": r'$\mathrm{SM\ H} \rightarrow\tau\tau$',
         "H_ps": r'$\mathrm{PS\ H} \rightarrow\tau\tau$',
         "Bestfit": r'$\mathrm{Bestfit\ H} \rightarrow\tau\tau$',
+        "Bestfit_stack": r'$\mathrm{Bestfit\ H} \rightarrow\tau\tau$',
     },
     "colours": {
         "SMTotal": 'black', 
         "Backgrounds": "#d9d9d9", 
         "Minors": "#d9d9d9",
+        "Others": "#93C6D6",
         #"ZL": "#64C0E8",
         "ZL": "#93C6D6",
         "QCD": "#ffb8c9",
@@ -608,12 +748,16 @@ process_kw={
         #"H_sm": "#4292c6",
         "H_sm": "#253494", # dark blue
         #"H_ps": "#2ca25f", # dark green
-        "H_ps": "#006837", # darker green
-        "Bestfit": "#253494", # dark blue
+        # "H_ps": "#006837", # darker green
+        "H_ps": "#006837", # dark green
+        # "Bestfit": "#253494", # dark blue
+        "Bestfit": "#D62839", # crimson red
+        # "Bestfit_stack": "#82AEB1", # dark blue
+        "Bestfit_stack": "#253494", # dark blue
     },
     "linestyles": {
         "H_sm": "-",
-        "H_ps": "--",
+        "H_ps": "-",
         "Bestfit": "-",
     },
     "zorder": {
@@ -625,8 +769,8 @@ process_kw={
 
 nbins_kw = {
     "tt": {
-        1: [[None], 1, "embed", "embed"], # embed
-        2: [[None], 1, "fakes", "fakes"], # fakes
+        1: [[None], 1, r'$\tau_h\tau_h\ \mathrm{genuine}$', "embed"], # embed
+        2: [[None], 1, r'$\tau_h\tau_h\ \mathrm{fake}$', "fakes"], # fakes
         3: [[0., 0.7, 0.8, 0.9, 1.], 10, r'$\rho\rho$', "rho-rho"], # rho-rho
         4: [[0., 0.7, 0.8, 0.9, 1.], 4, r'$a_{1}^{1\mathrm{pr}}\rho + a_{1}^{1\mathrm{pr}}a_{1}^{1\mathrm{pr}}$', "0a1-rho_0a1-0a1"], # 0a1-rho + 0a1-0a1
         5: [[0., 0.7, 0.8, 0.9, 1.], 4, r'$a_{1}^{3\mathrm{pr}}\rho$', "a1-rho"], # a1-rho
@@ -641,8 +785,8 @@ nbins_kw = {
         100: [[None], 1, "signal", "signal"],
     },
     "mt": {
-        1: [[None], 1, "embed", "embed"], # embed
-        2: [[None], 1, "fakes", "fakes"], # fakes
+        1: [[None], 1, r'$\tau_\mu \tau_h\ \mathrm{genuine}$', "embed"], # embed
+        2: [[None], 1, r'$\tau_\mu \tau_h\ \mathrm{fake}$', "fakes"], # fakes
         3: [[0.0, 0.45, 0.6, 0.7, 0.8, 0.9, 1.0], 10, r'$\mu\rho$', "mu-rho"], # mu-rho
         4: [[0.0, 0.45, 0.6, 0.7, 0.8, 0.9, 1.0], 8, r'$\mu\pi$', "mu-pi"], # mu-pi
         5: [[0.0, 0.45, 0.6, 0.7, 0.8, 0.9, 1.0], 4, r'$\mu a_{1}^{3\mathrm{pr}}$', "mu-a1"], # mu-a1
@@ -651,8 +795,8 @@ nbins_kw = {
         100: [[None], 1, "signal", "signal"],
     },
     "et": {
-        1: [[None], 1, "embed", "embed"], # embed
-        2: [[None], 1, "fakes", "fakes"], # fakes
+        1: [[None], 1, r'$\tau_e \tau_h\ \mathrm{genuine}$', "embed"], # embed
+        2: [[None], 1, r'$\tau_e \tau_h\ \mathrm{fake}$', "fakes"], # fakes
         3: [[0.0, 0.45, 0.6, 0.7, 0.8, 0.9, 1.0], 10, r'$e\rho$', "e-rho"], # e-rho
         4: [[0.0, 0.45, 0.6, 0.7, 0.8, 0.9, 1.0], 8, r'$e\pi$', "e-pi"], # e-pi
         5: [[0.0, 0.45, 0.6, 0.7, 0.8, 0.9, 1.0], 4, r'$e a_{1}^{3\mathrm{pr}}$', "e-a1"], # e-a1
@@ -685,14 +829,14 @@ nllscan_kw = {
         5: [r'$\mu a_{1}^{3\mathrm{pr}}$', "mu-a1", "#addd8e"], # mu-a1
         6: [r'$\mu a_{1}^{1\mathrm{pr}}$', "mu-0a1", "#c994c7"], # mu-0a1
     },
-    "et": {
+    "mt": {
         0: [r"$\tau_{e}\tau_h$", "combined", "#DE5A6A"],
         1: ["embed", "embed", ""], # embed
         2: ["fakes", "fakes", ""], # fakes
-        3: [r'$e\rho$', "e-rho", "#9B98CC"], # e-rho
-        4: [r'$e\pi$', "e-pi", "#E8AD46"], # e-pi
-        5: [r'$e a_{1}^{3\mathrm{pr}}$', "e-a1", "#addd8e"], # e-a1
-        6: [r'$e a_{1}^{1\mathrm{pr}}$', "e-0a1", "#c994c7"], # e-0a1
+        3: [r'$e\rho$', "mu-rho", "#9B98CC"], # mu-rho
+        4: [r'$e\pi$', "mu-pi", "#E8AD46"], # mu-pi
+        5: [r'$e a_{1}^{3\mathrm{pr}}$', "mu-a1", "#addd8e"], # mu-a1
+        6: [r'$e a_{1}^{1\mathrm{pr}}$', "mu-0a1", "#c994c7"], # mu-0a1
     },
     "years": {
         0: [r"Combined", "combined", "#DE5A6A"],
