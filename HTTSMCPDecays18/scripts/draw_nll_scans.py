@@ -59,7 +59,7 @@ def parse_arguments():
     parser.add_argument(
         "--mode",
         default="single",
-        choices=["single", "split_by_category", "2d_kappa", "muV", "muggH", "alpha", "alpha_obs", "mutautau", "2d"],
+        choices=["single", "split_by_category", "2d_kappa", "muV", "muggH", "alpha", "alpha_obs", "mutautau", "2d","2d_phi_muggh","2d_phi_muV", "2d_muV_muggh"],
         help="What scans to plot",
     )
     parser.add_argument(
@@ -669,7 +669,7 @@ def split_by_year_scan(input_folder, plot_name, y_scale="linear"):
         pdf.savefig(fig, bbox_inches='tight')
         pass
 
-def scan_2d(input_folder, category="cmb", plot_name="scan_2d",threesig=True):
+def scan_2d(input_folder, category="cmb", plot_name="scan_2d",xvar='alpha',yvar='mutautau',threesig=True,supp=False):
     """
     Function to plot NLL scan using multiple ROOT output file from MultiDimFit.
     This is specifically for 2D scans of kappas (ie. reduced Yukawa couplings)
@@ -692,21 +692,30 @@ def scan_2d(input_folder, category="cmb", plot_name="scan_2d",threesig=True):
         fig, ax = plt.subplots(
             figsize=(4, 3), dpi=200,
         )
-        path = f"{input_folder}/{category}/125/higgsCombine.mu_vs_phi.MultiDimFit.mH125.root"
-        parameter0 = "alpha"
-        parameter1 = "mutautau"
+        if xvar=='alpha' and yvar=='mutautau':
+          path = f"{input_folder}/{category}/125/higgsCombine.mu_vs_phi.MultiDimFit.mH125.root"
+        elif xvar=='alpha' and yvar=='muggH':
+          path = f"{input_folder}/{category}/125/higgsCombine.alpha_vs_muggH.MultiDimFit.mH125.root"
+        elif xvar=='alpha' and yvar=='muV':
+          path = f"{input_folder}/{category}/125/higgsCombine.alpha_vs_muV.MultiDimFit.mH125.root"
+        elif xvar=='muV' and yvar=='muggH':
+          path = f"{input_folder}/{category}/125/higgsCombine.muggH_vs_muV_v2.MultiDimFit.mH125.root"
+        parameter0 = xvar
+        parameter1 = yvar
         f = uproot.open(path)["limit"]
         df = f.pandas.df([parameter0, parameter1, "deltaNLL","quantileExpected"],
             namedecode="utf-8")
-        df = df.query("quantileExpected > -0.5 and deltaNLL < 1000 ")
+        df = df.query("quantileExpected > -0.5 and deltaNLL < 1000")
         df = df.loc[~df.duplicated(),:]
         df = df.sort_values(by=[parameter1, parameter0])
-        custom_cms_label(ax, "Preliminary", lumi=137)
+        if supp: custom_cms_label(ax, "Supplementary", lumi=137)
+        else: custom_cms_label(ax, "", lumi=137)
         
         xbins = df[parameter0].unique()
         ybins = df[parameter1].unique()
         df["deltaNLL"] = 2*df["deltaNLL"]
         z = df.set_index([parameter0, parameter1])["deltaNLL"].unstack().values.T
+
         # some nans...remove by setting to high value (high NLL)
         # this is only a temp. fix, hopefully fix to Physics model will remove these
         for index, i in enumerate(z): 
@@ -715,17 +724,22 @@ def scan_2d(input_folder, category="cmb", plot_name="scan_2d",threesig=True):
               z[index][index2] = z[index][index2-1] 
 
         z[np.isnan(z)] = 25
-        
+ 
         pos = ax.imshow(
             z, origin='lower', interpolation='bicubic',
-            # extent=[xbins[0], xbins[-1], ybins[0], ybins[-1]],
+            #extent=[xbins[0], xbins[-1], ybins[0], ybins[-1]],
             extent=[xbins.min(), xbins.max(), ybins.min(), ybins.max()],
             aspect='auto', cmap="Blues_r",
             vmin=0., vmax=25.,
         )
         cbar = fig.colorbar(pos, ax=ax)
         cbar.set_label(r'$-2\Delta\log \mathcal{L}$')
-        
+       
+        if xvar == 'muV' and yvar == 'muggH':
+          ax.set_xlim(-2, 4)
+          ax.set_ylim(-2, 4)
+          xbins=ybins
+ 
         X, Y = np.meshgrid(xbins, ybins)
         ax.contour(
             scipy.ndimage.zoom(X, 4),
@@ -759,10 +773,16 @@ def scan_2d(input_folder, category="cmb", plot_name="scan_2d",threesig=True):
             *bf, 'P', color='black',
             ms=5, label="Best fit",
         )
-        ax.plot(
-            0, 1, '*', color='#e31a1c',
-            ms=5, label="SM",
-        )
+        if xvar=='muV' and yvar=='muggH':
+          ax.plot(
+              1, 1, '*', color='#e31a1c',
+              ms=5, label="SM",
+          )
+        else:
+          ax.plot(
+              0, 1, '*', color='#e31a1c',
+              ms=5, label="SM",
+          )
 
         # split legend into two parts
         handles, labels = ax.get_legend_handles_labels()
@@ -792,16 +812,46 @@ def scan_2d(input_folder, category="cmb", plot_name="scan_2d",threesig=True):
         # add back first legend to axis
         ax.add_artist(leg1)
 
-        ax.text(
-            0.75, 0.05, r"$\mu_{gg\mathrm{H}} = \mu_{\mathrm{V}} = 1$",
-            ha='center', va='bottom', transform=ax.transAxes,
-        )
+        if xvar=='alpha' and yvar=='muggH':
+          ax.text(
+              0.75, 0.05, r"$\mu_{\mathrm{V}}$ profiled",
+              ha='center', va='bottom', transform=ax.transAxes,
+          )
+        elif xvar=='alpha' and yvar=='muV':
+          ax.text(
+              0.75, 0.05, r"$\mu_{gg\mathrm{H}}$ profiled",
+              ha='center', va='bottom', transform=ax.transAxes,
+          )
+        elif xvar=='muV' and yvar=='muggH':
+          ax.text(
+              0.75, 0.05, r"$\phi_{\tau\tau}$ profiled",
+              ha='center', va='bottom', transform=ax.transAxes,
+          )
+        else:
+          ax.text(
+              0.75, 0.05, r"$\mu_{gg\mathrm{H}} = \mu_{\mathrm{V}} = 1$",
+              ha='center', va='bottom', transform=ax.transAxes,
+          )
 
-        ax.set_xlabel(r'$\phi_{\tau\tau} (\mathrm{degrees})$')
-        ax.set_ylabel(r'$\mu^{\tau\tau}$')
+        if xvar=='alpha':
+          ax.set_xlabel(r'$\phi_{\tau\tau} (\mathrm{degrees})$')
+        elif xvar=='muV':
+          ax.set_xlabel(r'$\mu_{\mathrm{V}}$')
+        elif xvar=='muggH':
+          ax.set_xlabel(r'$\mu_{gg\mathrm{H}}$')
+
+        if yvar=='muV':
+          ax.set_ylabel(r'$\mu_{\mathrm{V}}$')
+        elif yvar=='muggH':
+          ax.set_ylabel(r'$\mu_{gg\mathrm{H}}$')
+        else:
+          ax.set_ylabel(r'$\mu^{\tau\tau}$')
         # ax.set_ylim(-1.5, 1.5)
         # ax.set_xlim(-1.5, 1.5)
-        ax.set_xticks([-90, -45, 0, 45, 90])
+        if xvar == 'alpha':
+          ax.set_xticks([-90, -45, 0, 45, 90])
+        #if xvar == 'muV':
+        #  ax.set_xlim(-2, 6)
         print(f"Saving figure as plots/{plot_name}.pdf")
         pdf.savefig(fig, bbox_inches='tight')
 
@@ -983,6 +1033,12 @@ def main(input_folder, channel, cat, nsigmas, mode, plot_name, y_scale, observed
         scan_2d_kappa(input_folder, cat, plot_name, threesig)
     elif mode == "2d":
         scan_2d(input_folder, cat)
+    elif mode == "2d_phi_muggh":
+        scan_2d(input_folder, cat,yvar='muggH',plot_name='scan_'+mode,supp=True)
+    elif mode == "2d_phi_muV":
+        scan_2d(input_folder, cat,yvar='muV',plot_name='scan_'+mode,supp=True)
+    elif mode == "2d_muV_muggh":
+        scan_2d(input_folder, cat,xvar='muV',yvar='muggH',plot_name='scan_'+mode,supp=True)
 
 if __name__ == "__main__":
     main(**vars(parse_arguments()))

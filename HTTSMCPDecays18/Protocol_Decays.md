@@ -35,6 +35,10 @@ for this fit and others when running on data it helps to define fall back algori
 
 --cminDefaultMinimizerStrategy=0 --cminDefaultMinimizerTolerance=0.1 --cminFallbackAlgo Minuit2,Migrad,0:1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10
 
+# example showing how to run a 2D scan of rater param vs phi_tt as batch jobs:
+
+combineTool.py -m 125 -M MultiDimFit --setParameters muV=1,muggH=1,mutautau=1 --setParameterRanges alpha=-90,90:muggH=-2,4:muV=-2,6  --redefineSignalPOIs alpha,muV --points 6000  -d output/paper_230121/cmb/125/ws.root --algo grid --there -n .alpha_vs_muV_v2 --alignEdges 1 --cminDefaultMinimizerStrategy=0 --cminDefaultMinimizerTolerance=1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10 --job-mode 'SGE' --prefix-file ic --sub-opts "-q hep.q -l h_rt=3:0:0" --split-points 2 --task-name="alpha_vs_muV_v2"
+
 # Plot scan
 
 1D scans can be plotted using scripts/plot1DScan.py script.
