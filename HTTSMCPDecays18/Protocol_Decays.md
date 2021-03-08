@@ -339,3 +339,24 @@ Use `scripts/run_draw1d_cpdecays.py` (with option `--mode prefit` or `--mode pos
     python3 scripts/run_draw1d_cpdecays.py --channel tt --year 2016 --draw-signals --signal-scale 50 --mode prefit --datacard shapes_eff_sm_prefitonly_tt_2016.root --alt-datacard shapes_eff_ps_prefitonly_tt_2016.root
 
 If not wanting to draw signals, use `--draw-signals False` and no need to specify `alt-datacard`.
+
+To make plots for paper starting from shapes that have already been produced:
+Copy this directory containing the shapes: /eos/user/d/dwinterb/shapes_for_plots
+
+(note these shape files have been "converted" using convert_shapes_paper.py so that all years can be plotted together)
+
+To run background category plots:
+
+for c in et mt tt; do ^Cr i in 1 2; do python3 scripts/run_draw1d_cpdecays.py --channel ${c} --year 2018 --draw-signals --signal-scale 50 --mode postfit --cmb_years --datacard shapes_for_plots/shapes_all_cmb.root --bin_id=${i}; done; done
+
+To run signal category plots:
+
+for c in et mt; do for i in 3 4 5 6; do python3 scripts/run_draw1d_cpdecays.py --channel ${c} --year 2018 --draw-signals --signal-scale 50 --mode postfit --cmb_years --datacard shapes_for_plots/shapes_all_cmb.root --alt-datacard shapes_for_plots/shapes_all_cmb.root --bin_id=${i}; done; done
+
+for i in 3 4 5 6 7 8 9 10 11; do python3 scripts/run_draw1d_cpdecays.py --channel tt --year 2018 --draw-signals --signal-scale 50 --mode postfit --cmb_years --datacard shapes_for_plots/shapes_all_cmb.root --alt-datacard shapes_for_plots/shapes_all_cmb.root --bin_id=${i}; done
+
+To run propoganda plots:
+for i in 1 2 3 4 5 6; do python scripts/phiCPWeightedPlots_v2.py -m $i; done
+
+To run ztt plots:
+python3 scripts/run_draw1d_cpdecays_ztt.py --channel mt --year 2018  --mode postfit --datacard shapes_for_plots/shapes_ztt_cmb.root --cmb_years

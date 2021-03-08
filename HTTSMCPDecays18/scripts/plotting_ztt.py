@@ -138,8 +138,8 @@ def custom_cms_label(ax, label, lumi=35.9, energy=13, extra_label=''):
 
 def chan_label(ax, label, alpha_label=r'$\alpha^{\rho}_{-} \geq \frac{\pi}{4}$'):
     # label on centre top of axes
-    ax.text(0.05, 0.88, label,transform=ax.transAxes)
-    ax.text(0.05, 0.76, alpha_label,transform=ax.transAxes)
+    ax.text(0.05, 0.88, label,transform=ax.transAxes, fontsize='small')
+    ax.text(0.05, 0.76, alpha_label,transform=ax.transAxes, fontsize='small')
 
 def draw_signal_ratio(ax, df_, sigs=["H_sm", "H_ps",],):
     
@@ -360,10 +360,7 @@ def draw_1d(
         ax[0].set_xticks([0., 90., 180., 270., 360.])
         if norm_bins:
             ax[0].set_ylabel(r'Events/bin')
-        #ax[1].set_ylabel(r'Ratio')
-        #ax[1].set_ylabel(r'Data/Exp.')
-        #ax[1].set_ylabel(r'Obs./Exp.')
-        ax[1].set_ylabel(r'Data/Exp.')
+        ax[1].set_ylabel(r'Obs./Exp.')
         
         first_xpos = 0.
         if unrolled:
@@ -457,7 +454,7 @@ def draw_1d(
                 )
                 ax[1].set_ylabel(r'Ratio')
 
-        ax[1].set_ylim(0.9, 1.1)
+        ax[1].set_ylim(0.85, 1.15)
         ax[1].set_yticks([0.9, 1., 1.1])
         if unrolled:
             ax[1].set_ylim(0., 2.)

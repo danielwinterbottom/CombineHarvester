@@ -60,6 +60,10 @@ def parse_arguments():
         "--cmb_years", action="store_true", default=False,
         help="Do combined years",
     )
+    parser.add_argument(
+        "--bin_id", default=None,
+        help="If specified only draw plots for this bin",
+    )
 
     arguments = parser.parse_args()
 
@@ -75,7 +79,7 @@ def parse_arguments():
 
 def draw1d_cpdecays(
     channel, year, draw_signals, signal_scale, ff, embedding, mode,
-    datacard, alt_datacard, cmb_years,
+    datacard, alt_datacard, cmb_years, bin_id
 ):
 
     # Plotting SM and PS template
@@ -136,6 +140,7 @@ def draw1d_cpdecays(
     elif channel == "mt" or channel == "et":
         bins_to_plot = list(range(1,7))
         #bins_to_plot = [1,2,3,4]
+    if bin_id is not None: bins_to_plot=[int(bin_id)]
     for bin_number in bins_to_plot:
         category = nbins_kw[channel][bin_number][3]
         # Initialise empty and change depending on category bellow
@@ -238,7 +243,7 @@ def draw1d_cpdecays(
             signal_scale=signal_scale, ch_kw=ch_kw, process_kw=process_kw, 
             var_kw=var_kw, leg_kw=leg_kw, unrolled=unrolled, norm_bins=norm_bins,
             nbins=nbins_kw[channel][bin_number], mcstat=True, mcsyst=True,
-            logy=True, sm_bkg_ratio=False, postfix=mode, difference=True
+            logy=True, sm_bkg_ratio=False, postfix=mode, difference=True, bin_id=bin_id
         )
 
 if __name__ == "__main__":

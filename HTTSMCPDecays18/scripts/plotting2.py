@@ -362,7 +362,7 @@ def PositionedLegend(width, height, pos, offset,yoffset):
         c = l + 0.5 * (1 - l - r)
         return R.TLegend(c - 0.5 * w, 1 - t - o - h, c + 0.5 * w, 1 - t - o, '', 'NBNDC')
     if pos == 3:
-        return R.TLegend(1 - r - o - w, 1 - t - o - h, 1 - r - o, 1 - t - o, '', 'NBNDC')
+        return R.TLegend(1 - r - o - w, 1 - t - o - h-yoffset, 1 - r - o, 1 - t - o -yoffset, '', 'NBNDC')
     if pos == 4:
         return R.TLegend(l + o, b + o, l + o + w, b + o + h, '', 'NBNDC')
     if pos == 5:
@@ -510,7 +510,7 @@ def propoganda_plot(sm,ps,best,bkg,data,plot_name):
     DrawTitle(pads[0], '137 fb^{-1} (13 TeV)', 3)
 
     #Setup legend
-    legend = PositionedLegend(0.25,0.3,6,0.02,0.08)
+    legend = PositionedLegend(0.25,0.1,6,0.02,0.02)
     legend.SetTextFont(42)
     legend.SetTextSize(0.05)
     legend.SetFillColor(0)
@@ -518,15 +518,28 @@ def propoganda_plot(sm,ps,best,bkg,data,plot_name):
 
     legend.AddEntry(data,'Data #minus Bkg.',"lep")
     legend.AddEntry(bkg,'Bkg. uncert.',"f")
-    legend.AddEntry(sm,'#phi_{#tau#tau} = 0^{#circ}',"l")
-    legend.AddEntry(ps,'#phi_{#tau#tau} = 90^{#circ}',"l")
+    #legend.AddEntry(sm,'#phi_{#tau#tau} = 0^{#circ}',"l")
+    #legend.AddEntry(ps,'#phi_{#tau#tau} = 90^{#circ}',"l")
     legend.Draw("same")
+
+    legend2 = PositionedLegend(0.25,0.3,6,0.08,0.08)
+    legend2.SetTextFont(42)
+    legend2.SetTextSize(0.05)
+    legend2.SetFillColor(0)
+    legend2.SetFillStyle(0)
+
+    #legend2.AddEntry(data,'Data #minus Bkg.',"lep")
+    #legend2.AddEntry(bkg,'Bkg. uncert.',"f")
+    legend2.AddEntry(sm,'#phi_{#tau#tau} = 0^{#circ}',"l")
+    legend2.AddEntry(ps,'#phi_{#tau#tau} = 90^{#circ}',"l")
+    legend2.Draw("same")
+
 
     c1.SaveAs(plot_name+'.pdf')
 
 def propoganda_plot_phicp(sm,ps,best,bkg,data,plot_name,mode=1):
 
-    title='#rho#rho + #pi#rho + #mu#rho'
+    title='#rho#rho + #pi#rho + #mu#rho + e#rho'
     if mode == 2:
       title='#rho#rho'
     if mode == 3:
@@ -535,6 +548,8 @@ def propoganda_plot_phicp(sm,ps,best,bkg,data,plot_name,mode=1):
       title='#mu#rho' 
     if mode == 5:
       title = 'others'
+    if mode == 6:
+      title='e#rho'
 
     latex = R.TLatex()
     latex.SetNDC()
@@ -587,7 +602,9 @@ def propoganda_plot_phicp(sm,ps,best,bkg,data,plot_name,mode=1):
       x=data.GetBinContent(i) - data.GetBinError(i)
       if x < miny: miny=x 
     if miny<data.GetMinimum(): data.SetMinimum(miny)
-    if mode ==5: data.SetMaximum(data.GetMaximum()*1.8)
+    if mode in [5]: data.SetMaximum(data.GetMaximum()*1.8)
+    if mode in [6]: data.SetMaximum(data.GetMaximum()*2.0)
+    if mode ==1: data.SetMaximum(data.GetMaximum()*1.5)
     data.Draw("E")
 
     col_sm = R.TColor().GetColor('#253494') 
@@ -619,22 +636,35 @@ def propoganda_plot_phicp(sm,ps,best,bkg,data,plot_name,mode=1):
     data.Draw("E same")
 
 
-    if mode==1 or True: DrawCMSLogo(pads[0], 'CMS', 'Preliminary', 11, 0.001, -0.07, 0.2, 1.5, '', 1.0)
+    if mode==1: DrawCMSLogo(pads[0], 'CMS', '', 11, 0.001, -0.07, 0.2, 1.5, '', 1.0)
     else: DrawCMSLogo(pads[0], 'CMS', 'Supplementary', 11, 0.001, -0.07, 0.2, 1.5, '', 1.0)
     DrawTitle(pads[0], '137 fb^{-1} (13 TeV)', 3)
 
     #Setup legend
-    legend = PositionedLegend(0.25,0.3,3,0.02,0.08)
+    legend = PositionedLegend(0.25,0.15,3,0.01,0.00)
     legend.SetTextFont(42)
     legend.SetTextSize(0.05)
     legend.SetFillColor(0)
     legend.SetFillStyle(0)
 
-    legend.AddEntry(data,'Data #minus Bkg.',"lep")
+    legend.AddEntry(data,'Obs. #minus Bkg.',"lep")
     legend.AddEntry(bkg,'Bkg. uncert.',"f")
-    legend.AddEntry(sm,'#phi_{#tau#tau} = 0^{#circ}',"l")
-    legend.AddEntry(ps,'#phi_{#tau#tau} = 90^{#circ}',"l")
+    #legend.AddEntry(sm,'#phi_{#tau#tau} = 0^{#circ}',"l")
+    #legend.AddEntry(ps,'#phi_{#tau#tau} = 90^{#circ}',"l")
     legend.Draw("same")
+
+    legend2 = PositionedLegend(0.20,0.15,3,0.00,0.15)
+    legend2.SetTextFont(42)
+    legend2.SetTextSize(0.05)
+    legend2.SetFillColor(0)
+    legend2.SetFillStyle(0)
+
+    #legend2.AddEntry(data,'Data #minus Bkg.',"lep")
+    #legend2.AddEntry(bkg,'Bkg. uncert.',"f")
+    legend2.AddEntry(sm,'#phi_{#tau#tau} = 0^{#circ}',"l")
+    legend2.AddEntry(ps,'#phi_{#tau#tau} = 90^{#circ}',"l")
+    legend2.Draw("same")
+
 
 
     latex.DrawLatex(0.2, 0.85, title)

@@ -314,7 +314,7 @@ def prepare_results(ax, results, pc_level, parameter, pos, observed):
             )
         elif parameter == "muV":
             result_label = (
-                r"$\hat{\mu}_{\mathrm{V}}^{\tau\tau} = " + full_string
+                r"$\hat{\mu}_{qq\mathrm{H}}^{\tau\tau} = " + full_string
             )
         elif parameter == "mutautau":
             result_label = (
@@ -490,7 +490,7 @@ def single_parameter_scan(input_folder, parameter, cat, plot_name, observed, add
         elif parameter == "muggH":
             ax.set_xlabel(r"$\mu_{gg\mathrm{H}}^{\tau\tau}$")
         elif parameter == "muV":
-            ax.set_xlabel(r"$\mu_{\mathrm{V}}^{\tau\tau}$")
+            ax.set_xlabel(r"$\mu_{qq\mathrm{H}}^{\tau\tau}$")
             ax.set_ylim(0, 3.2)
         elif parameter == "mutautau":
             ax.set_xlabel(r"$\mu^{\tau\tau}$")
@@ -697,7 +697,8 @@ def scan_2d(input_folder, category="cmb", plot_name="scan_2d",xvar='alpha',yvar=
         elif xvar=='alpha' and yvar=='muggH':
           path = f"{input_folder}/{category}/125/higgsCombine.alpha_vs_muggH.MultiDimFit.mH125.root"
         elif xvar=='alpha' and yvar=='muV':
-          path = f"{input_folder}/{category}/125/higgsCombine.alpha_vs_muV.MultiDimFit.mH125.root"
+#          path = f"{input_folder}/{category}/125/higgsCombine.alpha_vs_muV.MultiDimFit.mH125.root"
+          path = f"{input_folder}/{category}/125/higgsCombine.alpha_vs_muV_v5.MultiDimFit.mH125.root"
         elif xvar=='muV' and yvar=='muggH':
           path = f"{input_folder}/{category}/125/higgsCombine.muggH_vs_muV_v2.MultiDimFit.mH125.root"
         parameter0 = xvar
@@ -710,10 +711,16 @@ def scan_2d(input_folder, category="cmb", plot_name="scan_2d",xvar='alpha',yvar=
         df = df.sort_values(by=[parameter1, parameter0])
         if supp: custom_cms_label(ax, "Supplementary", lumi=137)
         else: custom_cms_label(ax, "", lumi=137)
-        
+       
+        #if True:
+          #fix for missing alpha=90 values 
+          #max_phi = (df[parameter0].max()) 
         xbins = df[parameter0].unique()
         ybins = df[parameter1].unique()
+        print (len(ybins))
+        print (len(xbins))
         df["deltaNLL"] = 2*df["deltaNLL"]
+        #print (xbins)
         z = df.set_index([parameter0, parameter1])["deltaNLL"].unstack().values.T
 
         # some nans...remove by setting to high value (high NLL)
@@ -739,29 +746,36 @@ def scan_2d(input_folder, category="cmb", plot_name="scan_2d",xvar='alpha',yvar=
           ax.set_xlim(-2, 4)
           ax.set_ylim(-2, 4)
           xbins=ybins
+
+        if xvar == 'alpha' and yvar == 'muV':
+          ax.set_xlim(-90, 50)
  
         X, Y = np.meshgrid(xbins, ybins)
+        from scipy.ndimage.filters import gaussian_filter
+        sigma = 0
+        if xvar=='alpha' and yvar=='muV': sigma=4
+        zoom=4 
         ax.contour(
-            scipy.ndimage.zoom(X, 4),
-            scipy.ndimage.zoom(Y, 4),
-            scipy.ndimage.zoom(z, 4),
+            gaussian_filter(scipy.ndimage.zoom(X, zoom),sigma),
+            gaussian_filter(scipy.ndimage.zoom(Y, zoom),sigma),
+            gaussian_filter(scipy.ndimage.zoom(z, zoom),sigma),
             #z,
             levels=[scipy.stats.chi2.ppf(0.68, df=2)],
             #levels=[scipy.stats.chi2.ppf(0.95, df=2)],
             colors=['black'],
         )
         ax.contour(
-            scipy.ndimage.zoom(X, 4),
-            scipy.ndimage.zoom(Y, 4),
-            scipy.ndimage.zoom(z, 4),
+            gaussian_filter(scipy.ndimage.zoom(X, zoom),sigma),
+            gaussian_filter(scipy.ndimage.zoom(Y, zoom),sigma),
+            gaussian_filter(scipy.ndimage.zoom(z, zoom),sigma),
             levels=[scipy.stats.chi2.ppf(0.95, df=2)],
             colors=['black'], linestyles='dashed',
         )
         if threesig:
           ax.contour(
-              scipy.ndimage.zoom(X, 4),
-              scipy.ndimage.zoom(Y, 4),
-              scipy.ndimage.zoom(z, 4),
+              scipy.ndimage.zoom(X, zoom),
+              scipy.ndimage.zoom(Y, zoom),
+              scipy.ndimage.zoom(z, zoom),
               levels=[scipy.stats.chi2.ppf(0.997, df=2)],
               colors=['black'], linestyles='dashdot',
           )
@@ -814,7 +828,7 @@ def scan_2d(input_folder, category="cmb", plot_name="scan_2d",xvar='alpha',yvar=
 
         if xvar=='alpha' and yvar=='muggH':
           ax.text(
-              0.75, 0.05, r"$\mu_{\mathrm{V}}$ profiled",
+              0.75, 0.05, r"$\mu_{qq\mathrm{H}}$ profiled",
               ha='center', va='bottom', transform=ax.transAxes,
           )
         elif xvar=='alpha' and yvar=='muV':
@@ -829,19 +843,19 @@ def scan_2d(input_folder, category="cmb", plot_name="scan_2d",xvar='alpha',yvar=
           )
         else:
           ax.text(
-              0.75, 0.05, r"$\mu_{gg\mathrm{H}} = \mu_{\mathrm{V}} = 1$",
+              0.75, 0.05, r"$\mu_{gg\mathrm{H}} = \mu_{qq\mathrm{H}} = 1$",
               ha='center', va='bottom', transform=ax.transAxes,
           )
 
         if xvar=='alpha':
           ax.set_xlabel(r'$\phi_{\tau\tau} (\mathrm{degrees})$')
         elif xvar=='muV':
-          ax.set_xlabel(r'$\mu_{\mathrm{V}}$')
+          ax.set_xlabel(r'$\mu_{qq\mathrm{H}}$')
         elif xvar=='muggH':
           ax.set_xlabel(r'$\mu_{gg\mathrm{H}}$')
 
         if yvar=='muV':
-          ax.set_ylabel(r'$\mu_{\mathrm{V}}$')
+          ax.set_ylabel(r'$\mu_{qq\mathrm{H}}$')
         elif yvar=='muggH':
           ax.set_ylabel(r'$\mu_{gg\mathrm{H}}$')
         else:

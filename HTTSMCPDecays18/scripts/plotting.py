@@ -180,7 +180,7 @@ def draw_1d(
     unrolled=False, nbins=[[4], 14, "inclusive", "inclusive"], mcstat=True,
     sig_ratio=False, norm_bins=False, mcsyst=False,
     mcstat_kw={}, logy=False, postfix="", sm_bkg_ratio=False,
-    combined=False, difference=False,
+    combined=False, difference=False, bin_id=1
 ):
     year_ = year
     if year == 'cmb': year_ = 2018
@@ -236,17 +236,22 @@ def draw_1d(
         else:
             lumi = 137
         
+        supp_plots = [] 
+        if channel == 'tt':
+          supp_plots = [4,5,6,8,9,10,11]
+        else:
+          supp_plots = [5,6] 
         if unrolled and not combined and lumi != 137:
             dftools.draw.cms_label(ax[0], "Preliminary", lumi=lumi, extra_label=nbins[2])
         elif not combined and lumi !=137:
             dftools.draw.cms_label(ax[0], "Preliminary", lumi=lumi)
         # for all three years together (assume uncorrelated)
-        elif (combined or lumi==137) and unrolled : 
-            #custom_cms_label(ax[0], "Supplementary", lumi=137, extra_label=nbins[2])
-            custom_cms_label(ax[0], " ", lumi=137, extra_label=nbins[2])
+        elif (combined or lumi==137) and unrolled :
+            if int(bin_id) in supp_plots: custom_cms_label(ax[0], "Supplementary", lumi=137, extra_label=nbins[2])
+            else: custom_cms_label(ax[0], " ", lumi=137, extra_label=nbins[2])
         else:
-            #custom_cms_label(ax[0], "Supplementary", lumi=137)
-            custom_cms_label(ax[0], " ", lumi=137)
+            if bin_id in supp_plots: custom_cms_label(ax[0], "Supplementary", lumi=137)
+            else: custom_cms_label(ax[0], " ", lumi=137)
             
         
         # to fix when y axis is too large 
@@ -380,7 +385,7 @@ def draw_1d(
         if norm_bins:
             ax[0].set_ylabel(r'Events/bin')
         #ax[1].set_ylabel(r'Ratio')
-        ax[1].set_ylabel(r'Data/Bkg.')
+        ax[1].set_ylabel(r'Obs./Bkg.')
         
         first_xpos = 0.
         if unrolled:
@@ -512,7 +517,7 @@ def draw_1d(
                         legend_items.append(r'$\mathrm{PS\ H}\rightarrow\tau\tau$')
                     else:
                         # legend_items.append(r'$\frac{\mathrm{Bestfit\ H}\rightarrow\tau\tau}{\mathrm{Bkg.\ unc.}}$')
-                        legend_items.append(r'$\mathrm{Bestfit\ H}\rightarrow\tau\tau$')
+                        legend_items.append(r'$\mathrm{Best\ fit\ H}\rightarrow\tau\tau$')
             lines.append(ax[1].axhspan(-1, 1, zorder=-10, fc='gray', alpha=0.3))
             legend_items.append("Bkg. unc.")
             if unrolled:
@@ -545,16 +550,16 @@ def draw_1d(
             #ax[1].set_yticks([0.7, 1., 1.3])
 
         if difference:
-            ax[1].set_ylabel(r'$\frac{\mathrm{Data}-\mathrm{Bkg.}}{\mathrm{Bkg.\ unc.}}$')
+            ax[1].set_ylabel(r'$\frac{\mathrm{Obs.}-\mathrm{Bkg.}}{\mathrm{Bkg.\ unc.}}$')
             if not unrolled:
                 # for mt
                 if channel in ["mt",'et']:
-                    ax[1].set_ylim(-2., 6.)
+                    ax[1].set_ylim(-3., 7.)
                     ax[1].set_yticks([-2., 0.,  2., 4., 6.])
                 # for tt
                 elif channel == "tt":
-                    ax[1].set_ylim(-4., 8.)
-                    ax[1].set_yticks([-4, 0., 4., 8.])
+                    ax[1].set_ylim(-6., 10.)
+                    ax[1].set_yticks([-5, 0., 5.,10.])
             #for mu-rho channel we use a larger range for ratio part
             elif channel == 'mt' and nbins[3] == 'mu-rho':
                 ax[1].set_ylim(-5.,30.)
@@ -709,15 +714,18 @@ process_kw={
         "ZTT": r'$\mathrm{Z}\rightarrow\tau\tau$',
         "ZMM": r'$\mathrm{Z}\rightarrow \mu\mu$',
         "ZEE": r'$\mathrm{Z}\rightarrow ee$',
+        #"jetFakes": r'$\mathrm{jet}\rightarrow \tau_{h}$',
+        #"EmbedZTT": r'$\mu\rightarrow\tau \ \mathrm{Embed.}$',
         "jetFakes": r'$\mathrm{jet}\rightarrow \tau_{h}$',
-        "EmbedZTT": r'$\mu\rightarrow\tau \ \mathrm{Embed.}$',
+        "EmbedZTT": r'$\tau\tau \mathrm{\ bkg.}$',
         "ggH": r'$gg\mathrm{H} \rightarrow\tau\tau$',
         "qqH": r'$qq\mathrm{H} \rightarrow\tau\tau$',
         "VH": r'$\mathrm{VH} \rightarrow\tau\tau$',
         "H_sm": r'$\mathrm{SM\ H} \rightarrow\tau\tau$',
         "H_ps": r'$\mathrm{PS\ H} \rightarrow\tau\tau$',
-        "Bestfit": r'$\mathrm{Bestfit\ H} \rightarrow\tau\tau$',
-        "Bestfit_stack": r'$\mathrm{Bestfit\ H} \rightarrow\tau\tau$',
+        "Bestfit": r'$\mathrm{Best\ fit\ H} \rightarrow\tau\tau$',
+        "Bestfit_stack": r'$\mathrm{Best\ fit\ H} \rightarrow\tau\tau$',
+        "data_obs": r'$\mathrm{Observation}$',
     },
     "colours": {
         "SMTotal": 'black', 
