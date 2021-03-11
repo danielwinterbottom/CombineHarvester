@@ -231,14 +231,14 @@ def draw_1d(
           lumi = 137
         
         if unrolled and not combined and lumi != 137:
-            dftools.draw.cms_label(ax[0], "Preliminary", lumi=lumi, extra_label=nbins[2])
+            dftools.draw.cms_label(ax[0], "Supplementary", lumi=lumi, extra_label=nbins[2])
         elif not combined and lumi !=137:
-            dftools.draw.cms_label(ax[0], "Preliminary", lumi=lumi)
+            dftools.draw.cms_label(ax[0], "Supplementary", lumi=lumi)
         # for all three years together (assume uncorrelated)
         elif (combined or lumi==137) and unrolled : 
-            custom_cms_label(ax[0], "Preliminary", lumi=137, extra_label=nbins[2])
+            custom_cms_label(ax[0], "Supplementary", lumi=137, extra_label=nbins[2])
         else:
-            custom_cms_label(ax[0], "Preliminary", lumi=137)
+            custom_cms_label(ax[0], "Supplementary", lumi=137)
             
        
         chan_label(ax[0], label=nbins[2], alpha_label=nbins[4])
