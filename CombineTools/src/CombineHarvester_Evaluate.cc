@@ -335,11 +335,11 @@ TH1F CombineHarvester::GetShapeInternal(ProcSystMap const& lookup,
           continue;  // don't evaluate this for now
         }
         auto param_it = params_.find(sys_it->name());
-        if (param_it == params_.end()) {
-          throw std::runtime_error(
-              FNERROR("Parameter " + sys_it->name() +
-                      " not found in CombineHarvester instance"));
-        }
+        //if (param_it == params_.end()) {
+        //  throw std::runtime_error(
+        //      FNERROR("Parameter " + sys_it->name() +
+        //              " not found in CombineHarvester instance"));
+        //}
         double x = param_it->second->val();
         if (sys_it->asymm()) {
           p_rate *= logKappaForX(x * sys_it->scale(), sys_it->value_d(),

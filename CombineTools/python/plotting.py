@@ -177,6 +177,11 @@ def ModTDRStyle(width=600, height=600, t=0.06, b=0.12, l=0.16, r=0.04):
     R.gStyle.SetCanvasDefW(width)
     R.gStyle.SetCanvasDefH(height)
 
+    R.gStyle.SetHatchesSpacing(1.0)
+    R.gStyle.SetHatchesLineWidth(1)
+    #print R.gStyle().GetLineStyleString(3)
+    #R.gStyle().SetLineStyleString(3," 4 8")
+
     # Set the default margins. These are given as fractions of the pad height
     # for `Top` and `Bottom` and the pad width for `Left` and `Right`. But we
     # want to specify all of these as fractions of the shortest length.

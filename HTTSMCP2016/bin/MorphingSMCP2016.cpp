@@ -23,6 +23,7 @@
 #include "CombineHarvester/CombinePdfs/interface/MorphFunctions.h"
 #include "CombineHarvester/HTTSMCP2016/interface/HttSystematics_SMRun2.h"
 #include "CombineHarvester/CombineTools/interface/JsonTools.h"
+#include "CombineHarvester/CombineTools/interface/TFileIO.h"
 #include "RooWorkspace.h"
 #include "RooRealVar.h"
 #include "TH2.h"
@@ -569,6 +570,8 @@ int main(int argc, char** argv) {
     bool powheg_check = false;
     int sync = 0;
     bool mergeSymm = true;
+    bool prop_plot = false;
+    std::string fitresult_file="";
 
     string era;
     po::variables_map vm;
@@ -594,7 +597,10 @@ int main(int argc, char** argv) {
     ("ttbar_fit", po::value<bool>(&ttbar_fit)->default_value(false))
     ("powheg_check", po::value<bool>(&powheg_check)->default_value(false))
     ("mergeSymm", po::value<bool>(&mergeSymm)->default_value(true))
-    ("sync", po::value<int>(&sync)->default_value(0));
+    ("sync", po::value<int>(&sync)->default_value(0))
+    ("fitresult_file", po::value<string>(&fitresult_file)->default_value(fitresult_file))
+    ("prop_plot", po::value<bool>(&prop_plot)->default_value(false));
+
 
     po::store(po::command_line_parser(argc, argv).options(config).run(), vm);
     po::notify(vm);
@@ -1913,6 +1919,160 @@ int main(int argc, char** argv) {
  
     cb.PrintAll();
     cout << " done\n";
+
+    // propoganda plots here    
+ // make propoganda plot here:
+
+  if (prop_plot) {
+
+    auto bin_set = cb.cp().bin_id({1,2}, false).bin_set();
+  
+    // if fit result is given then load this to get postfit values for signal/background yields
+  
+    RooFitResult* fitresult = nullptr;
+    if (fitresult_file.length()) {
+      using ch::syst::SystMap;
+      cb.cp().process({"ggH_mm_htt"}).AddSyst(cb, "muggH","rateParam",SystMap<>::init(1.0));
+      fitresult =
+          new RooFitResult(ch::OpenFromTFile<RooFitResult>(fitresult_file));
+      auto fitparams = ch::ExtractFitParameters(*fitresult);
+      cb.UpdateParameters(fitparams);
+    }
+  
+    TH1F proto1("proto1", "proto1", 12, -3.2,3.2);
+  
+    for (auto const& bin : bin_set) {
+
+      std::cout << bin << std::endl;
+      int nxbins = 12;
+      ch::CombineHarvester cmb_bin = std::move(cb.cp().bin({bin}));
+      double muggH = 1.;
+      if (fitresult_file.length()) { 
+        muggH = cb.GetParameter("muggH")->val();
+      }
+      TH1F bkg = cmb_bin.cp().backgrounds().GetShape();
+
+      TH1F sm_sig = cmb_bin.cp().signals().process({"ggH_sm_htt"}).GetShape();
+      TH1F ps_sig = cmb_bin.cp().signals().process({"ggH_ps_htt"}).GetShape();
+
+      sm_sig.Scale(muggH);
+      ps_sig.Scale(muggH);
+
+      std::map<int, double> wt_mapping;
+      double s_sb=0.;
+      double A_ave=0.;
+      for (int b = 1; b <= bkg.GetNbinsX(); ++b) {
+        if((b-1) % nxbins ==0) {
+          double i_sm = sm_sig.Integral(b,b+nxbins-1);
+          double i_ps = ps_sig.Integral(b,b+nxbins-1);
+          double i_bkg = bkg.Integral(b,b+nxbins-1);
+          double i_sig = (i_sm+i_ps)/2;
+          s_sb = i_sig/(i_sig+i_bkg);
+          double A_tot=0.;
+          for(int i=b; i<b+nxbins; ++i) {
+            double b_sm = sm_sig.GetBinContent(i);
+            double b_ps = ps_sig.GetBinContent(i);
+            A_tot += std::fabs(b_sm-b_ps)/(b_sm+b_ps);
+          }
+          A_ave = A_tot/nxbins;
+          std::cout << b << ": " << s_sb << "  " << A_ave << std::endl;
+        }
+        
+        wt_mapping[b] = s_sb*A_ave;
+      }
+  
+      cmb_bin.ForEachObs([&](ch::Observation *e) {
+        TH1 const * old_h = e->shape();
+        std::unique_ptr<TH1> new_h;
+        new_h = ch::make_unique<TH1F>(TH1F(proto1));
+        for (int i=0; i<=new_h->GetNbinsX();++i) {
+          new_h->SetBinContent(i,0.);
+          new_h->SetBinError(i,0.);
+        }
+   
+        for (int b = 1; b <= old_h->GetNbinsX(); ++b) {
+          int new_bin = (b-1) % nxbins +1;
+          double wt = (wt_mapping.find(b))->second;
+          new_h->SetBinContent(
+              new_bin,
+              new_h->GetBinContent(new_bin) + wt*old_h->GetBinContent(b));
+          new_h->SetBinError(
+              new_bin,
+              sqrt(pow(new_h->GetBinError(new_bin),2) + pow(wt*old_h->GetBinError(b),2)));
+        }
+  
+        new_h->Scale(e->rate());
+        e->set_shape(std::move(new_h), true);
+      });
+  
+      cmb_bin.ForEachProc([&](ch::Process *e) {
+        TH1 const * old_h = e->shape();
+        std::unique_ptr<TH1> new_h;
+        new_h = ch::make_unique<TH1F>(TH1F(proto1));
+  
+        for (int b = 1; b <= old_h->GetNbinsX(); ++b) {
+          int new_bin = (b-1) % nxbins +1;
+          double wt = (wt_mapping.find(b))->second;
+          new_h->SetBinContent(
+              new_bin,
+              new_h->GetBinContent(new_bin) + wt*old_h->GetBinContent(b));
+        }
+  
+        new_h->Scale(e->rate());
+        e->set_shape(std::move(new_h), true);
+      });
+  
+      cmb_bin.ForEachSyst([&](ch::Systematic *e) {
+        if (e->type() != "shape") return;
+        TH1D *old_hu = (TH1D*)e->ClonedShapeU().get()->Clone();
+        TH1D *old_hd = (TH1D*)e->ClonedShapeD().get()->Clone();
+  
+        float val_u = e->value_u(); 
+        float val_d = e->value_d();
+        TH1D *old_nom = new TH1D();
+        cb.cp().ForEachProc([&](ch::Process *proc){
+           bool match_proc = (MatchingProcess(*proc,*e));
+           if(match_proc) {
+             old_nom = (TH1D*)proc->ClonedShape().get()->Clone();
+           } 
+        });
+  
+        std::unique_ptr<TH1> new_hd;
+        std::unique_ptr<TH1> new_hu;
+  
+        new_hu = ch::make_unique<TH1F>(TH1F(proto1));
+        new_hd = ch::make_unique<TH1F>(TH1F(proto1));
+  
+        for (int b = 1; b <= old_hd->GetNbinsX(); ++b) {
+          int new_bin = (b-1) % nxbins +1;
+          double wt = (wt_mapping.find(b))->second;
+  
+          new_hd->SetBinContent(
+              new_bin,
+              new_hd->GetBinContent(new_bin) + val_d*wt*old_hd->GetBinContent(b));
+          new_hu->SetBinContent(
+              new_bin,
+              new_hu->GetBinContent(new_bin) + val_u*wt*old_hu->GetBinContent(b));
+        }
+        e->set_shapes(std::move(new_hu), std::move(new_hd), nullptr);
+      });
+  
+    } // end of loop over bins
     
-    
+    auto s = cb.cp().bin_id({3,4,5,6}).GetObservedShape();
+  
+    writer.WriteCards("plot_cmb", cb.cp().bin_id({3,4,5,6})); 
+  
+    writer.WriteCards("plot_loosemjj_lowboost", cb.cp().bin_id({3}));   
+    writer.WriteCards("plot_loosemjj_boosted", cb.cp().bin_id({4}));   
+    writer.WriteCards("plot_tightmjj_lowboost", cb.cp().bin_id({5}));   
+    writer.WriteCards("plot_tightmjj_boosted", cb.cp().bin_id({6}));   
+
+    writer.WriteCards("plot_lowboost", cb.cp().bin_id({3,5}));   
+    writer.WriteCards("plot_boosted", cb.cp().bin_id({4,6}));
+
+    writer.WriteCards("plot_loosemjj", cb.cp().bin_id({3,4}));    
+    writer.WriteCards("plot_tightmjj", cb.cp().bin_id({5,6})); 
+
+    } 
 }

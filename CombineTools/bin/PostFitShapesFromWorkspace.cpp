@@ -45,6 +45,7 @@ int main(int argc, char* argv[]) {
   bool skip_prefit  = false;
   bool skip_proc_errs = false;
   bool total_shapes = false;
+  bool skip_bychan = false;
   bool combine_years = false;
   std::vector<std::string> reverse_bins_;
 
@@ -100,6 +101,9 @@ int main(int argc, char* argv[]) {
     ("total-shapes",
       po::value<bool>(&total_shapes)->default_value(total_shapes)->implicit_value(true),
       "Save signal- and background shapes added for all channels/categories")
+    ("skip-bychan",
+      po::value<bool>(&skip_bychan)->default_value(skip_bychan)->implicit_value(true),
+      "skip plots for individual channel (just make totals)")
     ("combine-years",
       po::value<bool>(&combine_years)->default_value(combine_years)->implicit_value(true),
       "Save signal- and background shapes added together for each year (2016+2017)")
@@ -358,7 +362,8 @@ int main(int argc, char* argv[]) {
     map<string, TH1F> post_shapes_tot;
 
     if(total_shapes){
-      post_shapes_tot["data_obs"] = cmb.GetObservedShape();
+      if (datacard != "") post_shapes_tot["data_obs"] = cmb_card.cp().GetObservedShape(); 
+      else post_shapes_tot["data_obs"] = cmb.GetObservedShape();
       // Fill the total sig. and total bkg. hists
       auto cmb_bkgs = cmb.cp().backgrounds();
       auto cmb_sigs = cmb.cp().signals();
@@ -446,74 +451,76 @@ int main(int argc, char* argv[]) {
       }
     }
 
-    for (auto bin : bins) {
-      ch::CombineHarvester cmb_bin = cmb.cp().bin({bin});
-      post_shapes[bin]["data_obs"] = cmb_bin.GetObservedShape();
-      for (auto proc : cmb_bin.process_set()) {
-        auto cmb_proc = cmb_bin.cp().process({proc});
-        // Method to get the shape uncertainty depends on whether we are using
-        // the sampling method or the "wrong" method (assumes no correlations)
-        std::cout << ">> Doing postfit: " << bin << "," << proc << std::endl;
-        if (skip_proc_errs) {
-          post_shapes[bin][proc] = cmb_proc.GetShape();
-        } else {
-          post_shapes[bin][proc] =
-              sampling ? cmb_proc.GetShapeWithUncertainty(res, samples)
-                       : cmb_proc.GetShapeWithUncertainty();
+    if(!skip_bychan){
+      for (auto bin : bins) {
+        ch::CombineHarvester cmb_bin = cmb.cp().bin({bin});
+        post_shapes[bin]["data_obs"] = cmb_bin.GetObservedShape();
+        for (auto proc : cmb_bin.process_set()) {
+          auto cmb_proc = cmb_bin.cp().process({proc});
+          // Method to get the shape uncertainty depends on whether we are using
+          // the sampling method or the "wrong" method (assumes no correlations)
+          std::cout << ">> Doing postfit: " << bin << "," << proc << std::endl;
+          if (skip_proc_errs) {
+            post_shapes[bin][proc] = cmb_proc.GetShape();
+          } else {
+            post_shapes[bin][proc] =
+                sampling ? cmb_proc.GetShapeWithUncertainty(res, samples)
+                         : cmb_proc.GetShapeWithUncertainty();
+          }
         }
-      }
-      if (sampling && covariance) {
-        post_yield_cov[bin] = cmb_bin.GetRateCovariance(res, samples);
-        post_yield_cor[bin] = cmb_bin.GetRateCorrelation(res, samples);
-      }
-      // Fill the total sig. and total bkg. hists
-      auto cmb_bkgs = cmb_bin.cp().backgrounds();
-      auto cmb_sigs = cmb_bin.cp().signals();
-      std::cout << ">> Doing postfit: " << bin << "," << "TotalBkg" << std::endl;
-      post_shapes[bin]["TotalBkg"] =
-          sampling ? cmb_bkgs.GetShapeWithUncertainty(res, samples)
-                   : cmb_bkgs.GetShapeWithUncertainty();
-      std::cout << ">> Doing postfit: " << bin << "," << "TotalSig" << std::endl;
-      post_shapes[bin]["TotalSig"] =
-          sampling ? cmb_sigs.GetShapeWithUncertainty(res, samples)
-                   : cmb_sigs.GetShapeWithUncertainty();
-      std::cout << ">> Doing postfit: " << bin << "," << "TotalProcs" << std::endl;
-      post_shapes[bin]["TotalProcs"] =
-          sampling ? cmb_bin.cp().GetShapeWithUncertainty(res, samples)
-                   : cmb_bin.cp().GetShapeWithUncertainty();
-
-      if (datacard != "") {
-        TH1F ref = cmb_card.cp().bin({bin}).GetObservedShape();
-        for (auto & it : post_shapes[bin]) {
-          it.second = ch::RestoreBinning(it.second, ref);
+        if (sampling && covariance) {
+          post_yield_cov[bin] = cmb_bin.GetRateCovariance(res, samples);
+          post_yield_cor[bin] = cmb_bin.GetRateCorrelation(res, samples);
         }
-      }
+        // Fill the total sig. and total bkg. hists
+        auto cmb_bkgs = cmb_bin.cp().backgrounds();
+        auto cmb_sigs = cmb_bin.cp().signals();
+        std::cout << ">> Doing postfit: " << bin << "," << "TotalBkg" << std::endl;
+        post_shapes[bin]["TotalBkg"] =
+            sampling ? cmb_bkgs.GetShapeWithUncertainty(res, samples)
+                     : cmb_bkgs.GetShapeWithUncertainty();
+        std::cout << ">> Doing postfit: " << bin << "," << "TotalSig" << std::endl;
+        post_shapes[bin]["TotalSig"] =
+            sampling ? cmb_sigs.GetShapeWithUncertainty(res, samples)
+                     : cmb_sigs.GetShapeWithUncertainty();
+        std::cout << ">> Doing postfit: " << bin << "," << "TotalProcs" << std::endl;
+        post_shapes[bin]["TotalProcs"] =
+            sampling ? cmb_bin.cp().GetShapeWithUncertainty(res, samples)
+                     : cmb_bin.cp().GetShapeWithUncertainty();
 
-      outfile.cd();
-      // Write the post-fit histograms
-
-      for (auto const& rbin : reverse_bins_) {
-        if (rbin != bin) continue;
-        std::cout << ">> reversing hists in bin " << bin << "\n";
-        auto & hists = post_shapes[bin];
-        for (auto it = hists.begin(); it != hists.end(); ++it) {
-          ReverseBins(it->second);
+        if (datacard != "") {
+          TH1F ref = cmb_card.cp().bin({bin}).GetObservedShape();
+          for (auto & it : post_shapes[bin]) {
+            it.second = ch::RestoreBinning(it.second, ref);
+          }
         }
-      }
 
-      for (auto & iter : post_shapes[bin]) {
-        ch::WriteToTFile(&(iter.second), &outfile,
-                         bin + "_postfit/" + iter.first);
-      }
-      for (auto & iter : post_yield_cov) {
-        ch::WriteToTFile(&(iter.second), &outfile,
-                         iter.first+"_cov");
-      }
-      for (auto & iter : post_yield_cor) {
-        ch::WriteToTFile(&(iter.second), &outfile,
-                         iter.first+"_cor");
-      }
+        outfile.cd();
+        // Write the post-fit histograms
 
+        for (auto const& rbin : reverse_bins_) {
+          if (rbin != bin) continue;
+          std::cout << ">> reversing hists in bin " << bin << "\n";
+          auto & hists = post_shapes[bin];
+          for (auto it = hists.begin(); it != hists.end(); ++it) {
+            ReverseBins(it->second);
+          }
+        }
+
+        for (auto & iter : post_shapes[bin]) {
+          ch::WriteToTFile(&(iter.second), &outfile,
+                           bin + "_postfit/" + iter.first);
+        }
+        for (auto & iter : post_yield_cov) {
+          ch::WriteToTFile(&(iter.second), &outfile,
+                           iter.first+"_cov");
+        }
+        for (auto & iter : post_yield_cor) {
+          ch::WriteToTFile(&(iter.second), &outfile,
+                           iter.first+"_cor");
+        }
+
+      }
     }
 
     if (factors) {

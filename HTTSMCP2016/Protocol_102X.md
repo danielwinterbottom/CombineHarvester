@@ -161,6 +161,10 @@ Plot can be produced using the postFitPlotJetFakes.py script, e.g:
 
 `python scripts/postFitPlotJetFakes.py --mode prefit --file_dir htt_tt_2018_6_ -f shapes_prefit_tt_6.root --file_alt=shapes_prefit_tt_6_ps.root --ratio  --proper_errors_uniform --manual_blind --log_y`
 
+# latest example for combined years plot:
+
+  python scripts/postFitPlotJetFakes.py --mode postfit --file_dir htt_mt_2018_6_ -f shapes_unblinding_v2/shapes_unblinding_mt_6.root --file_alt=shapes_unblinding_v2/shapes_unblinding_mt_6_ps.root --ratio  --proper_errors_uniform --log_y --combined_yr
+
 Run with (some) systematics frozen
 Do fit and store workspace
   'combineTool.py -m 125 -M MultiDimFit  --redefineSignalPOIs alpha -d output/cp260219/cmb/125/ws.root --algo none  --there -n .saveWS  --saveWorkspace'
@@ -171,3 +175,20 @@ Now run scans freezing all systematics with "--freezeParameters all" - can also 
 can also do the following to freeze theory uncertanties only:
 
 combineTool.py -m 125 -M MultiDimFit --setParameters alpha=0 --setParameterRanges alpha=-90,90  --redefineSignalPOIs alpha  -d output/cp260219/cmb/125/higgsCombine.saveWS.MultiDimFit.mH125.root --algo grid --there -n .alpha.notheory --floatOtherPOIs 1 --points=37 --alignEdges 1  --snapshot MultiDimFit --freezeParameters CMS_scale_gg_13TeV,CMS_FiniteQuarkMass_13TeV,CMS_PS_ggH_13TeV,CMS_UE_ggH_13TeV,BR_htt_THU,BR_htt_PU_mq,BR_htt_PU_alphas,QCDScale_ggH,QCDScale_qqH,QCDScale_WH,QCDScale_ZH,pdf_Higgs_WH,pdf_Higgs_ZH,pdf_Higgs_gg,pdf_Higgs_qq,CMS_ggH_mig01,CMS_ggH_mig12 --job-mode 'SGE' --prefix-file ic --sub-opts "-q hep.q -l h_rt=0:180:0" --split-points 1 --task-name alpha.notheory
+
+make propoganda plots:
+
+MorphingSMCP2016 --output_folder="propoganda_v2" --postfix="-2D" --prop_plot=true 
+
+combineTool.py -M T2W -P CombineHarvester.CombinePdfs.CPMixture:CPMixture -i output/propoganda_v2/plot_*/* -o ws_floatVBF.root --parallel 8 --PO VBFangle 
+
+combineTool.py -m 125 -M MultiDimFit --setParameters alpha=0 --setParameterRanges alpha=-90,90  --redefineSignalPOIs alpha  -d output/paper_181120/cmb/125/ws.root --algo none  --there -n .bestfit.freezeVBFPH.v3 --floatOtherPOIs 1 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,Migrad,0:1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10 --saveFitResult --robustHesse 1
+
+for c in cmb loosemjj_lowboost loosemjj_boosted tightmjj_lowboost tightmjj_boosted lowboost boosted loosemjj tightmjj; do
+  PostFitShapesFromWorkspace -m 125 -d output/propoganda_v2/plot_${c}/125/combined.txt.cmb -w output/propoganda_v2/plot_cmb/125/ws_floatVBF.root -o shapes_propoganda_sm_${c}.root --sampling --postfit -f output/paper_181120/cmb/125/multidimfit.bestfit.freezeVBF.v3.root:fit_mdf --total-shapes=true --skip-proc-errs=true --skip-prefit=true --skip-bychan=true --freeze alpha=0,beta=0
+
+  PostFitShapesFromWorkspace -m 125 -d output/propoganda_v2/plot_${c}/125/combined.txt.cmb -w output/propoganda_v2/plot_cmb/125/ws_floatVBF.root -o shapes_propoganda_ps_${c}.root --sampling --postfit -f output/paper_181120/cmb/125/multidimfit.bestfit.freezeVBF.v3.root:fit_mdf --total-shapes=true --skip-proc-errs=true --skip-prefit=true --skip-bychan=true --freeze alpha=90,beta=0
+
+done
+
+python scripts/phiCPWeightedPlots_v2.py

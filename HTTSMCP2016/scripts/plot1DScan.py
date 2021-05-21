@@ -230,7 +230,7 @@ if args.others is not None:
     for oargs in args.others:
         splitargs = oargs.split(':')
         other_scans_opts.append(splitargs)
-        other_scans.append(BuildScan(args.output, args.POI, [splitargs[0]], int(splitargs[2]), yvals, args.chop, args.remove_near_min if args.envelope is False else None, args.rezero, args.envelope,  remove_delta = args.remove_delta, improve = args.improve, expected=False))#True)) set last option to True to do expected style
+        other_scans.append(BuildScan(args.output, args.POI, [splitargs[0]], int(splitargs[2]), yvals, args.chop, args.remove_near_min if args.envelope is False else None, args.rezero, args.envelope,  remove_delta = args.remove_delta, improve = args.improve, expected=False)) #set last option to True to do expected style
 
 if args.envelope:
     new_gr = ProcessEnvelope(main_scan, other_scans, args.relax_safety)
@@ -248,6 +248,7 @@ if args.envelope:
 canv = ROOT.TCanvas(args.output, args.output)
 pads = plot.OnePad()
 if args.pub: main_scan['graph'].SetMarkerSize(0)
+main_scan['graph'].SetMarkerSize(0)
 main_scan['graph'].SetMarkerColor(1)
 main_scan['graph'].SetLineColor(ROOT.kBlue)
 main_scan['graph'].SetLineStyle(2)
@@ -302,10 +303,11 @@ for other in other_scans:
         other['graph'].SetMarkerSize(0.4)
     if args.pub: other['graph'].SetMarkerSize(0.0)
     #other['graph'].Draw('PSAME')
-    other['graph'].Draw('SAME')
+    #other['graph'].Draw('SAME L')
 
 line = ROOT.TLine()
-line.SetLineColor(14)
+#line.SetLineColor(14)
+line.SetLineColor(1)
 # line.SetLineStyle(7)
 #lines for 1 sigma and 2 sigma
 
@@ -342,7 +344,7 @@ for yval in yvals:
 
 
 main_scan['func'].SetLineColor(ROOT.TColor.GetColor("#000099"))
-#main_scan['func'].SetLineColor(1)
+main_scan['func'].SetLineColor(1)
 if not args.POI=='CMS_zz4l_fai1': main_scan['func'].Draw('same')
 main_scan['graph'].Draw('PSAME')
 
