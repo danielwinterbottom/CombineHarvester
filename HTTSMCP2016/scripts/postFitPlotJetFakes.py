@@ -272,7 +272,7 @@ def main(args):
         args.ratio_range = "0.85,1.15"
     if bin_number == "2":
         args.ratio_range = "0.4,1.6"
-        bin_label = "boosted"
+        bin_label = "Boosted"
     if bin_number == "3":
         bin_label = "VBF Loose-m_{jj}"
     if bin_number == "4":
@@ -586,9 +586,9 @@ def main(args):
 ##### new defs to match agreed color schemes #####
 
     background_schemes['em'] = [
-              backgroundComp("Others",["VV","W"],ROOT.TColor.GetColor("#12cadd")),
+              backgroundComp("Others",["VV","W","ZLL","EWKZ"],ROOT.TColor.GetColor("#12cadd")),
               backgroundComp("t#bar{t}+jets",["TT"],ROOT.TColor.GetColor("#9999cc")),
-              backgroundComp("Z#rightarrowee/#mu#mu",["ZLL","EWKZ"],ROOT.TColor.GetColor("#4496c8")),
+              #backgroundComp("Z#rightarrowee/#mu#mu",["ZLL","EWKZ"],ROOT.TColor.GetColor("#4496c8")),
               backgroundComp("QCD",["QCD"],ROOT.TColor.GetColor("#ffccff")),
               backgroundComp("#tau#tau bkg.",["EmbedZTT"],ROOT.TColor.GetColor("#ffcc66")),
               backgroundComp("H#rightarrow#tau#tau (Best fit)", ["TotalSig"],ROOT.kRed),
@@ -604,6 +604,15 @@ def main(args):
               ]
 
     background_schemes['mt'] = [
+              backgroundComp("Others",["VVT","TTT","ZL","EWKZ"],ROOT.TColor.GetColor("#12cadd")),
+              #backgroundComp("t#bar{t}+jets",["TTT"],ROOT.TColor.GetColor("#9999cc")),
+              #backgroundComp("Z#rightarrowee/#mu#mu",["ZL","EWKZ"],ROOT.TColor.GetColor("#4496c8")),
+              backgroundComp("jet#rightarrow#tau_{h} mis-ID",["jetFakes","Wfakes"],ROOT.TColor.GetColor("#ffccff")),
+              backgroundComp("#tau#tau bkg.",["EmbedZTT"],ROOT.TColor.GetColor("#ffcc66")),
+              backgroundComp("H#rightarrow#tau#tau (Best fit)", ["TotalSig"],ROOT.kRed),
+              ]
+
+    background_schemes['et'] = [
               backgroundComp("Others",["VVT","TTT","ZL","EWKZ"],ROOT.TColor.GetColor("#12cadd")),
               #backgroundComp("t#bar{t}+jets",["TTT"],ROOT.TColor.GetColor("#9999cc")),
               #backgroundComp("Z#rightarrowee/#mu#mu",["ZL","EWKZ"],ROOT.TColor.GetColor("#4496c8")),
@@ -1045,11 +1054,13 @@ def main(args):
             axish[0].GetYaxis().SetRangeUser(y_axis_min,y_axis_max)
         elif fractions: axish[0].GetYaxis().SetRangeUser(0,1)
     axish[0].GetYaxis().SetTitleOffset(0.5)
+    axish[1].GetYaxis().SetTitleOffset(0.5)
     #print axish[0].GetYaxis().GetTitleOffset()
     axish[0].GetYaxis().SetTitle("Events / bin")
     if int(bin_number) == 1:
         axish[0].GetYaxis().SetTitle("dN/dm_{#tau#tau} (1/GeV)")
         axish[0].GetYaxis().SetTitleOffset(1.5)
+        axish[1].GetYaxis().SetTitleOffset(1.5)
 
     axish[0].GetXaxis().SetTitle(args.x_title)
         
@@ -1172,8 +1183,9 @@ def main(args):
     latex2.SetTextColor(ROOT.kBlack)
     latex2.SetTextFont(42)
     if int(bin_number) == 1:
-        latex2.SetTextSize(0.04)
-        latex2.DrawLatex(0.19,0.955,"{}, {}".format(bin_label, channel_label))
+        latex2.SetTextSize(0.036)
+        #latex2.DrawLatex(0.19,0.955,"{}, {}".format(bin_label, channel_label))
+        latex2.DrawLatex(0.55,0.955,"{}, {}".format(bin_label, channel_label))
     else:
         latex2.SetTextAlign(23)
         latex2.SetTextSize(0.05)
@@ -1181,18 +1193,25 @@ def main(args):
 
     #CMS and lumi labels
     plot.FixTopRange(pads[0], plot.GetPadYMax(pads[0]), extra_pad if extra_pad>0 else 0.15)
+    extra=''
+    print '!!!!!!'
+    print file_dir
+    if '_mt_' not in file_dir or '_tt_' not in file_dir or not (('_mt_' in file_dir or '_tt_' in file_dir) and '_6_' in file_dir):
+      extra='Supplementary'
+    if 'htt_tt_2018_6_' in file_dir or 'htt_mt_2018_6_' in file_dir: extra=''
     if bin_number == "1":
-        plot.DrawCMSLogo(pads[0], 'CMS', '', 11, 0.045, 0.05, 1.0, '', 1.0)
-        plot.DrawTitle(pads[0], lumi, 3)
+        #plot.DrawCMSLogo(pads[0], 'CMS', extra, 11, 0.07, 0.05, 1.0, '', 1.0)
+        plot.DrawCMSLogo(pads[0], 'CMS', extra, 0, 0.07, -0.0, 2.0, '', 0.85, relExtraDX=0.05)
+        plot.DrawTitle(pads[0], lumi, 3, textSize=0.6)
     else:
-        plot.DrawCMSLogo(pads[0], 'CMS', '', 0, 0.07, -0.0, 2.0, '', 0.6)
+        plot.DrawCMSLogo(pads[0], 'CMS', extra, 0, 0.07, -0.0, 2.0, '', 0.6, relExtraDX=0.005)
         DrawTitleUnrolled(pads[0], lumi, 3, scale=0.7)
     
     #Add ratio plot if required
     new_ratio=False
     if not new_ratio: 
       axish[1].GetYaxis().SetTitle("Obs./Exp.")
-      axish[1].GetYaxis().SetTitleOffset(0.5)
+      #axish[1].GetYaxis().SetTitleOffset(0.5)
     if args.ratio and not soverb_plot and not fractions:
         if new_ratio: bkghist = bkgonlyhist.Clone() # may what this option even without new_ratio
         ratio_bkghist = plot.MakeRatioHist(bkghist,bkghist,True,False)
@@ -1312,7 +1331,7 @@ def main(args):
             for i,bin_ in enumerate(x_bins):
                 # print i,bin_
                 if i < Nxbins:
-                    extra_axis = ROOT.TGaxis(i,-0.1,i+1,-0.1,float(x_bins[i]),float(x_bins[i+1]),1,"NS")
+                    extra_axis = ROOT.TGaxis(i,-0.05,i+1,-0.05,float(x_bins[i]),float(x_bins[i+1]),1,"NS")
                     extra_axes.append(extra_axis)
             for axis in extra_axes:
                 axis.SetLabelSize(0.02)
@@ -1325,15 +1344,25 @@ def main(args):
             # since the middle tick labels are being drawn twice and look bolder 
             # without this fix
             # Also useful to add label to the full axis
-            extra_axis = ROOT.TGaxis(0,-0.1,Nxbins,-0.1,float(x_bins[0]),float(x_bins[-1]),1,"NS")
+            extra_axis = ROOT.TGaxis(0,-0.05,Nxbins,-0.05,float(x_bins[0]),float(x_bins[-1]),1,"NS")
             # extra_axis.SetTitle("{}".format(re.split(",|\[|\]", bin_labels[0])[1]))
             extra_axis.SetTitle("m_{#tau#tau} (GeV)") # use same svfit mass label for each channel now
             extra_axis.SetTickSize(0.08)
             extra_axis.SetLabelSize(0.02)
             extra_axis.SetLabelFont(42)
-            extra_axis.SetTitleSize(0.045)
             extra_axis.SetTitleFont(42)
             extra_axis.SetTitleOffset(0.9)
+
+#            extra_axis = ROOT.TGaxis(0,-0.5*scale,Nxbins,-0.5*scale,-3.2,3.2,304,"NS")
+#            extra_axis.SetLabelSize(0.03)
+#            extra_axis.SetLabelFont(42)
+#            extra_axis.SetMaxDigits(2)
+#            extra_axis.SetTitle("#Delta#phi_{jj}")
+#            extra_axis.SetTitleFont(42)
+#            extra_axis.SetTitleSize(0.035)
+#            extra_axis.SetTitleOffset(1.1)
+#            extra_axis.SetTickSize(0.08)
+
             extra_axis.Draw()
 
     pads[0].cd()

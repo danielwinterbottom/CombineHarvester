@@ -28,7 +28,7 @@ namespace ch {
         //
         
         
-        std::vector<std::string> sig_procs = {"ggH_htt","qqH_htt","qqH_htt125","WH_htt","WH_htt125","ZH_htt","ZH_htt125","reweighted_ggH_htt_0PM", "reweighted_ggH_htt_0M", "reweighted_ggH_htt_0Mf05ph0","qqH_sm_htt", "qqH_ps_htt", "qqH_mm_htt","vbf125_powheg","qqH_sm_htt125", "qqH_ps_htt", "qqH_mm_htt","wh125_powheg","zh125_powheg","WH_sm_htt125","ZH_sm_htt125", "WH_ps_htt","ZH_ps_htt","WH_mm_htt","ZH_mm_htt","WH_sm_htt","ZH_sm_htt","WH_ps_htt","ZH_ps_htt","WH_mm_htt","ZH_mm_htt", "ggHsm_jhu_htt","ggHps_jhu_htt","ggHmm_jhu_htt","ggH_ph_htt" ,"qqH_sm_htt", "qqH_ps_htt", "qqH_mm_htt", "ggH_sm_htt", "ggH_ps_htt", "ggH_mm_htt"};
+        std::vector<std::string> sig_procs = {"ggH_htt","qqH_htt","qqH_htt125","WH_htt","WH_htt125","ZH_htt","ZH_htt125","reweighted_ggH_htt_0PM", "reweighted_ggH_htt_0M", "reweighted_ggH_htt_0Mf05ph0","qqH_sm_htt", "qqH_ps_htt", "qqH_mm_htt","vbf125_powheg","qqH_sm_htt125", "qqH_ps_htt", "qqH_mm_htt","wh125_powheg","zh125_powheg","WH_sm_htt125","ZH_sm_htt125", "WH_ps_htt","ZH_ps_htt","WH_mm_htt","ZH_mm_htt","WH_sm_htt","ZH_sm_htt","WH_ps_htt","ZH_ps_htt","WH_mm_htt","ZH_mm_htt", "ggHsm_jhu_htt","ggHps_jhu_htt","ggHmm_jhu_htt","ggH_ph_htt" ,"qqH_sm_htt", "qqH_ps_htt", "qqH_mm_htt", "ggH_sm_htt", "ggH_ps_htt", "ggH_mm_htt","WH_mm_htt125","ZH_mm_htt125","qqH_mm_htt125","WH_ps_htt125","ZH_ps_htt125","qqH_ps_htt125"};
         std::vector<std::string> ggH_sig_procs = {"ggH_htt","reweighted_ggH_htt_0PM", "reweighted_ggH_htt_0M", "reweighted_ggH_htt_0Mf05ph0","ggHsm_jhu_htt","ggHps_jhu_htt","ggHmm_jhu_htt","ggH_ph_htt","ggH_sm_htt", "ggH_ps_htt", "ggH_mm_htt"};
         std::vector<std::string> qqH_sig_procs = {"qqH_htt","qqH_htt125","qqH_sm_htt", "qqH_ps_htt", "qqH_mm_htt", "vbf125_powheg","qqH_sm_htt125", "qqH_ps_htt125", "qqH_mm_htt125"};
         
@@ -855,13 +855,13 @@ namespace ch {
         
         cb.cp().process(JoinStr({ggH_sig_procs, {"ggH_hww125"}})).AddSyst(cb,"QCDscale_ggH", "lnN", SystMap<>::init(1.039));
         cb.cp().process(JoinStr({qqH_sig_procs, {"qqH_hww125"}})).AddSyst(cb,"QCDscale_qqH", "lnN", SystMap<>::init(1.004));
-        cb.cp().process({"wh125_powheg","WH_htt","WH_sm_htt125","WH_ps_htt","WH_mm_htt","WH_sm_htt","WH_ps_htt","WH_mm_htt"}).AddSyst(cb,"QCDscale_qqH", "lnN", SystMap<>::init(1.007));
-        cb.cp().process({"wh125_powheg","ZH_htt","ZH_sm_htt125","ZH_ps_htt","ZH_mm_htt","ZH_sm_htt","ZH_ps_htt","ZH_mm_htt"}).AddSyst(cb,"QCDscale_qqH", "lnN", SystMap<>::init(1.038));
+        cb.cp().process({"wh125_powheg","WH_htt","WH_sm_htt125","WH_ps_htt","WH_mm_htt","WH_sm_htt","WH_ps_htt","WH_mm_htt","WH_ps_htt125","WH_mm_htt125"}).AddSyst(cb,"QCDscale_qqH", "lnN", SystMap<>::init(1.007));
+        cb.cp().process({"wh125_powheg","ZH_htt","ZH_sm_htt125","ZH_ps_htt","ZH_mm_htt","ZH_sm_htt","ZH_ps_htt","ZH_mm_htt","ZH_ps_htt125","ZH_mm_htt125"}).AddSyst(cb,"QCDscale_qqH", "lnN", SystMap<>::init(1.038));
         
         cb.cp().process(JoinStr({ggH_sig_procs, {"ggH_hww125"}})).AddSyst(cb,"pdf_Higgs_gg", "lnN", SystMap<>::init(1.032));
         cb.cp().process(JoinStr({qqH_sig_procs, {"qqH_hww125"}})).AddSyst(cb,"pdf_Higgs_qqbar", "lnN", SystMap<>::init(1.021));
-        cb.cp().process({"wh125_powheg","WH_htt","WH_sm_htt125","WH_ps_htt","WH_mm_htt","WH_sm_htt","WH_ps_htt","WH_mm_htt"}).AddSyst(cb,"pdf_Higgs_qqbar", "lnN", SystMap<>::init(1.019));
-        cb.cp().process({"zh125_powheg","ZH_htt""ZH_sm_htt125","ZH_ps_htt","ZH_mm_htt","ZH_sm_htt","ZH_ps_htt","ZH_mm_htt"}).AddSyst(cb,"pdf_Higgs_qqbar", "lnN", SystMap<>::init(1.016));
+        cb.cp().process({"wh125_powheg","WH_htt","WH_sm_htt125","WH_ps_htt","WH_mm_htt","WH_sm_htt","WH_ps_htt","WH_mm_htt","WH_ps_htt125","WH_mm_htt125"}).AddSyst(cb,"pdf_Higgs_qqbar", "lnN", SystMap<>::init(1.019));
+        cb.cp().process({"zh125_powheg","ZH_htt""ZH_sm_htt125","ZH_ps_htt","ZH_mm_htt","ZH_sm_htt","ZH_ps_htt","ZH_mm_htt","ZH_ps_htt125","ZH_mm_htt125"}).AddSyst(cb,"pdf_Higgs_qqbar", "lnN", SystMap<>::init(1.016));
         
         // jet bin migration uncertainties from: https://arxiv.org/pdf/1610.07922.pdf#subsection.1.4.2.5 (Table 20)
         // For boosted category this is not exclusivly 1 jet events since events with > 1 jets and mjj<300 enter also. So take weighted average of Njets=1 and Njets>=1 uncertainties i.e sigma(boosted) = sigma(njets=1)*(# Njets=1 && boosted)/(# boosted) + sigma(njets>=1)*(#Njets>1 && boosted)/(# boosted)

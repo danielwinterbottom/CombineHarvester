@@ -367,6 +367,7 @@ int main(int argc, char* argv[]) {
       // Fill the total sig. and total bkg. hists
       auto cmb_bkgs = cmb.cp().backgrounds();
       auto cmb_sigs = cmb.cp().signals();
+      auto cmb_vbf = cmb.cp().signals().process({"qqH_sm_htt", "qqH_ps_htt", "qqH_mm_htt", "WH_sm_htt", "WH_ps_htt", "WH_mm_htt","ZH_sm_htt", "ZH_ps_htt", "ZH_mm_htt"});
       std::cout << ">> Doing postfit: TotalBkg" << std::endl;
       post_shapes_tot["TotalBkg"] =
           sampling ? cmb_bkgs.GetShapeWithUncertainty(res, samples)
@@ -379,6 +380,11 @@ int main(int argc, char* argv[]) {
       post_shapes_tot["TotalProcs"] =
           sampling ? cmb.cp().GetShapeWithUncertainty(res, samples)
                    : cmb.cp().GetShapeWithUncertainty();
+
+        std::cout << ">> Doing postfit: qqH" << std::endl;
+        post_shapes_tot["qqH"] =
+            sampling ? cmb_vbf.cp().GetShapeWithUncertainty(res, samples)
+                     : cmb_vbf.cp().GetShapeWithUncertainty();
 
       if (datacard != "") {
         TH1F ref = cmb_card.cp().GetObservedShape();

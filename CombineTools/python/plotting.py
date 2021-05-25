@@ -1378,7 +1378,7 @@ def StandardAxes(xaxis, yaxis, var, units):
         yaxis.SetTitle("Events / " + w_label + " " + units)
 
 
-def DrawCMSLogo(pad, cmsText, extraText, iPosX, relPosX, relPosY, relExtraDY, extraText2='', cmsTextSize=0.8):
+def DrawCMSLogo(pad, cmsText, extraText, iPosX, relPosX, relPosY, relExtraDY, extraText2='', cmsTextSize=0.8,relExtraDX=0.0):
     """Blah
 
     Args:
@@ -1473,13 +1473,13 @@ def DrawCMSLogo(pad, cmsText, extraText, iPosX, relPosX, relPosY, relExtraDY, ex
             latex.SetTextAlign(align_)
             latex.SetTextSize(extraTextSize * t * pad_ratio)
             latex.DrawLatex(
-                posX_, posY_ - relExtraDY * cmsTextSize * t, extraText)
+                posX_- relExtraDX, posY_ - relExtraDY * cmsTextSize * t, extraText)
             if writeExtraText2:
                 latex.DrawLatex(
                     posX_, posY_ - 1.8 * relExtraDY * cmsTextSize * t, extraText2)
     elif writeExtraText:
         if iPosX == 0:
-            posX_ = l + relPosX * (1 - l - r)
+            posX_ = l + relPosX * (1 - l - r) + relExtraDX
             posY_ = 1 - t + lumiTextOffset * t
         latex.SetTextFont(extraTextFont)
         latex.SetTextSize(extraTextSize * t * pad_ratio)

@@ -1,6 +1,7 @@
 import ROOT as R
 import math
 COL_STORE = []
+import CombineHarvester.CombineTools.plotting as plot
 
 def SetTDRStyle():
     """Sets the PubComm recommended style
@@ -537,16 +538,27 @@ def propoganda_plot(sm,ps,best,bkg,data,plot_name):
 
     c1.SaveAs(plot_name+'.pdf')
 
-def propoganda_plot_phicp(sm,ps,best,bkg,data,plot_name,mode=1):
+def propoganda_plot_phicp(sm,ps,best,bkg,data,plot_name,mode=1,vbf=None):
 
-    title='#tau_{h}#tau_{h} + #mu_{}#tau_{h} + e_{}#tau_{h} + e_{}#mu_{}'
+    #title='#tau_{h}#tau_{h} + #mu_{}#tau_{h} + e_{}#tau_{h} + e_{}#mu_{}'
+    title=''
+
+#for c in cmb loosemjj_lowboost loosemjj_boosted tightmjj_lowboost tightmjj_boosted lowboost boosted loosemjj tightmjj; do
+    if mode == 2: title = 'VBF Loose-m_{jj}'
+    if mode == 3: title = 'VBF Loose-m_{jj} boosted'
+    if mode == 4: title = 'VBF Tight-m_{jj}'
+    if mode == 5: title = 'VBF Tight-m_{jj} boosted'
+    if mode == 6: title = 'VBF p_{T}^{#tau#tau} < 150 GeV'
+    if mode == 7: title = 'VBF p_{T}^{#tau#tau} > 150 GeV'
+    if mode == 8: title = 'VBF m_{jj} < 500 GeV'
+    if mode == 9: title = 'VBF m_{jj} > 500 GeV'
 
     latex = R.TLatex()
     latex.SetNDC()
     latex.SetTextAngle(0)
     latex.SetTextColor(R.kBlack)
     latex.SetTextFont(42)
-    latex.SetTextSize(0.06)
+    latex.SetTextSize(0.05)
 
 
     def ConvertToEqualBins(h):
@@ -567,7 +579,9 @@ def propoganda_plot_phicp(sm,ps,best,bkg,data,plot_name,mode=1):
 
     R.gROOT.SetBatch(R.kTRUE)
     R.TH1.AddDirectory(False)
-    ModTDRStyle(r=0.04, l=0.14)
+    #ModTDRStyle(r=0.04, l=0.14)
+    #ModTDRStyle(r=0.25, l=0.14)
+    plot.ModTDRStyle(r=0.04, l=0.14,height=700,width=400,t=0.11,b=0.2)
 
     pads=OnePad()
     pads[0].cd()
@@ -578,6 +592,7 @@ def propoganda_plot_phicp(sm,ps,best,bkg,data,plot_name,mode=1):
     data.SetLineColor(1)
     miny=0.
     maxe=0.
+    maxy=0.
     for i in range(1,bkg.GetNbinsX()+1):
      e = bkg.GetBinError(i)
      if e> maxe: maxe=e
@@ -585,11 +600,15 @@ def propoganda_plot_phicp(sm,ps,best,bkg,data,plot_name,mode=1):
     c=0.1
     for i in range(1,data.GetNbinsX()+1): 
       x=data.GetBinContent(i) - c*data.GetBinError(i)
+      y=data.GetBinContent(i) + data.GetBinError(i)*1.2
       if x < miny: miny=x 
+      if y > maxy: maxy=y 
     if miny<data.GetMinimum(): data.SetMinimum(miny)
     #if mode in [5]: data.SetMaximum(data.GetMaximum()*1.8)
     #if mode in [6]: data.SetMaximum(data.GetMaximum()*2.0)
-    if mode ==1 or True: data.SetMaximum(data.GetMaximum()*1.4)
+    if mode ==1 or True: 
+      data.SetMaximum(maxy+0.1*(maxy-miny))
+    print maxy
     data.Draw("E")
 
     #col_sm = R.TColor().GetColor('#253494') 
@@ -607,8 +626,16 @@ def propoganda_plot_phicp(sm,ps,best,bkg,data,plot_name,mode=1):
     ps.SetMarkerSize(0)
     ps.SetFillStyle(0)
 
+    if vbf is not None:
+      vbf.SetLineWidth(3)
+      vbf.SetLineStyle(3)
+      vbf.SetLineColor(R.kMagenta)
+      vbf.SetMarkerSize(0)
+      vbf.SetFillStyle(0)
+
     hs.Add(ps)
     hs.Add(sm)
+    if vbf is not None: hs.Add(vbf)
     #hs.Add(best)
 
     hs.Draw("nostack hist same")
@@ -627,19 +654,24 @@ def propoganda_plot_phicp(sm,ps,best,bkg,data,plot_name,mode=1):
     DrawTitle(pads[0], '137 fb^{-1} (13 TeV)', 3)
 
     #Setup legend
-    legend = PositionedLegend(0.25,0.15,1,0.02,0.0)
+    legend = PositionedLegend(0.78,0.05,1,0.02,0.02)
     legend.SetTextFont(42)
-    legend.SetTextSize(0.05)
+    if vbf is not None: legend.SetNColumns(5)
+    else: legend.SetNColumns(4)
+    legend.SetTextSize(0.032)
     legend.SetFillColor(0)
     legend.SetFillStyle(0)
 
     legend.AddEntry(data,'Obs. #minus Bkg.',"lep")
     legend.AddEntry(bkg,'Bkg. uncert.',"f")
+    legend.AddEntry(sm,'ggH (f_{a3}^{ggH} = 0)',"l")
+    legend.AddEntry(ps,'ggH (f_{a3}^{ggH} = 1)',"l")
+    if vbf is not None: legend.AddEntry(vbf,'qqH (f_{a3} = 0)',"l")
     #legend.AddEntry(sm,'#phi_{#tau#tau} = 0^{#circ}',"l")
     #legend.AddEntry(ps,'#phi_{#tau#tau} = 90^{#circ}',"l")
     legend.Draw("same")
 
-    legend2 = PositionedLegend(0.20,0.15,1,0.02,0.15)
+    legend2 = PositionedLegend(0.25,0.15,3,-0.25,0.4)
     legend2.SetTextFont(42)
     legend2.SetTextSize(0.05)
     legend2.SetFillColor(0)
@@ -649,11 +681,16 @@ def propoganda_plot_phicp(sm,ps,best,bkg,data,plot_name,mode=1):
     #legend2.AddEntry(bkg,'Bkg. uncert.',"f")
     legend2.AddEntry(sm,'f_{a3}^{ggH} = 0',"l")
     legend2.AddEntry(ps,'f_{a3}^{ggH} = 1',"l")
-    legend2.Draw("same")
+    #legend2.Draw("same")
+
+    line = R.TLine()
+    line.SetLineWidth(1)
+    line.SetLineStyle(2)
+    line.SetLineColor(1)
+    line.DrawLine(-3.2,0.,3.2,0.)
 
 
-
-    #latex.DrawLatex(0.4, 0.95, title)
-    #DrawTitle(pads[0], title, 2)
+    if mode>1: latex.DrawLatex(0.17, 0.78, title)
+    #if mode > 1: DrawTitle(pads[0], title, 2)
 
     c1.SaveAs(plot_name+'.pdf')

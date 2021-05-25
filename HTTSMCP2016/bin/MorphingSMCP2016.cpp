@@ -1111,6 +1111,7 @@ int main(int argc, char** argv) {
     sig_procs["qqH"] = {"qqH_htt125","WH_htt125","ZH_htt125"};
     if(sync) sig_procs["qqH"] = {"vbf125_powheg","wh125_powheg","zh125_powheg"};
 
+    //sig_procs["qqH_BSM"] = {"qqH_sm_htt125","qqH_mm_htt125","qqH_ps_htt125","WH_sm_htt125","WH_ps_htt125","WH_mm_htt125","ZH_sm_htt125","ZH_ps_htt125","ZH_mm_htt125"};
     sig_procs["qqH_BSM"] = {"qqH_sm_htt","qqH_mm_htt","qqH_ps_htt","WH_sm_htt","WH_ps_htt","WH_mm_htt","ZH_sm_htt","ZH_ps_htt","ZH_mm_htt"};
     
     sig_procs["ggHCP"] = {"ggH_sm_htt", "ggH_mm_htt", "ggH_ps_htt"};
@@ -1181,6 +1182,7 @@ int main(int argc, char** argv) {
                                                                       input_dir[chn]+ extra + "htt_"+chn+".inputs-sm-13TeV"+postfix+".root",
                                                                       "$BIN/$PROCESS$MASS",
                                                                       "$BIN/$PROCESS$MASS_$SYSTEMATIC");
+
             }
             cb.cp().channel({chn+"_"+year}).process(sig_procs["ggH"]).ExtractShapes(
                                                                     input_dir[chn] + extra +  "htt_"+chn+".inputs-sm-13TeV"+postfix+".root",
@@ -1603,8 +1605,8 @@ int main(int argc, char** argv) {
       .SetAddThreshold(0.)
       .SetMergeThreshold(0.5)
       .SetFixNorm(false);
-      bbb.MergeBinErrors(cb.cp().backgrounds());
-      bbb.AddBinByBin(cb.cp().backgrounds(), cb);
+      bbb.MergeBinErrors(cb.cp().backgrounds().process(sig_procs["qqH_BSM"],false));
+      bbb.AddBinByBin(cb.cp().backgrounds().process(sig_procs["qqH_BSM"],false), cb);
   
       // add bbb uncertainties for the signal but only if uncertainties are > 5% and only for categories with significant amount of signal events to reduce the total number of bbb uncertainties
       // neglect bbb uncerts on signal since these are subdominant to background uncerts (would give a 0.5% increase in the total bbb even in the most extream case)
@@ -1950,13 +1952,15 @@ int main(int argc, char** argv) {
       if (fitresult_file.length()) { 
         muggH = cb.GetParameter("muggH")->val();
       }
-      TH1F bkg = cmb_bin.cp().backgrounds().GetShape();
+      TH1F bkg = cmb_bin.cp().backgrounds().process(sig_procs["qqH_BSM"],false).GetShape();
 
       TH1F sm_sig = cmb_bin.cp().signals().process({"ggH_sm_htt"}).GetShape();
       TH1F ps_sig = cmb_bin.cp().signals().process({"ggH_ps_htt"}).GetShape();
 
       sm_sig.Scale(muggH);
       ps_sig.Scale(muggH);
+
+      std::cout << " integral= " <<  sm_sig.Integral() << "    " << ps_sig.Integral() << std::endl;
 
       std::map<int, double> wt_mapping;
       double s_sb=0.;
@@ -1971,7 +1975,7 @@ int main(int argc, char** argv) {
           double A_tot=0.;
           for(int i=b; i<b+nxbins; ++i) {
             double b_sm = sm_sig.GetBinContent(i);
-            double b_ps = ps_sig.GetBinContent(i);
+            double b_ps = ps_sig.GetBinContent(i); 
             A_tot += std::fabs(b_sm-b_ps)/(b_sm+b_ps);
           }
           A_ave = A_tot/nxbins;
