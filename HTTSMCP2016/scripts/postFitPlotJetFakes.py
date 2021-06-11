@@ -172,7 +172,7 @@ def parse_arguments():
                     help='Full path to fit result for making post fit plots')
     parser.add_argument('--model_dep',action='store_true',
                     default=False,help='Make plots for full model dependent signal h,H,A')
-    parser.add_argument('--mode',default='prefit',
+    parser.add_argument('--mode',default='postfit',
                     help='Prefit or postfit')
     #Blinding options
     parser.add_argument('--manual_blind', action='store_true',
@@ -250,15 +250,15 @@ def main(args):
     lumi = args.lumi
     era = args.file_dir.split("_")[2]
     if args.combined_yrs:
-        lumi = "137 fb^{-1} (13 TeV)"
+        lumi = "138 fb^{-1} (13 TeV)"
     elif era == "2016":
-        lumi = "35.9 fb^{-1} (13 TeV)"
+        lumi = "36.3 fb^{-1} (13 TeV)"
     elif era == "2017":
-        lumi = "41.9 fb^{-1} (13 TeV)"
+        lumi = "41.5 fb^{-1} (13 TeV)"
     elif era == "2018":
         lumi = "59.7 fb^{-1} (13 TeV)"
     elif era == "all":
-        lumi = "137.2 fb^{-1} (13 TeV)"
+        lumi = "138 fb^{-1} (13 TeV)"
 
     plot.ModTDRStyle(width=1800, height=700, r=0.4, l=0.16, t=0.12,b=0.15)
     ROOT.TGaxis.SetExponentOffset(-0.06, 0.01, "y")
@@ -861,7 +861,8 @@ def main(args):
                 if not uniform:
                     h = getHistogram(histo_file,k, file_dir,mode, logx=log_x)[0]
                     if args.combined_yrs: 
-                      for x in other_years: h.Add(getHistogram(histo_file,k, file_dir.replace(era,x),mode, logx=log_x)[0])
+                      for x in other_years: 
+                        if getHistogram(histo_file,k, file_dir.replace(era,x),mode, logx=log_x) is not None: h.Add(getHistogram(histo_file,k, file_dir.replace(era,x),mode, logx=log_x)[0])
                 else :
                     htemp = getHistogram(histo_file,k,file_dir, mode,logx=log_x)[0]
                     if args.combined_yrs: 
@@ -1194,8 +1195,6 @@ def main(args):
     #CMS and lumi labels
     plot.FixTopRange(pads[0], plot.GetPadYMax(pads[0]), extra_pad if extra_pad>0 else 0.15)
     extra=''
-    print '!!!!!!'
-    print file_dir
     if '_mt_' not in file_dir or '_tt_' not in file_dir or not (('_mt_' in file_dir or '_tt_' in file_dir) and '_6_' in file_dir):
       extra='Supplementary'
     if 'htt_tt_2018_6_' in file_dir or 'htt_mt_2018_6_' in file_dir: extra=''
@@ -1397,8 +1396,9 @@ def main(args):
     latex_bin.SetTextColor(ROOT.kBlack)
     latex_bin.SetTextFont(42)
     latex_bin.SetTextSize(0.035)
-    if len(y_bin_labels) > 6: 
+    if len(y_bin_labels) > 6 or ('_2_' in file_dir and len(y_bin_labels)>5):
         latex_bin.SetTextSize(0.027)
+        print '!!!!!!', y_bin_labels
 
     for i in range(0, len(y_bin_labels)):
         if i < len(y_bin_labels)-1:

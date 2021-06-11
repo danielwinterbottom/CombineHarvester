@@ -44,6 +44,12 @@ To scan alpha:
 
 combineTool.py -m 125 -M MultiDimFit --setParameters alpha=0 --setParameterRanges alpha=-90,90  --redefineSignalPOIs alpha  -d output/cp071020/cmb/125/ws.root --algo grid  --there -n .alpha --floatOtherPOIs 1 --points=21 --alignEdges 1 -t -1 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,Migrad,0:1 --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10
 
+# latest working command for obs:
+
+combineTool.py -m 125 -M MultiDimFit --setParameters alpha=0 --setParameterRanges alpha=-90,90:muggH=0,2:muV=0,2  --redefineSignalPOIs alpha  -d output/cp040621_newlumi/cmb/125/ws.root --algo grid  --there -n .alpha.obs.v3 --floatOtherPOIs 1 --points=201 --alignEdges 1 --cminDefaultMinimizerTolerance 0.1 --cminDefaultMinimizerStrategy 1 --cminFallbackAlgo Minuit2,Migrad,0:0.1   --cminFallbackAlgo Minuit2,Migrad,0:1  --cminFallbackAlgo Minuit2,Migrad,0:2 --cminFallbackAlgo Minuit2,Migrad,0:4 --cminFallbackAlgo Minuit2,Migrad,0:10 --job-mode 'SGE' --prefix-file ic --sub-opts "-q hep.q -l h_rt=0:180:0" --split-points 1 --task-name obs.v4
+
+# for 2D scan
+
 (Note we may want to change the --cminDefaultMinimizerStrategy 0 at some point but the fit does not always converget for --cminDefaultMinimizerStrategy 1 - could adjust the number of function calls and/or tolerance to get this to work)
 
 To free all systematics add '--freezeParameters allConstrainedNuisances'
@@ -163,7 +169,13 @@ Plot can be produced using the postFitPlotJetFakes.py script, e.g:
 
 # latest example for combined years plot:
 
-  python scripts/postFitPlotJetFakes.py --mode postfit --file_dir htt_mt_2018_6_ -f shapes_unblinding_v2/shapes_unblinding_mt_6.root --file_alt=shapes_unblinding_v2/shapes_unblinding_mt_6_ps.root --ratio  --proper_errors_uniform --log_y --combined_yr
+# bins 1 - 2 :
+
+for i in 1 2; do for c in em et mt tt; do python scripts/postFitPlotJetFakes.py --mode postfit --file_dir htt_${c}_2018_${i}_ -f shapes_unblinding_v3/shapes_unblinding_${c}_${i}.root --ratio --proper_errors_uniform --log_y --combined_yr; done; done
+
+# bins 3-6:
+
+ for i in 3 4 5 6; do for c in em et mt tt; do python scripts/postFitPlotJetFakes.py --mode postfit --file_dir htt_${c}_2018_${i}_ -f shapes_unblinding_v3/shapes_unblinding_${c}_${i}.root --file_alt=shapes_unblinding_v3/shapes_unblinding_${c}_${i}_ps.root --ratio  --proper_errors_uniform --log_y --combined_yr; done; done
 
 Run with (some) systematics frozen
 Do fit and store workspace

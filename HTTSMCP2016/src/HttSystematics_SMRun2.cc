@@ -62,45 +62,23 @@ namespace ch {
 
 
         cb.cp().process(JoinStr({sig_procs, all_mc_bkgs})).channel({"tt","tt_2016","et","et_2016","mt","mt_2016","em","em_2016","ttbar","ttbar_2016"}).AddSyst(cb,
-                                            "lumi_13TeV_2016", "lnN", SystMap<>::init(1.022));
+                                            "lumi_13TeV_2016", "lnN", SystMap<>::init(1.010));
         cb.cp().process(JoinStr({sig_procs, all_mc_bkgs})).channel({"tt_2017","mt_2017","et_2017","em_2017","ttbar_2017"}).AddSyst(cb,
                                             "lumi_13TeV_2017", "lnN", SystMap<>::init(1.020));
         cb.cp().process(JoinStr({sig_procs, all_mc_bkgs})).channel({"tt_2018","mt_2018","et_2018","em_2018","ttbar_2018"}).AddSyst(cb,
                                             "lumi_13TeV_2018", "lnN", SystMap<>::init(1.015));
 
-
         cb.cp().process(JoinStr({sig_procs, all_mc_bkgs})).channel({"tt","tt_2016","et","et_2016","mt","mt_2016","em","em_2016","ttbar","ttbar_2016"}).AddSyst(cb,
-                                            "lumi_13TeV_XY", "lnN", SystMap<>::init(1.009));
+                                            "lumi_13TeV", "lnN", SystMap<>::init(1.006));
         cb.cp().process(JoinStr({sig_procs, all_mc_bkgs})).channel({"tt_2017","mt_2017","et_2017","em_2017","ttbar_2017"}).AddSyst(cb,
-                                            "lumi_13TeV_XY", "lnN", SystMap<>::init(1.008));
+                                            "lumi_13TeV", "lnN", SystMap<>::init(1.009));
         cb.cp().process(JoinStr({sig_procs, all_mc_bkgs})).channel({"tt_2018","mt_2018","et_2018","em_2018","ttbar_2018"}).AddSyst(cb,
-                                            "lumi_13TeV_XY", "lnN", SystMap<>::init(1.020));
+                                            "lumi_13TeV", "lnN", SystMap<>::init(1.020));
 
         cb.cp().process(JoinStr({sig_procs, all_mc_bkgs})).channel({"tt_2017","mt_2017","et_2017","em_2017","ttbar_2017"}).AddSyst(cb,
-                                            "lumi_13TeV_LS", "lnN", SystMap<>::init(1.003));
+                                            "lumi_13TeV_2017And2018", "lnN", SystMap<>::init(1.006));
         cb.cp().process(JoinStr({sig_procs, all_mc_bkgs})).channel({"tt_2018","mt_2018","et_2018","em_2018","ttbar_2018"}).AddSyst(cb,
-                                            "lumi_13TeV_LS", "lnN", SystMap<>::init(1.002));
-
-        cb.cp().process(JoinStr({sig_procs, all_mc_bkgs})).channel({"tt","tt_2016","et","et_2016","mt","mt_2016","em","em_2016","ttbar","ttbar_2016"}).AddSyst(cb,
-                                            "lumi_13TeV_BBD", "lnN", SystMap<>::init(1.004));
-        cb.cp().process(JoinStr({sig_procs, all_mc_bkgs})).channel({"tt_2017","mt_2017","et_2017","em_2017","ttbar_2017"}).AddSyst(cb,
-                                            "lumi_13TeV_BBD", "lnN", SystMap<>::init(1.004));
-
-        cb.cp().process(JoinStr({sig_procs, all_mc_bkgs})).channel({"tt","tt_2016","et","et_2016","mt","mt_2016","em","em_2016","ttbar","ttbar_2016"}).AddSyst(cb,
-                                            "lumi_13TeV_DB", "lnN", SystMap<>::init(1.005));
-        cb.cp().process(JoinStr({sig_procs, all_mc_bkgs})).channel({"tt_2017","mt_2017","et_2017","em_2017","ttbar_2017"}).AddSyst(cb,
-                                            "lumi_13TeV_DB", "lnN", SystMap<>::init(1.005));
-
-        cb.cp().process(JoinStr({sig_procs, all_mc_bkgs})).channel({"tt_2017","mt_2017","et_2017","em_2017","ttbar_2017"}).AddSyst(cb,
-                                            "lumi_13TeV_BCC", "lnN", SystMap<>::init(1.003));
-        cb.cp().process(JoinStr({sig_procs, all_mc_bkgs})).channel({"tt_2018","mt_2018","et_2018","em_2018","ttbar_2018"}).AddSyst(cb,
-                                            "lumi_13TeV_BCC", "lnN", SystMap<>::init(1.002));
-
-        cb.cp().process(JoinStr({sig_procs, all_mc_bkgs})).channel({"tt","tt_2016","et","et_2016","mt","mt_2016","em","em_2016","ttbar","ttbar_2016"}).AddSyst(cb,
-                                            "lumi_13TeV_GS", "lnN", SystMap<>::init(1.004));
-        cb.cp().process(JoinStr({sig_procs, all_mc_bkgs})).channel({"tt_2017","mt_2017","et_2017","em_2017","ttbar_2017"}).AddSyst(cb,
-                                            "lumi_13TeV_GS", "lnN", SystMap<>::init(1.001));
-
+                                            "lumi_13TeV_2017And2018", "lnN", SystMap<>::init(1.002));
 
         //##############################################################################
         //  trigger   
